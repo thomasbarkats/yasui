@@ -1,0 +1,8 @@
+/debug
+/node_modules
+/.git
+/.vscode
+/dist
+/lib
+.env
+package-lock.json
