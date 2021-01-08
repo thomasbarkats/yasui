@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 import chalk from 'chalk';
 
 
@@ -34,7 +32,7 @@ export abstract class LoggerService {
     private static getText(message: string, src?: string, time?: number): string {
         const text = `${LoggerService.getDate()} ${chalk.bold(src ? src : 'app')}: ${message}`;
         if (time !== undefined) {
-            return text + chalk.gray(` +${time.toString()}ms`);
+            return text + chalk.gray(`  +${time.toString()}ms`);
         }
         return text;
     }

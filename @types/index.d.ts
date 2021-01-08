@@ -6,8 +6,14 @@ import { Server } from 'http';
 
 export as namespace yasui;
 
-import { YasuiConfig } from './base.config';
-export { YasuiConfig };
+export interface YasuiConfig {
+    controllers?: any[],
+    middlewares?: express.RequestHandler[],
+    environment?: string;
+    port?: number;
+    debug?: boolean,
+    apiKey?: string,
+}
 
 export * from './decorators';
 export * from './services';

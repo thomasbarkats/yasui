@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { RequestHandler } from 'express';
 
-export function Controller(path: string, ...middlewares: any[]): ClassDecorator;
-export function Get(path: string, ...middlewares: any[]): MethodDecorator;
-export function Post(path: string, ...middlewares: any[]): MethodDecorator;
-export function Put(path: string, ...middlewares: any[]): MethodDecorator;
-export function Delete(path: string, ...middlewares: any[]): MethodDecorator;
-export function Patch(path: string, ...middlewares: any[]): MethodDecorator;
+export function Controller(path: string, ...middlewares: RequestHandler[]): ClassDecorator;
+export function Get(path: string, ...middlewares: RequestHandler[]): MethodDecorator;
+export function Post(path: string, ...middlewares: RequestHandler[]): MethodDecorator;
+export function Put(path: string, ...middlewares: RequestHandler[]): MethodDecorator;
+export function Delete(path: string, ...middlewares: RequestHandler[]): MethodDecorator;
+export function Patch(path: string, ...middlewares: RequestHandler[]): MethodDecorator;

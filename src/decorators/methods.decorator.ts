@@ -1,17 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/ban-types */
-
-import { RouteMethods } from '../enums';
+import { RequestHandler } from 'express';
+import { RouteMethods } from '../@types/enums';
 import { IControllerRoute } from '../utils/controller-route.model';
 
 
-// set routes metadata for controller methods
+/** set routes metadata for controller methods */
 function addRoute(
     method: RouteMethods,
     path: string,
-    ...middlewares: any[]
+    ...middlewares: RequestHandler[]
 ): MethodDecorator {
     return function (
+        // eslint-disable-next-line @typescript-eslint/ban-types
         target: Object,
         propertyKey: string | symbol,
         descriptor: PropertyDescriptor
@@ -28,8 +27,8 @@ function addRoute(
 }
 
 
-export const Get = (path: string, ...middlewares: any[]): MethodDecorator => addRoute(RouteMethods.GET, path, ...middlewares);
-export const Post = (path: string, ...middlewares: any[]): MethodDecorator => addRoute(RouteMethods.POST, path, ...middlewares);
-export const Put = (path: string, ...middlewares: any[]): MethodDecorator => addRoute(RouteMethods.PUT, path, ...middlewares);
-export const Delete = (path: string, ...middlewares: any[]): MethodDecorator => addRoute(RouteMethods.DELETE, path, ...middlewares);
-export const Patch = (path: string, ...middlewares: any[]): MethodDecorator => addRoute(RouteMethods.PATCH, path, ...middlewares);
+export const Get = (path: string, ...middlewares: RequestHandler[]): MethodDecorator => addRoute(RouteMethods.GET, path, ...middlewares);
+export const Post = (path: string, ...middlewares: RequestHandler[]): MethodDecorator => addRoute(RouteMethods.POST, path, ...middlewares);
+export const Put = (path: string, ...middlewares: RequestHandler[]): MethodDecorator => addRoute(RouteMethods.PUT, path, ...middlewares);
+export const Delete = (path: string, ...middlewares: RequestHandler[]): MethodDecorator => addRoute(RouteMethods.DELETE, path, ...middlewares);
+export const Patch = (path: string, ...middlewares: RequestHandler[]): MethodDecorator => addRoute(RouteMethods.PATCH, path, ...middlewares);

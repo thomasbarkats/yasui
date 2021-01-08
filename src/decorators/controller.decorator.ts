@@ -1,8 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/ban-types */
-
-import express from 'express';
-import { set, forEach, toUpper } from 'lodash';
+import { RequestHandler, Router } from 'express';
 import chalk from 'chalk';
 import { timeLogger } from '../services';
 import { IControllerRoute } from '../utils/controller-route.model';
@@ -10,38 +6,40 @@ import { IControllerRoute } from '../utils/controller-route.model';
 
 export function Controller(
     path: string,
-    ...middlewares: any[]
+    ...middlewares: RequestHandler[]
 ): ClassDecorator {
+    // eslint-disable-next-line @typescript-eslint/ban-types
     return function (constructor: Function): void {
         // define path property of controller object
         constructor.prototype.path = path;
 
-        constructor.prototype.configureRoutes = (debug = false): express.Router => {
-            const router: express.Router = express.Router();
+        constructor.prototype.configureRoutes = (debug = false): Router => {
+            const router: Router = Router();
 
-            // enrich query with controller infos for logs and errors handling
+            /** enrich query with controller infos for logs and errors handling */
             router.use((req, res, next) => {
-                set(req, 'source', constructor.name);
-                set(req, 'logger', timeLogger.start());
+                req.source = constructor.name;
+                req.logger = timeLogger.start();
                 next();
             });
 
-            // use other optional middlewares for all controller routes
-            forEach(middlewares, middleware => {
+            /** use other optional middlewares for all controller routes */
+            for (const middleware of middlewares) {
                 router.use(middleware);
-            });
+            }
 
-            // add routes from object metadata
-            const routes: IControllerRoute[] = Reflect.getMetadata('ROUTES', constructor.prototype);
+            /** add routes from object metadata */
+            const routes: IControllerRoute[] = Reflect.getMetadata('ROUTES', constructor.prototype) || [];
             const timelog = new timeLogger();
-            forEach(routes, route => {
+
+            for (const route of routes) {
                 debug && timelog.debug(
-                    `stack route ${chalk.italic(`${toUpper(route.method)} ${route.path}`)}`,
+                    `stack route ${chalk.italic(`${route.method.toUpperCase()} ${route.path}`)}`,
                     constructor.name
                 );
                 const middlewares = route.middlewares || [];
                 router[route.method](route.path, ...middlewares, route.function);
-            });
+            }
 
             return router;
         };

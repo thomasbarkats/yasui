@@ -1,10 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import * as http from 'http';
 import express from 'express';
 import { json } from 'body-parser';
 import chalk from 'chalk';
-import { forEach, get } from 'lodash';
 import { connect, connection } from 'mongoose';
 
 import { AppMiddleware } from './utils/app.middleware';
@@ -12,8 +9,9 @@ import { logger, timeLogger } from './services';
 
 
 export interface YasuiConfig {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     controllers?: any[],
-    middlewares?: any[],
+    middlewares?: express.RequestHandler[],
     environment?: string;
     port?: number;
     debug?: boolean,
@@ -21,8 +19,9 @@ export interface YasuiConfig {
 }
 
 export function createServer(conf: YasuiConfig): http.Server {
-    // eslint-disable-next-line no-console
     conf.debug && console.clear();
+    logger.log(chalk.hex('#DB7093')('（◠‿◠）やすいです！'), chalk.hex('#DB7093')('yasui'));
+
     const envDefined = conf.environment !== undefined;
     envDefined && logger.log(chalk.blue(`run as ${conf.environment} environment`));
 
@@ -41,11 +40,11 @@ export function createApp(conf: YasuiConfig): express.Application {
     const app: express.Application = express();
     app.use(json());
 
-    // client authentication
+    /** client authentication */
     const haveApiKey: boolean = conf.apiKey !== undefined;
     haveApiKey && app.use(new AppMiddleware(conf.apiKey).auth);
 
-    // logs for debugging
+    /** logs for debugging */
     if (conf.debug) {
         logger.warn('debug mode is enabled');
         app.use(AppMiddleware.logRequest);
@@ -53,32 +52,31 @@ export function createApp(conf: YasuiConfig): express.Application {
 
     const timelog = timeLogger.start();
 
-    // use other optional middlewares
-    forEach(conf.middlewares, middleware => {
+    /** use other optional middlewares */
+    for (const middleware of conf.middlewares || []) {
         try {
             app.use(middleware);
         } catch(err) {
-            timelog.error(`failed to load ${get(middleware, 'name', '<invalid function>')} middleware\n${err}`);
+            timelog.error(`failed to load ${middleware.name || '<invalid function>'} middleware\n${err}`);
         }
-    });
+    }
 
     timelog.log('load routes from controllers...');
-    forEach(conf.controllers, (Controller: any) => {
+    for (const Controller of conf.controllers || []) {
         try {
-            const controller: any = new Controller();
-            const path: string = get(controller, 'path', '/');
+            const controller = new Controller();
+            const path: string = controller.path || '/';
             const router: express.Router = controller.configureRoutes(conf.debug);
             app.use(path, router);
 
             timelog.success(
                 `${chalk.italic(`${path}`)} routes loaded`,
-                get(Controller, 'name')
+                Controller.name
             );
         } catch(err) {
-            timelog.error(`failed to load ${get(Controller, 'name', '<invalid controller>')} routes\n${err}`);
+            timelog.error(`failed to load ${Controller.name || '<invalid controller>'} routes\n${err}`);
         }
-    });
-
+    }
 
     app.get('/', (req: express.Request, res: express.Response) => res.sendStatus(200));
     app.use(AppMiddleware.handleNotFound);

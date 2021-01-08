@@ -1,4 +1,4 @@
-export abstract class log {
+export abstract class logger {
     static log(message: string, src?: string, time?: number): void;
     static debug(message: string, src?: string, time?: number): void;
     static success(message: string, src?: string, time?: number): void;
@@ -6,9 +6,9 @@ export abstract class log {
     static warn(message: string, src?: string, time?: number): void;
 }
 
-export class timeLog extends log {
+export class timeLogger extends logger {
     constructor();
-    static start(): timeLog;
+    static start(): timeLogger;
     stop(): number;
     getTime(): number;
     log(message: string, src?: string): void;

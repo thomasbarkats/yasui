@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import { RouteMethods } from '../enums';
+import { RequestHandler } from 'express';
+import { RouteMethods } from '../@types/enums';
 
 
 export interface IControllerRoute {
     method: RouteMethods,
     path: string,
-    middlewares?: any[],
-    function: any,
+    middlewares?: RequestHandler[],
+    function: RequestHandler,
 }

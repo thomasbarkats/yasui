@@ -1,7 +1,12 @@
 import chalk from 'chalk';
 import express from 'express';
-import { filter, forEach, get } from 'lodash';
 
+
+export interface IEError extends Error {
+    status?: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [index: string]: any;
+}
 
 export class ErrorResource {
     public url: string;
@@ -12,12 +17,12 @@ export class ErrorResource {
     public status: number;
     public data: Record<string, string>;
 
-    constructor(err: Error, req: express.Request) {
+    constructor(err: IEError, req: express.Request) {
         this.url = `${req.protocol}://${req.headers.host}${req.originalUrl}`;
         this.path = req.path;
         this.method = req.method;
-        this.status = get(err, 'status', 500);
-        this.message = err.message;
+        this.status = err.status || 500;
+        this.message = err.message || '';
         this.name = err.constructor.name;
 
         this.data = {};
@@ -32,14 +37,14 @@ export class ErrorResource {
             `data: ${JSON.stringify(this.data, null, 2)}`;
     }
 
-    private setData(err: Error): void {
-        forEach(
-            // get other eventual fields of Error instance
-            filter(Object.keys(err), (key: string) => 
-                Object.keys(this).indexOf(key) === -1
-            ),
-            // add value to data error resource field
-            (key: string) => this.data[key] = get(err, key)
-        );
+    private setData(err: IEError): void {
+        /** get other eventual fields of Error extented instance */
+        const otherKeys: string[] = Object.keys(err)
+            .filter(key => Object.keys(this).indexOf(key) === -1);
+
+        for (const key in otherKeys) {
+            /** add value to data error resource field */
+            this.data[key] = err[key];
+        }
     }
 }
