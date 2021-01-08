@@ -2,7 +2,6 @@
 /node_modules
 /.git
 /.vscode
-/dist
 /lib
-.env
+/@types/enums
 package-lock.json

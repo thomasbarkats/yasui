@@ -38,8 +38,6 @@ rules:
     - error
   require-await:
     - warn
-  no-console:
-    - warn
   '@typescript-eslint/no-explicit-any':
     - warn
   '@typescript-eslint/no-require-imports':
