@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
-import { RouteMethods } from '../@types/enums';
-import { IControllerRoute } from '../utils/controller-route.model';
+import { RouteMethods } from '../types/enums';
+import { IControllerRoute } from '../types/interfaces';
 
 
 /** set routes metadata for controller methods */

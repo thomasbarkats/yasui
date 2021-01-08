@@ -4,21 +4,12 @@ import { json } from 'body-parser';
 import chalk from 'chalk';
 import { connect, connection } from 'mongoose';
 
+import { BaseConfig } from './types/interfaces';
 import { AppMiddleware } from './utils/app.middleware';
 import { logger, timeLogger } from './services';
 
 
-export interface YasuiConfig {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    controllers?: any[],
-    middlewares?: express.RequestHandler[],
-    environment?: string;
-    port?: number;
-    debug?: boolean,
-    apiKey?: string,
-}
-
-export function createServer(conf: YasuiConfig): http.Server {
+export function createServer(conf: BaseConfig): http.Server {
     conf.debug && console.clear();
     logger.log(chalk.hex('#DB7093')('（◠‿◠）やすいです！'), chalk.hex('#DB7093')('yasui'));
 
@@ -36,7 +27,7 @@ export function createServer(conf: YasuiConfig): http.Server {
     return server;
 }
 
-export function createApp(conf: YasuiConfig): express.Application {
+export function createApp(conf: BaseConfig): express.Application {
     const app: express.Application = express();
     app.use(json());
 
@@ -64,9 +55,8 @@ export function createApp(conf: YasuiConfig): express.Application {
     timelog.log('load routes from controllers...');
     for (const Controller of conf.controllers || []) {
         try {
-            const controller = new Controller();
-            const path: string = controller.path || '/';
-            const router: express.Router = controller.configureRoutes(conf.debug);
+            const path: string = Controller.prototype.path || '/';
+            const router: express.Router = Controller.prototype.configureRoutes(conf.debug);
             app.use(path, router);
 
             timelog.success(

@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { RouteMethods } from '../@types/enums';
+import { RouteMethods } from '../enums';
 
 
 export interface IControllerRoute {

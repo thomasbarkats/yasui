@@ -1,13 +1,11 @@
-/* eslint-disable @typescript-eslint/ban-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import express from 'express';
 import { Server } from 'http';
 
 export as namespace yasui;
 
 export interface YasuiConfig {
-    controllers?: any[],
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    controllers?: Function[],
     middlewares?: express.RequestHandler[],
     environment?: string;
     port?: number;

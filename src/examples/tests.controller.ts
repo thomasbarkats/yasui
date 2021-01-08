@@ -1,6 +1,6 @@
 import express from 'express';
 import { Get, Controller, Post, logger } from '..';
-import { HttpStatus } from '../@types/enums';
+import { HttpStatus } from '../types/enums';
 
 
 export abstract class TestsMiddleware {

@@ -1,7 +1,7 @@
 import { RequestHandler, Router } from 'express';
 import chalk from 'chalk';
 import { timeLogger } from '../services';
-import { IControllerRoute } from '../utils/controller-route.model';
+import { IControllerRoute } from '../types/interfaces';
 
 
 export function Controller(
@@ -9,16 +9,15 @@ export function Controller(
     ...middlewares: RequestHandler[]
 ): ClassDecorator {
     // eslint-disable-next-line @typescript-eslint/ban-types
-    return function (constructor: Function): void {
-        // define path property of controller object
-        constructor.prototype.path = path;
+    return function (target: Function): void {
+        target.prototype.path = path;
 
-        constructor.prototype.configureRoutes = (debug = false): Router => {
+        target.prototype.configureRoutes = (debug = false): Router => {
             const router: Router = Router();
 
             /** enrich query with controller infos for logs and errors handling */
             router.use((req, res, next) => {
-                req.source = constructor.name;
+                req.source = target.name;
                 req.logger = timeLogger.start();
                 next();
             });
@@ -29,13 +28,13 @@ export function Controller(
             }
 
             /** add routes from object metadata */
-            const routes: IControllerRoute[] = Reflect.getMetadata('ROUTES', constructor.prototype) || [];
+            const routes: IControllerRoute[] = Reflect.getMetadata('ROUTES', target.prototype) || [];
             const timelog = new timeLogger();
 
             for (const route of routes) {
                 debug && timelog.debug(
                     `stack route ${chalk.italic(`${route.method.toUpperCase()} ${route.path}`)}`,
-                    constructor.name
+                    target.name
                 );
                 const middlewares = route.middlewares || [];
                 router[route.method](route.path, ...middlewares, route.function);

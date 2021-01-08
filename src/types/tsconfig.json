@@ -3,7 +3,6 @@
       "target": "ESNext",
       "module": "CommonJS",
       "types": [],
-      "removeComments": true,
       "declarationDir": "../../@types",
       "declaration": true,
       "emitDeclarationOnly": true,

@@ -1,7 +1,7 @@
 import express from 'express';
 import chalk from 'chalk';
 
-import { HttpStatus } from '../@types/enums';
+import { HttpStatus } from '../types/enums';
 import { logger, timeLogger } from '../services';
 import { ErrorResource } from './error.resource';
 

@@ -1,15 +1,15 @@
 {
   "name": "yasui",
-  "version": "0.1.10",
+  "version": "0.2.1",
   "description": "Light framework using Express for Node.js applications",
   "main": "./lib/index.js",
   "type": "module",
   "scripts": {
-    "example": "npm run build && node lib/example/app.js",
+    "example": "npm run build && node lib/examples/app.js",
     "build": "tsc && npm run types-build",
-    "types-build": "cd src/@types/ && tsc",
+    "types-build": "cd src/types/ && tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint . --ext .ts --fix",
     "prepare": "npm run build",
     "prepublishOnly": "npm run lint",
     "preversion": "npm run lint"
