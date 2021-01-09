@@ -19,7 +19,7 @@ export function createServer(conf: BaseConfig): http.Server {
     const app: express.Application = createApp(conf);
 
     const server: http.Server = http.createServer(app);
-    const port: number = conf.port || 3000;
+    const port: number | string = conf.port || 3000;
 
     server.listen(port, () => {
         logger.success('server successfully started');
@@ -34,8 +34,10 @@ export function createApp(conf: BaseConfig): express.Application {
     app.use(json());
 
     /** client authentication */
-    const haveApiKey: boolean = conf.apiKey !== undefined;
-    haveApiKey && app.use(new AppMiddleware(conf.apiKey).auth);
+    if (conf.apiKey) {
+        const appMdI = new AppMiddleware(conf.apiKey);
+        app.use(appMdI.auth.bind(appMdI));
+    }
 
     /** logs for debugging */
     if (conf.debug) {

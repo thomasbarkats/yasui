@@ -6,7 +6,7 @@ export interface BaseConfig {
     controllers?: Function[],
     middlewares?: RequestHandler[],
     environment?: string;
-    port?: number;
+    port?: number | string;
     debug?: boolean,
     apiKey?: string,
 }

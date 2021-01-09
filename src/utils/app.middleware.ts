@@ -26,7 +26,7 @@ export class AppMiddleware {
         res.sendStatus(HttpStatus.FORBIDDEN);
 
         logger.reset();
-        logger.error(`Access denied (query attempt on ${req.method} ${req.path})`);
+        logger.error(`Access denied (query attempt on ${italic(`${req.method} ${req.path}`)})`);
     }
 
     public static logRequest(

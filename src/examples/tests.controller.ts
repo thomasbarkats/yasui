@@ -3,7 +3,7 @@ import { Get, Controller, Post, logger } from '..';
 import { HttpStatus } from '../types/enums';
 
 
-export abstract class TestsMiddleware {
+export class TestsMiddleware {
 
     public static hello(
         req: express.Request,

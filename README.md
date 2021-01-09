@@ -5,7 +5,7 @@ Light framework using Express for Node.js applications.
 
 Yasui can mean "easy" in Japanese. Yasui is meant to be easy to use, light, going to essentials only, with few dependencies.
 Yasui simplifies your life by providing you tools to quickly implement your controllers, middleware, endpoints, and your server.
-Yasui provides also complete error management (logs and client responses), and a simple but complete logging service.
+Yasui provides also complete errors management (logs and client responses) and logging service.
 
 &nbsp;
 ## Get started
@@ -26,7 +26,7 @@ Use `yasui.createApp({ })`, that return an express application, if you want to p
 `createServer` and `createApp` takes a configuration object that can take the following parameters:
 
 | Parameter | Description |
-| ----------------- | -------------------|
+| :-------- | :-----------|
 | controllers | An array containing your controllers (classes using the `@Controller` decorator). |
 | middlewares | A function table of type `express.RequestHandler`. |
 | environment | The name of your environment. |
@@ -56,11 +56,12 @@ export abstract class MyMiddleware {
     }
 }
 
-@Controller('/tests', MyMiddleware.hello)
+@Controller('/tests')
 export class MyController {
-    @Get('/')
+    @Get('/', MyMiddleware.log)
     private hello(req, res): void {
         res.status(200).json({ message: 'Hello world !' });
     }
 }
 ```
+See `src/examples` folder for more details.

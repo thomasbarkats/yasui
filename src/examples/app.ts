@@ -10,6 +10,7 @@ yasui.createServer({
     environment: 'developement',
     port: 8080, // 3000 by default
     debug: true, // false by default
+    apiKey: 'TEST',
 });
 
 yasui.connectMongoDB('mongodb://localhost:27017/test');
