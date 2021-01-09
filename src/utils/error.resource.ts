@@ -1,5 +1,6 @@
 import { italic } from 'kleur';
 import express from 'express';
+import { HttpStatus, HttpStatusMap } from '../types/enums';
 
 
 export interface IEError extends Error {
@@ -14,6 +15,7 @@ export class ErrorResource {
     public method: string;
     public name: string;
     public message: string;
+    public statusMessage: string;
     public status: number;
     public data: Record<string, string>;
 
@@ -21,7 +23,8 @@ export class ErrorResource {
         this.url = `${req.protocol}://${req.headers.host}${req.originalUrl}`;
         this.path = req.path;
         this.method = req.method;
-        this.status = err.status || 500;
+        this.status = err.status || HttpStatus.INTERNAL_SERVER_ERROR;
+        this.statusMessage = HttpStatusMap[this.status];
         this.message = err.message;
         this.name = err.constructor.name;
 
@@ -32,7 +35,7 @@ export class ErrorResource {
     public toString(): string {
         return `url: ${this.url}\n` +
             `request: ${italic(`${this.method} ${this.path}`)}\n` +
-            `status: ${this.status}\n` +
+            `status: ${this.status} (${this.statusMessage})\n` +
             `message: ${this.message}\n` +
             `data: ${JSON.stringify(this.data, null, 2)}`;
     }

@@ -61,7 +61,7 @@ export enum HttpStatus {
     NETWORK_AUTHENTICATION_REQUIRED = 511,
 }
 
-export const HttpStatusMap = {
+export const HttpStatusMap: Record<number, string> = {
     [HttpStatus.CONTINUE]: 'Continue',
     [HttpStatus.SWITCHING_PROTOCOLS]: 'Switching Protocols',
     [HttpStatus.OK]: 'OK',

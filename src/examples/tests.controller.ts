@@ -25,7 +25,7 @@ export abstract class TestsMiddleware {
 }
 
 
-@Controller('/tests')
+@Controller('/tests', TestsMiddleware.hello)
 export class TestsController {
 
     @Get('/')
