@@ -7,7 +7,7 @@ Yasui can mean "easy" in Japanese. Yasui is meant to be easy to use, light, goin
 Yasui simplifies your life by providing you tools to quickly implement your controllers, middleware, endpoints, and your server.
 Yasui provides also complete error management (logs and client responses), and a simple but complete logging service.
 
-
+&nbsp;
 ## Get started
 ```sh
 $ npm install yasui
@@ -21,6 +21,7 @@ yasui.createServer({ });
 `createServer` will create an http server and listen it.
 Use `yasui.createApp({ })`, that return an express application, if you want to perform additional operations on it before listening the server and use your own listening method.
 
+&nbsp;
 ## Configuration
 `createServer` and `createApp` takes a configuration object that can take the following parameters:
 
@@ -33,6 +34,7 @@ Use `yasui.createApp({ })`, that return an express application, if you want to p
 | debug | Boolean, display logs more provided if true, and logs all incoming requests. |
 | apiKey | Authentication key for your API. If provided, all requests should contain the x-api-key header. |
 
+&nbsp;
 ## Controllers
 Yasui provides decorators to define your controllers and endpoints.
 

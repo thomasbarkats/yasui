@@ -41,7 +41,6 @@ export function Controller(
                 const middlewares = route.middlewares || [];
                 router[route.method](route.path, ...middlewares, route.function);
             }
-
             return router;
         };
     };

@@ -4,13 +4,13 @@ import { json } from 'body-parser';
 import { blue, bold, italic, magenta } from 'kleur';
 import { connect, connection } from 'mongoose';
 
-import { BaseConfig } from './types/interfaces';
+import { BaseConfig, IController } from './types/interfaces';
 import { AppMiddleware } from './utils/app.middleware';
 import { logger } from './services';
 
 
 export function createServer(conf: BaseConfig): http.Server {
-    conf.debug && console.clear();
+    console.clear();
     logger.log(bold(magenta('（◠‿◠）やすいです！')), magenta('yasui'));
 
     const envDefined = conf.environment !== undefined;
@@ -20,9 +20,11 @@ export function createServer(conf: BaseConfig): http.Server {
 
     const server: http.Server = http.createServer(app);
     const port: number = conf.port || 3000;
-    conf.debug && logger.debug(`server listens on port ${port}`);
 
-    server.listen(port, () => logger.success('server successfully started'));
+    server.listen(port, () => {
+        logger.success('server successfully started');
+        logger.log(`server listens on port ${port}`);
+    });
     return server;
 }
 
@@ -53,14 +55,12 @@ export function createApp(conf: BaseConfig): express.Application {
     logger.log('load routes from controllers...');
     for (const Controller of conf.controllers || []) {
         try {
-            const path: string = Controller.prototype.path || '/';
-            const router: express.Router = Controller.prototype.configureRoutes(conf.debug);
+            const prototype: IController = Controller.prototype as IController;
+            const path: string = prototype.path;
+            const router: express.Router = prototype.configureRoutes(conf.debug);
             app.use(path, router);
+            logger.success(`${italic(`${path}`)} routes loaded`);
 
-            logger.success(
-                `${italic(`${path}`)} routes loaded`,
-                Controller.name
-            );
         } catch(err) {
             logger.error(`failed to load ${Controller.name || '<invalid controller>'} routes\n${err}`);
         }
