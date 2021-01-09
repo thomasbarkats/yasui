@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import kleur from 'kleur';
 
 
 export abstract class LoggerService {
@@ -9,30 +9,30 @@ export abstract class LoggerService {
 
     public static debug(message: string, src?: string, time?: number): void {
         src = src ? `${src}(debug)` : 'app(debug)';
-        console.log(LoggerService.getText(message, chalk.cyan(src), time));
+        console.log(LoggerService.getText(message, kleur.cyan(src), time));
     }
 
     public static success(message: string, src?: string, time?: number): void {
-        console.log(chalk.green(LoggerService.getText(message, src, time)));
+        console.log(kleur.green(LoggerService.getText(message, src, time)));
     }
 
     public static error(message: string, src?: string, time?: number): void {
-        console.error(chalk.red(LoggerService.getText(message, src, time)));
+        console.error(kleur.red(LoggerService.getText(message, src, time)));
     }
 
     public static warn(message: string, src?: string, time?: number): void {
-        console.warn(chalk.yellow(LoggerService.getText(message, src, time)));
+        console.warn(kleur.yellow(LoggerService.getText(message, src, time)));
     }
 
     private static getDate(): string {
         const date: Date = new Date();
-        return chalk.gray(`[${date.toISOString()}]`);
+        return kleur.gray(`[${date.toISOString()}]`);
     }
 
     private static getText(message: string, src?: string, time?: number): string {
-        const text = `${LoggerService.getDate()} ${chalk.bold(src ? src : 'app')}: ${message}`;
+        const text = `${LoggerService.getDate()} ${kleur.bold(src ? src : 'app')}: ${message}`;
         if (time !== undefined) {
-            return text + chalk.gray(`  +${time.toString()}ms`);
+            return text + kleur.gray(`  +${time.toString()}ms`);
         }
         return text;
     }

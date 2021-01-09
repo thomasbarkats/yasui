@@ -1,5 +1,5 @@
 import express from 'express';
-import chalk from 'chalk';
+import { italic, gray } from 'kleur';
 
 import { HttpStatus } from '../types/enums';
 import { logger, timeLogger } from '../services';
@@ -31,7 +31,7 @@ export class AppMiddleware {
         res: express.Response,
         next: express.NextFunction,
     ): void {
-        logger.debug(`request ${chalk.italic(`${req.method} ${req.path}`)}`);
+        logger.debug(`request ${italic(`${req.method} ${req.path}`)}`);
         next();
     }
 
@@ -62,7 +62,7 @@ export class AppMiddleware {
         const reqLogger: timeLogger = req.logger || new timeLogger();
         const time: number = reqLogger.stop();
         logger.error(
-            `${err.constructor.name}  ${chalk.gray(`+${time}ms`)}\n` +
+            `${err.constructor.name}  ${gray(`+${time}ms`)}\n` +
             `source: ${filename ? `${filename} ${line}:${column}` : 'undefined'}\n` +
             errResource.toString(),
             req.source

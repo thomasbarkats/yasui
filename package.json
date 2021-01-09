@@ -1,6 +1,6 @@
 {
   "name": "yasui",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Light framework using Express for Node.js applications",
   "main": "./lib/index.js",
   "type": "module",
@@ -10,8 +10,7 @@
     "types-build": "cd src/types/ && tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --ext .ts --fix",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm run lint",
+    "prepublishOnly": "npm run build && npm run lint",
     "preversion": "npm run lint"
   },
   "files": [
@@ -31,7 +30,7 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "chalk": "^4.1.0",
+    "kleur": "^4.1.3",
     "express": "^4.17.1",
     "mongoose": "^5.4.13",
     "reflect-metadata": "^0.1.13"

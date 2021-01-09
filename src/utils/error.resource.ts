@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import { italic } from 'kleur';
 import express from 'express';
 
 
@@ -31,7 +31,7 @@ export class ErrorResource {
 
     public toString(): string {
         return `url: ${this.url}\n` +
-            `request: ${chalk.italic(`${this.method} ${this.path}`)}\n` +
+            `request: ${italic(`${this.method} ${this.path}`)}\n` +
             `status: ${this.status}\n` +
             `message: ${this.message}\n` +
             `data: ${JSON.stringify(this.data, null, 2)}`;

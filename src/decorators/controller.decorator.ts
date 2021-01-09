@@ -1,5 +1,6 @@
 import { RequestHandler, Router } from 'express';
-import chalk from 'chalk';
+import { italic } from 'kleur';
+
 import { timeLogger } from '../services';
 import { IControllerRoute } from '../types/interfaces';
 
@@ -33,7 +34,7 @@ export function Controller(
 
             for (const route of routes) {
                 debug && timelog.debug(
-                    `stack route ${chalk.italic(`${route.method.toUpperCase()} ${route.path}`)}`,
+                    `stack route ${italic(`${route.method.toUpperCase()} ${route.path}`)}`,
                     target.name
                 );
                 const middlewares = route.middlewares || [];

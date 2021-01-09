@@ -1,7 +1,7 @@
 import * as http from 'http';
 import express from 'express';
 import { json } from 'body-parser';
-import chalk from 'chalk';
+import { blue, bold, italic, magenta } from 'kleur';
 import { connect, connection } from 'mongoose';
 
 import { BaseConfig } from './types/interfaces';
@@ -11,10 +11,10 @@ import { logger, timeLogger } from './services';
 
 export function createServer(conf: BaseConfig): http.Server {
     conf.debug && console.clear();
-    logger.log(chalk.hex('#DB7093')('（◠‿◠）やすいです！'), chalk.hex('#DB7093')('yasui'));
+    logger.log(bold(magenta('（◠‿◠）やすいです！')), magenta('yasui'));
 
     const envDefined = conf.environment !== undefined;
-    envDefined && logger.log(chalk.blue(`run as ${conf.environment} environment`));
+    envDefined && logger.log(blue(`run as ${conf.environment} environment`));
 
     const app: express.Application = createApp(conf);
     const timelog = timeLogger.start();
@@ -60,7 +60,7 @@ export function createApp(conf: BaseConfig): express.Application {
             app.use(path, router);
 
             timelog.success(
-                `${chalk.italic(`${path}`)} routes loaded`,
+                `${italic(`${path}`)} routes loaded`,
                 Controller.name
             );
         } catch(err) {
