@@ -1,6 +1,6 @@
 {
   "name": "yasui",
-  "version": "0.2.1",
+  "version": "0.2.3",
   "description": "Light framework using Express for Node.js applications",
   "main": "./lib/index.js",
   "type": "module",

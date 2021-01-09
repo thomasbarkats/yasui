@@ -1,9 +1,9 @@
 import { RequestHandler } from 'express';
+import { IController } from '.';
 
 
 export interface BaseConfig {
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    controllers?: Function[],
+    controllers?: IController[],
     middlewares?: RequestHandler[],
     environment?: string;
     port?: number;

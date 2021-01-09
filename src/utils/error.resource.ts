@@ -3,9 +3,9 @@ import express from 'express';
 
 
 export interface IEError extends Error {
-    status?: number;
+    status?: number,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [index: string]: any;
+    [index: string]: any,
 }
 
 export class ErrorResource {
@@ -22,7 +22,7 @@ export class ErrorResource {
         this.path = req.path;
         this.method = req.method;
         this.status = err.status || 500;
-        this.message = err.message || '';
+        this.message = err.message;
         this.name = err.constructor.name;
 
         this.data = {};
