@@ -1,7 +1,8 @@
 import { RequestHandler, Router } from 'express';
 import { italic } from 'kleur';
 
-import { timeLogger } from '../services';
+import { logger } from '../services';
+import { LoggerService } from '../services/logger.service';
 import { IControllerRoute } from '../types/interfaces';
 
 
@@ -14,12 +15,13 @@ export function Controller(
         target.prototype.path = path;
 
         target.prototype.configureRoutes = (debug = false): Router => {
+            logger.start();
             const router: Router = Router();
 
             /** enrich query with controller infos for logs and errors handling */
             router.use((req, res, next) => {
                 req.source = target.name;
-                req.logger = timeLogger.start();
+                req.logger = new LoggerService().start();
                 next();
             });
 
@@ -30,10 +32,9 @@ export function Controller(
 
             /** add routes from object metadata */
             const routes: IControllerRoute[] = Reflect.getMetadata('ROUTES', target.prototype) || [];
-            const timelog = new timeLogger();
 
             for (const route of routes) {
-                debug && timelog.debug(
+                debug && logger.debug(
                     `stack route ${italic(`${route.method.toUpperCase()} ${route.path}`)}`,
                     target.name
                 );

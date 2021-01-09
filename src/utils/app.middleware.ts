@@ -1,13 +1,14 @@
 import express from 'express';
-import { italic, gray } from 'kleur';
+import { italic, red } from 'kleur';
 
 import { HttpStatus } from '../types/enums';
-import { logger, timeLogger } from '../services';
+import { logger } from '../services';
 import { ErrorResource } from './error.resource';
+import { LoggerService } from '../services/logger.service';
 
 
 export class AppMiddleware {
-    private apiKey: string | undefined;
+    private apiKey?: string;
 
     constructor(apiKey?: string) {
         this.apiKey = apiKey;
@@ -22,8 +23,10 @@ export class AppMiddleware {
         if (req.headers['x-api-key'] === this.apiKey) {
             return next();
         }
-        logger.error(`Access denied (query attempt on ${req.method} ${req.path})`);
         res.sendStatus(HttpStatus.FORBIDDEN);
+
+        logger.reset();
+        logger.error(`Access denied (query attempt on ${req.method} ${req.path})`);
     }
 
     public static logRequest(
@@ -31,6 +34,7 @@ export class AppMiddleware {
         res: express.Response,
         next: express.NextFunction,
     ): void {
+        logger.reset();
         logger.debug(`request ${italic(`${req.method} ${req.path}`)}`);
         next();
     }
@@ -41,8 +45,10 @@ export class AppMiddleware {
         res: express.Response,
     ): void {
         const message = `Cannot resolve ${req.method} ${req.path}`;
-        logger.error(message);
         res.sendStatus(HttpStatus.NOT_FOUND);
+
+        logger.reset();
+        logger.error(message);
     }
 
     /** pretty logs and client responses for errors */
@@ -59,14 +65,12 @@ export class AppMiddleware {
         const errResource = new ErrorResource(err, req);
         res.status(errResource.status).json(errResource);
 
-        const reqLogger: timeLogger = req.logger || new timeLogger();
-        const time: number = reqLogger.stop();
-        logger.error(
-            `${err.constructor.name}  ${gray(`+${time}ms`)}\n` +
+        const reqLogger: LoggerService = req.logger || logger.reset();
+        reqLogger.error(`${err.constructor.name}`, req.source);
+        console.error(red(
             `source: ${filename ? `${filename} ${line}:${column}` : 'undefined'}\n` +
             errResource.toString(),
-            req.source
-        );
+        ));
         next();
     }
 }

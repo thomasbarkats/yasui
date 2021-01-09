@@ -1,6 +1,6 @@
-export abstract class ConfigService {
+export class ConfigService {
 
-    public static get(name: string, backvalue = ''): string {
+    public get(name: string, backvalue = ''): string {
         return process.env[name] || backvalue;
     }
 }

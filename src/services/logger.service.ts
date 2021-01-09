@@ -1,87 +1,73 @@
 import kleur from 'kleur';
 
 
-export abstract class LoggerService {
-    
-    public static log(message: string, src?: string, time?: number): void {
-        console.log(LoggerService.getText(message, src, time));
+export class LoggerService {
+    public startTime?: number;
+    public lastTime?: number;
+    public endTime?: number;
+
+    public start(): this {
+        this.startTime = new Date().getTime();
+        this.lastTime = this.startTime;
+        return this;
     }
 
-    public static debug(message: string, src?: string, time?: number): void {
+    public reset(): this {
+        this.startTime = undefined;
+        this.lastTime = undefined;
+        this.endTime = undefined;
+        return this;
+    }
+
+    public stop(): number {
+        if (this.startTime) {
+            this.endTime = new Date().getTime();
+            return this.endTime - this.startTime;
+        }
+        throw new Error('No timers started');
+    }
+
+    public getTime(): number {
+        if (this.lastTime) {
+            const currentTime: number = new Date().getTime();
+            const timeDiff: number = currentTime - this.lastTime;
+            this.lastTime = currentTime;
+            return timeDiff;
+        }
+        throw new Error('No timers started');
+    }
+
+    public log(message: string, src?: string): void {
+        console.log(this.getText(message, src));
+    }
+
+    public debug(message: string, src?: string): void {
         src = src ? `${src}(debug)` : 'app(debug)';
-        console.log(LoggerService.getText(message, kleur.cyan(src), time));
+        console.log(this.getText(message, kleur.cyan(src)));
     }
 
-    public static success(message: string, src?: string, time?: number): void {
-        console.log(kleur.green(LoggerService.getText(message, src, time)));
+    public success(message: string, src?: string): void {
+        console.log(kleur.green(this.getText(message, src)));
     }
 
-    public static error(message: string, src?: string, time?: number): void {
-        console.error(kleur.red(LoggerService.getText(message, src, time)));
+    public error(message: string, src?: string): void {
+        console.error(kleur.red(this.getText(message, src)));
     }
 
-    public static warn(message: string, src?: string, time?: number): void {
-        console.warn(kleur.yellow(LoggerService.getText(message, src, time)));
+    public warn(message: string, src?: string): void {
+        console.warn(kleur.yellow(this.getText(message, src)));
     }
 
-    private static getDate(): string {
+    private getDate(): string {
         const date: Date = new Date();
         return kleur.gray(`[${date.toISOString()}]`);
     }
 
-    private static getText(message: string, src?: string, time?: number): string {
-        const text = `${LoggerService.getDate()} ${kleur.bold(src ? src : 'app')}: ${message}`;
-        if (time !== undefined) {
-            return text + kleur.gray(`  +${time.toString()}ms`);
+    private getText(message: string, src?: string): string {
+        const text = `${this.getDate()} ${kleur.bold(src ? src : 'app')}: ${message}`;
+        if (this.lastTime) {
+            return text + kleur.gray(`  +${this.getTime()}ms`);
         }
         return text;
-    }
-}
-
-export class TimeLoggerService extends LoggerService {
-    public startTime: number;
-    public lastTime: number;
-    public endTime: number | undefined;
-
-    constructor() {
-        super();
-        this.startTime = new Date().getTime();
-        this.lastTime = this.startTime;
-    }
-
-    public static start(): TimeLoggerService {
-        return new this();
-    }
-
-    public stop(): number {
-        this.endTime = new Date().getTime();
-        return this.endTime - this.startTime;
-    }
-
-    public getTime(): number {
-        const currentTime: number = new Date().getTime();
-        const timeDiff: number = currentTime - this.lastTime;
-        this.lastTime = currentTime;
-        return timeDiff;
-    }
-
-    public log(message: string, src?: string): void {
-        LoggerService.log(message, src, this.getTime());
-    }
-
-    public debug(message: string, src?: string): void {
-        LoggerService.debug(message, src, this.getTime());
-    }
-
-    public success(message: string, src?: string): void {
-        LoggerService.success(message, src, this.getTime());
-    }
-
-    public error(message: string, src?: string): void {
-        LoggerService.error(message, src, this.getTime());
-    }
-
-    public warn(message: string, src?: string): void {
-        LoggerService.warn(message, src, this.getTime());
     }
 }

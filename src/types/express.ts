@@ -1,14 +1,13 @@
-/* eslint-disable @typescript-eslint/no-namespace */
-
-import { timeLogger } from '../services';
+import { LoggerService } from '../services/logger.service';
 
 export { };
 
 declare global {
+    // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace Express {
         interface Request {
             source?: string,
-            logger?: timeLogger,
+            logger?: LoggerService,
         }
     }
 }
