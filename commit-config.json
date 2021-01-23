@@ -1,0 +1,26 @@
+{
+  "format": 1,
+  "types": [
+    {
+      "value": "fix",
+      "description": "Bug(s) correction"
+    },
+    {
+      "value": "feat",
+      "description": "New feature(s)"
+    },
+    {
+      "value": "core",
+      "description": "Change(s) on the application core"
+    },
+    {
+      "value": "test",
+      "description": "Change(s) related to tests"
+    }
+  ],
+  "minLength": 8,
+  "maxLengt": 70,
+  "changeVersion": "mainbranch",
+  "mainBranch": "master",
+  "showAllVersionTypes": false
+}
