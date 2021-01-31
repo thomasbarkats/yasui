@@ -16,11 +16,15 @@
     {
       "value": "test",
       "description": "Change(s) related to tests"
+    },
+    {
+      "value": "doc",
+      "description": "Documentation / comment(s)"
     }
   ],
   "minLength": 8,
   "maxLengt": 70,
-  "changeVersion": "mainbranch",
-  "mainBranch": "master",
-  "showAllVersionTypes": false
+  "changeVersion": "never",
+  "showAllVersionTypes": false,
+  "stageAllChanges": false
 }

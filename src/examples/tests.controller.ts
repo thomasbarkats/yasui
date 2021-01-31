@@ -1,5 +1,6 @@
 import express from 'express';
 import { Get, Controller, Post, logger } from '..';
+import { Res, Param, Header } from '../decorators';
 import { HttpStatus } from '../types/enums';
 
 
@@ -28,14 +29,20 @@ export class TestsMiddleware {
 @Controller('/tests', TestsMiddleware.hello)
 export class TestsController {
 
-    @Get('/')
-    private get(req: express.Request, res: express.Response): void {
-        res.status(HttpStatus.OK).json({ message: 'I\'m a simple test.' });
+    @Get('/:name')
+    private get(
+        @Param('name') name: string,
+        @Res() res: express.Response
+    ): void {
+        res.status(HttpStatus.OK).json({ message: `Hello ${name}!` });
     }
 
     @Post('/', TestsMiddleware.warning)
-    private post(req: express.Request, res: express.Response): void {
-        res.status(HttpStatus.OK).json({ message: 'I post a new test.' });
+    private post(
+        @Header('name') name: string,
+        @Res() res: express.Response
+    ): void {
+        res.status(HttpStatus.OK).json({ message: `${name} say hello!` });
     }
 
     @Get('/error')

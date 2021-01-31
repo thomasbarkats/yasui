@@ -41,7 +41,7 @@
     "@typescript-eslint/eslint-plugin": "^4.11.0",
     "@typescript-eslint/parser": "^4.11.0",
     "eslint": "^7.16.0",
-    "format-commit": "^0.1.7",
+    "format-commit": "^0.1.9",
     "typescript": "^4.1.3"
   },
   "repository": {

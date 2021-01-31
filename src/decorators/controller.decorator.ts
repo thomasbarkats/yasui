@@ -38,6 +38,8 @@ export function Controller(
                     `stack route ${italic(`${route.method.toUpperCase()} ${route.path}`)}`,
                     target.name
                 );
+
+                /** stack route and middlewares on controller router */
                 const middlewares = route.middlewares || [];
                 router[route.method](route.path, ...middlewares, route.function);
             }
