@@ -1,16 +1,29 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/ban-types */
 
-import express, { RequestHandler } from 'express';
+import express from 'express';
 import { RouteMethods } from '../types/enums';
 import { IControllerRoute, IRouteParam } from '../types/interfaces';
+
+
+/** express middleware decorator */
+export const Middleware = (): MethodDecorator => {
+    return function (
+        target: Object,
+        propertyKey: string | symbol,
+        descriptor: PropertyDescriptor
+    ): PropertyDescriptor {
+        descriptor.value = routeHandler(target, propertyKey, descriptor);
+        return descriptor;
+    };
+};
 
 
 /** create express method-routing decorator */
 function routeDecorator(method: RouteMethods): Function {
     return function (
         path: string,
-        ...middlewares: RequestHandler[]
+        ...middlewares: Function[]
     ): MethodDecorator {
         return addRoute(method, path, ...middlewares);
     };
@@ -20,7 +33,7 @@ function routeDecorator(method: RouteMethods): Function {
 function addRoute(
     method: RouteMethods,
     path: string,
-    ...middlewares: RequestHandler[]
+    ...middlewares: Function[]
 ): MethodDecorator {
     return function (
         target: Object,
@@ -48,7 +61,9 @@ function routeHandler(
     target: Object,
     propertyKey: string | symbol,
     descriptor: PropertyDescriptor
-): RequestHandler {
+): express.RequestHandler {
+    const routeFunction = descriptor.value as Function;
+
     return (
         req: express.Request,
         res: express.Response,
@@ -58,7 +73,6 @@ function routeHandler(
         const KEY = String(propertyKey);
         const params = Reflect.getMetadata(`${KEY}_PARAMS`, target) as IRouteParam[] || [];
 
-        const routeFunction = descriptor.value;
         const routeHandlerArgs = {req, res, next} as any;
 
         /** redefine route function args with mapped params path */
@@ -66,7 +80,7 @@ function routeHandler(
         for (const param of params) {
             args[param.index] = param.path.reduce((p, c) => p && p[c] || null, routeHandlerArgs);
         }
-        return routeFunction.apply(routeFunction, args);
+        return routeFunction.apply(target, args);
     };
 }
 

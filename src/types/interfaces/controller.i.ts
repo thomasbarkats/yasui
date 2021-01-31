@@ -10,6 +10,7 @@ export interface IController {
 export interface IControllerRoute {
     method: RouteMethods,
     path: string,
-    middlewares?: RequestHandler[],
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    middlewares?: Function[],
     function: RequestHandler,
 }

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-types */
+
 import { RequestHandler, Router } from 'express';
 import { italic } from 'kleur';
 
@@ -8,9 +10,8 @@ import { IControllerRoute } from '../types/interfaces';
 
 export function Controller(
     path: string,
-    ...middlewares: RequestHandler[]
+    ...middlewares: Function[]
 ): ClassDecorator {
-    // eslint-disable-next-line @typescript-eslint/ban-types
     return function (target: Function): void {
         target.prototype.path = path;
 
@@ -27,7 +28,7 @@ export function Controller(
 
             /** use other optional middlewares for all controller routes */
             for (const middleware of middlewares) {
-                router.use(middleware);
+                router.use(middleware as RequestHandler);
             }
 
             /** add routes from object metadata */
@@ -40,7 +41,7 @@ export function Controller(
                 );
 
                 /** stack route and middlewares on controller router */
-                const middlewares = route.middlewares || [];
+                const middlewares = route.middlewares as RequestHandler[] || [];
                 router[route.method](route.path, ...middlewares, route.function);
             }
             return router;

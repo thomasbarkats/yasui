@@ -48,7 +48,7 @@ export function createApp(conf: BaseConfig): express.Application {
     /** use other optional middlewares */
     for (const middleware of conf.middlewares || []) {
         try {
-            app.use(middleware);
+            app.use(middleware as express.RequestHandler);
         } catch(err) {
             logger.error(`failed to load ${middleware.name || '<invalid function>'} middleware\n${err}`);
         }

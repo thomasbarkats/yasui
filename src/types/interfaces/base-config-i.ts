@@ -1,10 +1,9 @@
-import { RequestHandler } from 'express';
+/* eslint-disable @typescript-eslint/ban-types */
 
 
 export interface BaseConfig {
-    // eslint-disable-next-line @typescript-eslint/ban-types
     controllers?: Function[],
-    middlewares?: RequestHandler[],
+    middlewares?: Function[],
     environment?: string;
     port?: number | string;
     debug?: boolean,

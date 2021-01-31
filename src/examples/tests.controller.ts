@@ -1,20 +1,25 @@
 import express from 'express';
-import { Get, Controller, Post, logger } from '..';
-import { Res, Param, Header } from '../decorators';
-import { HttpStatus } from '../types/enums';
+import {
+    Controller, Middleware, Get, Post, Put,
+    Req, Res, Next, Param, Header,
+    HttpStatus, logger
+} from '..';
 
 
 export class TestsMiddleware {
 
+    @Middleware()
     public static hello(
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
+        @Req() req: express.Request,
+        @Next() next: express.NextFunction
     ): void {
         logger.log('Hello World!', req.source);
         next();
     }
 
+    /**
+     * middlewares can also be written with classic express syntax
+     */
     public static warning(
         req: express.Request,
         res: express.Response,
@@ -45,7 +50,7 @@ export class TestsController {
         res.status(HttpStatus.OK).json({ message: `${name} say hello!` });
     }
 
-    @Get('/error')
+    @Put('/')
     private error(): void {
         throw new Error('I just simulate an error.');
     }
