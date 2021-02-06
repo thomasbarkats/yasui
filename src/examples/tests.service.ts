@@ -6,7 +6,7 @@ export class TestsService {
         return `Hello ${name}!`;
     }
 
-    public logHello(): void {
-        logger.success('Hello');
+    public helloWorld(source?: string): void {
+        logger.log('Hello World!', source);
     }
 }

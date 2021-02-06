@@ -7,7 +7,7 @@ import { ErrorResource } from './error.resource';
 import { LoggerService } from '../services/logger.service';
 
 
-export class AppMiddleware {
+export class AppService {
     private apiKey?: string;
 
     constructor(apiKey?: string) {

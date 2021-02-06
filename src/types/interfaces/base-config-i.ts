@@ -1,10 +1,10 @@
 import { TController } from './controller.i';
+import { TMiddleware } from './middleware.i';
 
 
 export interface BaseConfig {
     controllers?: TController[],
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    middlewares?: Function[],
+    middlewares?: TMiddleware[],
     environment?: string;
     port?: number | string;
     debug?: boolean,

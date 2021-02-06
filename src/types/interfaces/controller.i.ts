@@ -1,16 +1,21 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { RequestHandler, Router } from 'express';
 import { RouteMethods } from '../enums';
+import { TMiddleware } from './middleware.i';
 
 
 /** controller type */
 export interface TController extends Function {
-    new (): { [index: string]: any };
+    new (): IController;
 }
 
 /** controller interface */
 export interface IController {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [index: string]: any;
+}
+
+/** controller decorated interface */
+export interface IDController extends IController {
     path: string,
     configureRoutes: (self: this, debug?: boolean) => Router,
 }
@@ -19,7 +24,6 @@ export interface IController {
 export interface IControllerRoute {
     method: RouteMethods,
     path: string,
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    middlewares?: Function[],
+    middlewares: TMiddleware[],
     function: RequestHandler,
 }

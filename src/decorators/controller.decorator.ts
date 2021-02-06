@@ -5,12 +5,12 @@ import { italic } from 'kleur';
 
 import { logger } from '../services';
 import { LoggerService } from '../services/logger.service';
-import { IController, IControllerRoute } from '../types/interfaces';
+import { IController, IControllerRoute, IDMiddleware, TMiddleware } from '../types/interfaces';
 
 
 export function Controller(
     path: string,
-    ...middlewares: Function[]
+    ...middlewares: TMiddleware[]
 ): ClassDecorator {
     return function (target: Function): void {
         target.prototype.path = path;
@@ -33,8 +33,9 @@ export function Controller(
             });
 
             /** use other optional middlewares for all controller routes */
-            for (const middleware of middlewares) {
-                router.use(middleware as RequestHandler);
+            for (const Middleware of middlewares) {
+                const middleware = new Middleware() as IDMiddleware;
+                router.use(middleware.run(middleware));
             }
 
             /** add routes from object metadata */
@@ -47,7 +48,10 @@ export function Controller(
                 );
 
                 /** stack route and middlewares on controller router */
-                const middlewares = route.middlewares as RequestHandler[] || [];
+                const middlewares: RequestHandler[] = route.middlewares.map((Middleware: TMiddleware) => {
+                    const middleware = new Middleware() as IDMiddleware;
+                    return middleware.run(middleware);
+                });
                 router[route.method](route.path, ...middlewares, route.function);
             }
             return router;

@@ -44,7 +44,7 @@ function extractParam(
             path,
         };
         const KEY = String(propertyKey);
-        const routeParams = Reflect.getMetadata(`${KEY}_PARAMS`, target) as IRouteParam[] || [];
+        const routeParams: IRouteParam[] = Reflect.getMetadata(`${KEY}_PARAMS`, target) || [];
 
         /** add mapped param to route metadata */
         Reflect.defineMetadata(

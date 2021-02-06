@@ -3,27 +3,14 @@
 
 import express from 'express';
 import { RouteMethods } from '../types/enums';
-import { IController, IControllerRoute, IRouteParam } from '../types/interfaces';
-
-
-/** express middleware decorator */
-export const Middleware = (): MethodDecorator => {
-    return function (
-        target: Object,
-        propertyKey: string | symbol,
-        descriptor: PropertyDescriptor
-    ): PropertyDescriptor {
-        descriptor.value = routeHandler(target, propertyKey, descriptor);
-        return descriptor;
-    };
-};
+import { IController, IControllerRoute, IRouteParam, TMiddleware } from '../types/interfaces';
 
 
 /** create express method-routing decorator */
 function routeDecorator(method: RouteMethods): Function {
     return function (
         path: string,
-        ...middlewares: Function[]
+        ...middlewares: TMiddleware[]
     ): MethodDecorator {
         return addRoute(method, path, ...middlewares);
     };
@@ -33,7 +20,7 @@ function routeDecorator(method: RouteMethods): Function {
 function addRoute(
     method: RouteMethods,
     path: string,
-    ...middlewares: Function[]
+    ...middlewares: TMiddleware[]
 ): MethodDecorator {
     return function (
         target: Object,
@@ -57,12 +44,12 @@ function addRoute(
 
 
 /** create express-route-handler from controller method */
-function routeHandler(
+export function routeHandler(
     target: Object,
     propertyKey: string | symbol,
     descriptor: PropertyDescriptor
 ): express.RequestHandler {
-    const routeFunction = descriptor.value as Function;
+    const routeFunction: Function = descriptor.value;
 
     return (
         req: express.Request,
@@ -79,7 +66,7 @@ function routeHandler(
         /** redefine route function args with mapped params path */
         const args: any[] = [];
         for (const param of params) {
-            args[param.index] = param.path.reduce((p, c) => p && p[c] || null, routeHandlerArgs);
+            args[param.index] = param.path.reduce((prev, curr) => prev && prev[curr] || null, routeHandlerArgs);
         }
         return routeFunction.apply(self, args);
     };

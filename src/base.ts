@@ -4,8 +4,8 @@ import { json } from 'body-parser';
 import { blue, bold, italic, magenta } from 'kleur';
 import { connect, connection } from 'mongoose';
 
-import { BaseConfig, IController } from './types/interfaces';
-import { AppMiddleware } from './utils/app.middleware';
+import { BaseConfig, IDController, IDMiddleware } from './types/interfaces';
+import { AppService } from './utils/app.service';
 import { logger } from './services';
 
 
@@ -35,29 +35,30 @@ export function createApp(conf: BaseConfig): express.Application {
 
     /** client authentication */
     if (conf.apiKey) {
-        const appMiddleware = new AppMiddleware(conf.apiKey);
+        const appMiddleware = new AppService(conf.apiKey);
         app.use(appMiddleware.auth.bind(appMiddleware));
     }
 
     /** logs for debugging */
     if (conf.debug) {
         logger.warn('debug mode is enabled');
-        app.use(AppMiddleware.logRequest);
+        app.use(AppService.logRequest);
     }
 
     /** use other optional middlewares */
-    for (const middleware of conf.middlewares || []) {
+    for (const Middleware of conf.middlewares || []) {
         try {
-            app.use(middleware as express.RequestHandler);
+            const middleware = new Middleware() as IDMiddleware;
+            app.use(middleware.run(middleware));
         } catch(err) {
-            logger.error(`failed to load ${middleware.name || '<invalid function>'} middleware\n${err}`);
+            logger.error(`failed to load ${Middleware.name || '<invalid function>'} middleware\n${err}`);
         }
     }
 
     logger.log('load routes from controllers...');
     for (const Controller of conf.controllers || []) {
         try {
-            const controller = new Controller() as IController;
+            const controller = new Controller() as IDController;
             const path: string = controller.path;
             const router: express.Router = controller.configureRoutes(controller, conf.debug);
             app.use(path, router);
@@ -69,8 +70,8 @@ export function createApp(conf: BaseConfig): express.Application {
     }
 
     app.get('/', (req: express.Request, res: express.Response) => res.sendStatus(200));
-    app.use(AppMiddleware.handleNotFound);
-    app.use(AppMiddleware.handleErrors);
+    app.use(AppService.handleNotFound);
+    app.use(AppService.handleErrors);
 
     return app;
 }
