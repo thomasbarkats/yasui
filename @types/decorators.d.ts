@@ -1,14 +1,17 @@
-/* eslint-disable @typescript-eslint/ban-types */
+import { TMiddleware } from './interfaces';
 
-export function Controller(path: string, ...middlewares: Function[]): ClassDecorator;
 
-export function Middleware(): MethodDecorator;
-export function Get(path: string, ...middlewares: Function[]): MethodDecorator;
-export function Post(path: string, ...middlewares: Function[]): MethodDecorator;
-export function Put(path: string, ...middlewares: Function[]): MethodDecorator;
-export function Delete(path: string, ...middlewares: Function[]): MethodDecorator;
-export function Patch(path: string, ...middlewares: Function[]): MethodDecorator;
+export function Controller(path: string, ...middlewares: TMiddleware[]): ClassDecorator;
+export function Middleware(): ClassDecorator;
 
+/** controller route-methods decorators */
+export function Get(path: string, ...middlewares: TMiddleware[]): MethodDecorator;
+export function Post(path: string, ...middlewares: TMiddleware[]): MethodDecorator;
+export function Put(path: string, ...middlewares: TMiddleware[]): MethodDecorator;
+export function Delete(path: string, ...middlewares: TMiddleware[]): MethodDecorator;
+export function Patch(path: string, ...middlewares: TMiddleware[]): MethodDecorator;
+
+/** route parameters decorators */
 export function Req(): ParameterDecorator;
 export function Res(): ParameterDecorator;
 export function Next(): ParameterDecorator;

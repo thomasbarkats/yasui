@@ -20,6 +20,10 @@
     {
       "value": "doc",
       "description": "Documentation / comment(s)"
+    },
+    {
+      "value": "type",
+      "description": "Application usage typing"
     }
   ],
   "minLength": 8,

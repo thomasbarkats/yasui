@@ -2,17 +2,9 @@
 
 import express from 'express';
 import { Server } from 'http';
+import { BaseConfig } from './interfaces';
 
 export as namespace yasui;
-
-export interface BaseConfig {
-    controllers?: Function[],
-    middlewares?: Function[],
-    environment?: string;
-    port?: number | string;
-    debug?: boolean,
-    apiKey?: string,
-}
 
 export * from './decorators';
 export * from './services';
