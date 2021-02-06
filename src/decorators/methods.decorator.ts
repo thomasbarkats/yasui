@@ -3,7 +3,7 @@
 
 import express from 'express';
 import { RouteMethods } from '../types/enums';
-import { IControllerRoute, IRouteParam } from '../types/interfaces';
+import { IController, IControllerRoute, IRouteParam } from '../types/interfaces';
 
 
 /** express middleware decorator */
@@ -46,7 +46,7 @@ function addRoute(
             middlewares,
             function: routeHandler(target, propertyKey, descriptor),
         };
-        const routes = Reflect.getMetadata('ROUTES', target) as IControllerRoute[] || [];
+        const routes: IControllerRoute[] = Reflect.getMetadata('ROUTES', target) || [];
         Reflect.defineMetadata(
             'ROUTES',
             [...routes, route],
@@ -71,7 +71,8 @@ function routeHandler(
     ): void => {
         /** get params metadata of controller method */
         const KEY = String(propertyKey);
-        const params = Reflect.getMetadata(`${KEY}_PARAMS`, target) as IRouteParam[] || [];
+        const params: IRouteParam[] = Reflect.getMetadata(`${KEY}_PARAMS`, target) || [];
+        const self: IController = Reflect.getMetadata('SELF', target);
 
         const routeHandlerArgs = {req, res, next} as any;
 
@@ -80,7 +81,7 @@ function routeHandler(
         for (const param of params) {
             args[param.index] = param.path.reduce((p, c) => p && p[c] || null, routeHandlerArgs);
         }
-        return routeFunction.apply(target, args);
+        return routeFunction.apply(self, args);
     };
 }
 

@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/ban-types */
+import { TController } from './controller.i';
 
 
 export interface BaseConfig {
-    controllers?: Function[],
+    controllers?: TController[],
+    // eslint-disable-next-line @typescript-eslint/ban-types
     middlewares?: Function[],
     environment?: string;
     port?: number | string;

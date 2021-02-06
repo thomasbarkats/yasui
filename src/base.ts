@@ -35,8 +35,8 @@ export function createApp(conf: BaseConfig): express.Application {
 
     /** client authentication */
     if (conf.apiKey) {
-        const appMdI = new AppMiddleware(conf.apiKey);
-        app.use(appMdI.auth.bind(appMdI));
+        const appMiddleware = new AppMiddleware(conf.apiKey);
+        app.use(appMiddleware.auth.bind(appMiddleware));
     }
 
     /** logs for debugging */
@@ -57,9 +57,9 @@ export function createApp(conf: BaseConfig): express.Application {
     logger.log('load routes from controllers...');
     for (const Controller of conf.controllers || []) {
         try {
-            const prototype = Controller.prototype as IController;
-            const path: string = prototype.path;
-            const router: express.Router = prototype.configureRoutes(conf.debug);
+            const controller = new Controller() as IController;
+            const path: string = controller.path;
+            const router: express.Router = controller.configureRoutes(controller, conf.debug);
             app.use(path, router);
             logger.success(`${italic(`${path}`)} routes loaded`);
 

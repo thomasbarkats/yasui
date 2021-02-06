@@ -5,7 +5,7 @@ import { italic } from 'kleur';
 
 import { logger } from '../services';
 import { LoggerService } from '../services/logger.service';
-import { IControllerRoute } from '../types/interfaces';
+import { IController, IControllerRoute } from '../types/interfaces';
 
 
 export function Controller(
@@ -15,9 +15,15 @@ export function Controller(
     return function (target: Function): void {
         target.prototype.path = path;
 
-        target.prototype.configureRoutes = (debug = false): Router => {
+        target.prototype.configureRoutes = (
+            self: IController,
+            debug = false
+        ): Router => {
             logger.start();
             const router: Router = Router();
+
+            /** bind target impl to metadata to use this arg in route function */
+            Reflect.defineMetadata('SELF', self, target.prototype);
 
             /** enrich query with controller infos for logs and errors handling */
             router.use((req, res, next) => {
