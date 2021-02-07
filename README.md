@@ -28,7 +28,7 @@ Use `yasui.createApp({ })`, that return an express application, if you want to p
 | Parameter | Description |
 | :-------- | :-----------|
 | controllers | An array containing your controllers (classes using the `@Controller` decorator). |
-| middlewares | A function table of type `express.RequestHandler`. |
+| middlewares | An array containing your application level middlewares (classes using the `@Middleware` decorator). |
 | environment | The name of your environment. |
 | port | The listening port of your server (not needed in `createApp`). *3000* by default |
 | debug | Boolean, display logs more provided if true, and logs all incoming requests. |
@@ -39,29 +39,64 @@ Use `yasui.createApp({ })`, that return an express application, if you want to p
 Yasui provides decorators to define your controllers and endpoints.
 
 The `Controller` decorator takes in parameter the root path of its endpoints.
-You can also provide middlewares restricted to your controller.
 
 The methods of your controller can be decorated with the following: `@Get`, `@Post`, `@Put`, `@Delete`, `@Patch`. These take in parameter the relative path of the endpoint.
-You can also provide middlewares restricted to your endpoint.
+
+The parameters of your endpoint can be decorated with the following: `@Res`, `@Req`, `@Next`, to reflect express arguments, or with `@Param`, `@Body`, `@Query`, `@Header` to select a specific parameter from the query, or a subset of it ; they can take the name of the desired parameter as a parameter, in which case they will return the whole set.
 
 ### Example
 ```ts
 import express from 'express';
-import { Get, Controller, Post, logger } from 'yasui';
+import { Get, Controller, Res, Param } from 'yasui';
 
-export abstract class MyMiddleware {
-    public static log(req, res, next): void {
-        console.log('Hello world !')
-        next();
-    }
-}
-
-@Controller('/tests')
+@Controller('/')
 export class MyController {
-    @Get('/', MyMiddleware.log)
-    private hello(req, res): void {
-        res.status(200).json({ message: 'Hello world !' });
+
+    @Get('/:name')
+    private hello(
+        @Param('name') name: string,
+        @Res() res: express.Response
+    ): void {
+        res.status(200).json({ message: `Hello ${name}!` });
     }
 }
 ```
+
+&nbsp;
+## Middlewares
+Yasui provides also decorators to define your middlewares like controllers and use its at application, controller, or endpoint level.
+
+The `Middleware` decorator does not take parameter.
+
+The parameters of your middleware can be decorated with the same decorators as controller endpoints.
+
+Your middleware must obligatorily implement an `use()` method, which will define the execution function of it.
+
+### Example
+```ts
+import express from 'express';
+import { logger, Middleware, Param, Next } from '..';
+
+@Middleware()
+export class HelloMiddleware {
+    use(
+        @Param('name') name: string,
+        @Next() next: express.NextFunction
+    ): void {
+        logger.log(`Hello ${name}`);
+        next();
+    }
+}
+```
+
+```ts
+@Controller('/', HelloMiddleware)
+// [...]
+```
+
+```ts
+@Get('/:name', HelloMiddleware)
+// [...]
+```
+
 See `src/examples` folder for more details.
