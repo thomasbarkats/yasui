@@ -1,3 +1,6 @@
+import kleur from 'kleur';
+
+
 export const logger: {
     startTime?: number;
     lastTime?: number;
@@ -8,7 +11,7 @@ export const logger: {
     stop(): number;
     getTime(): number;
 
-    log(message: string, src?: string): void;
+    log(message: string, src?: string, color?: kleur.Color): void;
     debug(message: string, src?: string): void;
     success(message: string, src?: string): void;
     error(message: string, src?: string): void;
@@ -16,5 +19,5 @@ export const logger: {
 };
 
 export const config: {
-    get(name: string, backvalue?: string): string;
+    get(name: string, back?: string): string;
 };

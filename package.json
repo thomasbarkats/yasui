@@ -3,7 +3,6 @@
   "version": "0.3.0",
   "description": "Light framework using Express for Node.js applications",
   "main": "./lib/index.js",
-  "type": "module",
   "scripts": {
     "example": "npm run build && node lib/examples/app.js",
     "build": "tsc && npm run types-build",
@@ -12,6 +11,7 @@
     "lint": "eslint . --ext .ts --fix",
     "prepublishOnly": "npm run build && npm run lint",
     "preversion": "npm run lint",
+    "precommit": "npm run lint",
     "commit": "format-commit"
   },
   "files": [

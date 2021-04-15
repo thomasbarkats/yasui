@@ -11,7 +11,11 @@
     },
     {
       "value": "core",
-      "description": "Change(s) on the application core"
+      "description": "Change(s) on application core"
+    },
+    {
+      "value": "config",
+      "description": "Change(s) related to project configuration"
     },
     {
       "value": "test",
@@ -27,7 +31,7 @@
     }
   ],
   "minLength": 8,
-  "maxLengt": 70,
+  "maxLength": 70,
   "changeVersion": "never",
   "showAllVersionTypes": false,
   "stageAllChanges": false

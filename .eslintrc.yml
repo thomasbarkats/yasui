@@ -23,24 +23,19 @@ rules:
   semi:
     - error
     - always
-  eqeqeq:
-    - error
-  no-else-return:
-    - error
-  no-useless-catch:
-    - error
+  eqeqeq: error
+  no-else-return: error
+  no-useless-return: error
+  no-useless-catch: error
   eol-last: 
     - error
     - always
-  curly:
-    - error
-  no-return-await:
-    - error
-  require-await:
-    - warn
-  '@typescript-eslint/no-explicit-any':
-    - warn
-  '@typescript-eslint/no-require-imports':
-    - error
-  '@typescript-eslint/explicit-function-return-type':
-    - error
+  curly: error
+  no-return-await: error
+  camelcase: warn
+  dot-notation: error
+  no-multi-spaces: warn
+  require-await: warn
+  '@typescript-eslint/no-explicit-any': error
+  '@typescript-eslint/no-require-imports': error
+  '@typescript-eslint/explicit-function-return-type': error

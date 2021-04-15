@@ -37,8 +37,9 @@ export class LoggerService {
         throw new Error('No timers started');
     }
 
-    public log(message: string, src?: string): void {
-        console.log(this.getText(message, src));
+    public log(message: string, src?: string, color?: kleur.Color): void {
+        const text = this.getText(message, src);
+        console.log(color ? color(text) : text);
     }
 
     public debug(message: string, src?: string): void {

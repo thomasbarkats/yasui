@@ -11,4 +11,4 @@ yasui.createServer({
     apiKey: 'TEST',
 });
 
-yasui.connectMongoDB('mongodb://localhost:27017/test');
+// yasui.connectMongoDB('mongodb://localhost:27017/test');

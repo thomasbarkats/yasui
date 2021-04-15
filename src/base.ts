@@ -11,10 +11,10 @@ import { logger } from './services';
 
 export function createServer(conf: BaseConfig): http.Server {
     console.clear();
-    logger.log(bold(magenta('（◠‿◠）やすいです！')), magenta('yasui'));
+    logger.log(bold('（◠‿◠）やすいです！'), 'yasui', magenta);
 
-    const envDefined = conf.environment !== undefined;
-    envDefined && logger.log(blue(`run as ${conf.environment} environment`));
+    const envDefined: boolean = conf.environment !== undefined;
+    envDefined && logger.log(`run as ${conf.environment} environment`, 'app', blue);
 
     const app: express.Application = createApp(conf);
 

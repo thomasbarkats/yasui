@@ -1,7 +1,6 @@
 /debug
 /node_modules
 /.git
-/.vscode
 /lib
 /@types/enums
 package-lock.json
