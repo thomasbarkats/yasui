@@ -5,10 +5,8 @@ import { TestsController } from './tests.controller';
 yasui.createServer({
     controllers: [TestsController],
     middlewares: [], 
-    environment: 'developement',
+    environment: 'development',
     port: 8080, // 3000 by default
     debug: true, // false by default
     apiKey: 'TEST',
 });
-
-// yasui.connectMongoDB('mongodb://localhost:27017/test');

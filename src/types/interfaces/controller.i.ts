@@ -4,8 +4,9 @@ import { TMiddleware } from './middleware.i';
 
 
 /** controller type */
-export interface TController extends Function {
-    new (): IController;
+export type TController = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    new (...args: any[]): IController;
 }
 
 /** controller interface */

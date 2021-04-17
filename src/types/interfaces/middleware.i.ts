@@ -2,7 +2,7 @@ import express from 'express';
 
 
 /** middleware type */
-export interface TMiddleware extends Function {
+export type TMiddleware = {
     new (): IMiddleware;
 }
 

@@ -2,7 +2,6 @@ import * as http from 'http';
 import express from 'express';
 import { json } from 'body-parser';
 import { blue, bold, italic, magenta } from 'kleur';
-import { connect, connection } from 'mongoose';
 
 import { BaseConfig, IDController, IDMiddleware } from './types/interfaces';
 import { AppService } from './utils/app.service';
@@ -74,20 +73,4 @@ export function createApp(conf: BaseConfig): express.Application {
     app.use(AppService.handleErrors);
 
     return app;
-}
-
-export function connectMongoDB(url: string): void {
-    logger.start();
-    logger.log('establishing database connection...');
-
-    connect(
-        url,
-        {
-            useUnifiedTopology: true,
-            useNewUrlParser: true,
-        },
-    );
-    const db = connection;
-    db.on('error', () => logger.error('database connection: error'));
-    db.once('open', () => logger.success('database connection: success'));
 }

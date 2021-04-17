@@ -1,8 +1,26 @@
 {
   "name": "yasui",
-  "version": "0.3.0",
+  "version": "0.3.2",
   "description": "Light framework using Express for Node.js applications",
+  "license": "ISC",
+  "author": "Sendups",
+  "keywords": [
+    "express",
+    "framework",
+    "base",
+    "light",
+    "minimalist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sendups/yasui.git"
+  },
+  "homepage": "https://github.com/sendups/yasui#readme",
+  "bugs": {
+    "url": "https://github.com/sendups/yasui/issues"
+  },
   "main": "./lib/index.js",
+  "typings": "./@types/index.d.ts",
   "scripts": {
     "example": "npm run build && node lib/examples/app.js",
     "build": "tsc && npm run types-build",
@@ -20,20 +38,9 @@
     "@types/**/*",
     "!@types/enums.d.ts"
   ],
-  "typings": "./@types/index.d.ts",
-  "author": "Sendups",
-  "keywords": [
-    "express",
-    "framework",
-    "base",
-    "light",
-    "minimalist"
-  ],
-  "license": "ISC",
   "dependencies": {
-    "kleur": "^4.1.3",
     "express": "^4.17.1",
-    "mongoose": "^5.4.13",
+    "kleur": "^4.1.3",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
@@ -43,13 +50,5 @@
     "eslint": "^7.16.0",
     "format-commit": "^0.1.9",
     "typescript": "^4.1.3"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sendups/yasui.git"
-  },
-  "bugs": {
-    "url": "https://github.com/sendups/yasui/issues"
-  },
-  "homepage": "https://github.com/sendups/yasui#readme"
+  }
 }
