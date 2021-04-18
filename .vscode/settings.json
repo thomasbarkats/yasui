@@ -7,9 +7,11 @@
         "middlewares",
         "precommit",
         "preversion",
-        "yasui"
+        "yasui",
+        "paramtypes"
     ],
     "files.exclude": {
         "**/node_modules": true
-    }
+    },
+    "codemetrics.basics.ComplexityLevelNormal": 6
 }

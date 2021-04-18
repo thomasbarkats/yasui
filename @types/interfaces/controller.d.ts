@@ -1,10 +1,8 @@
-/** controller type */
-export interface TController extends Function {
-    new (): IController;
-}
+import { Constructible, ClassInstance } from './utils';
 
-/** controller interface */
-export interface IController {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [index: string]: any;
-}
+
+/** controller type */
+export type TController = Constructible<IController>;
+
+/** controller instance type */
+export type IController = ClassInstance;

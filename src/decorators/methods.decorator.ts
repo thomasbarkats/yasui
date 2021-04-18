@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/ban-types */
 
 import express from 'express';
@@ -61,10 +60,11 @@ export function routeHandler(
         const params: IRouteParam[] = Reflect.getMetadata(`${KEY}_PARAMS`, target) || [];
         const self: IController = Reflect.getMetadata('SELF', target);
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const routeHandlerArgs = {req, res, next} as any;
 
         /** redefine route function args with mapped params path */
-        const args: any[] = [];
+        const args: unknown[] = [];
         for (const param of params) {
             args[param.index] = param.path.reduce((prev, curr) => prev && prev[curr] || null, routeHandlerArgs);
         }

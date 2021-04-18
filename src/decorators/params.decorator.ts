@@ -64,3 +64,4 @@ export const Header = routeRequestParamDecorator(RouteRequestParamTypes.HEADER);
 export const Param = routeRequestParamDecorator(RouteRequestParamTypes.PARAM);
 export const Query = routeRequestParamDecorator(RouteRequestParamTypes.QUERY);
 export const Body = routeRequestParamDecorator(RouteRequestParamTypes.BODY);
+export const Logger = routeRequestParamDecorator(RouteRequestParamTypes.LOGGER);

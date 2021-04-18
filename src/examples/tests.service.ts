@@ -1,12 +1,16 @@
-import { logger } from '..';
+import { Injectable, LoggerService } from '..';
 
+@Injectable()
 export class TestsService {
+
+    /** services allow deep injections */
+    constructor(private logger: LoggerService) {}
 
     public getMessage(name: string): string {
         return `Hello ${name}!`;
     }
 
     public helloWorld(source?: string): void {
-        logger.log('Hello World!', source);
+        this.logger.log('Hello World!', source);
     }
 }

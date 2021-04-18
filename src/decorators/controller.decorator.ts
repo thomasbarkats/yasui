@@ -3,8 +3,8 @@
 import { RequestHandler, Router } from 'express';
 import { italic } from 'kleur';
 
-import { logger } from '../services';
-import { LoggerService } from '../services/logger.service';
+import { Core } from '../core';
+import { LoggerService } from '../services';
 import { IController, IControllerRoute, IDMiddleware, TMiddleware } from '../types/interfaces';
 
 
@@ -17,9 +17,9 @@ export function Controller(
 
         target.prototype.configureRoutes = (
             self: IController,
-            debug = false
+            core: Core
         ): Router => {
-            logger.start();
+            core.logger.start();
             const router: Router = Router();
 
             /** bind target impl to metadata to use this arg in route function */
@@ -34,7 +34,7 @@ export function Controller(
 
             /** use other optional middlewares for all controller routes */
             for (const Middleware of middlewares) {
-                const middleware = new Middleware() as IDMiddleware;
+                const middleware = core.build(Middleware) as IDMiddleware;
                 router.use(middleware.run(middleware));
             }
 
@@ -42,14 +42,14 @@ export function Controller(
             const routes: IControllerRoute[] = Reflect.getMetadata('ROUTES', target.prototype) || [];
 
             for (const route of routes) {
-                debug && logger.debug(
+                core.config.debug && core.logger.debug(
                     `stack route ${italic(`${route.method.toUpperCase()} ${route.path}`)}`,
                     target.name
                 );
 
                 /** stack route and middlewares on controller router */
                 const middlewares: RequestHandler[] = route.middlewares.map((Middleware: TMiddleware) => {
-                    const middleware = new Middleware() as IDMiddleware;
+                    const middleware = core.build(Middleware) as IDMiddleware;
                     return middleware.run(middleware);
                 });
                 router[route.method](route.path, ...middlewares, route.function);

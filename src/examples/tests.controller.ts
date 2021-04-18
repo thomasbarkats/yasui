@@ -12,11 +12,7 @@ import { TestsService } from './tests.service';
 export class TestsController {
 
     /** controllers allow service injections */
-    private testsService: TestsService;
-
-    constructor() {
-        this.testsService = new TestsService();
-    }
+    constructor(private testsService: TestsService) {}
 
 
     @Get('/:name')

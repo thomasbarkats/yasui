@@ -2,15 +2,16 @@ import express from 'express';
 import { italic, red } from 'kleur';
 
 import { HttpStatus } from '../types/enums';
-import { logger } from '../services';
 import { ErrorResource } from './error.resource';
 import { LoggerService } from '../services/logger.service';
 
 
 export class AppService {
+    private logger: LoggerService;
     private apiKey?: string;
 
     constructor(apiKey?: string) {
+        this.logger = new LoggerService();
         this.apiKey = apiKey;
     }
 
@@ -25,34 +26,34 @@ export class AppService {
         }
         res.sendStatus(HttpStatus.FORBIDDEN);
 
-        logger.reset();
-        logger.error(`Access denied (query attempt on ${italic(`${req.method} ${req.path}`)})`);
+        this.logger.reset();
+        this.logger.error(`Access denied (query attempt on ${italic(`${req.method} ${req.path}`)})`);
     }
 
-    public static logRequest(
+    public logRequest(
         req: express.Request,
         res: express.Response,
         next: express.NextFunction,
     ): void {
-        logger.reset();
-        logger.debug(`request ${italic(`${req.method} ${req.path}`)}`);
+        this.logger.reset();
+        this.logger.debug(`request ${italic(`${req.method} ${req.path}`)}`);
         next();
     }
 
     /** log and client response for 404 error */
-    public static handleNotFound(
+    public handleNotFound(
         req: express.Request,
         res: express.Response,
     ): void {
         const message = `Cannot resolve ${req.method} ${req.path}`;
         res.sendStatus(HttpStatus.NOT_FOUND);
 
-        logger.reset();
-        logger.error(message);
+        this.logger.reset();
+        this.logger.error(message);
     }
 
     /** pretty logs and client responses for errors */
-    public static handleErrors(
+    public handleErrors(
         err: Error,
         req: express.Request,
         res: express.Response,
@@ -65,7 +66,7 @@ export class AppService {
         const errResource = new ErrorResource(err, req);
         res.status(errResource.status).json(errResource);
 
-        const reqLogger: LoggerService = req.logger || logger.reset();
+        const reqLogger: LoggerService = req.logger || this.logger.reset();
         reqLogger.error(`${err.constructor.name}`, req.source);
         console.error(red(
             `source: ${filename ? `${filename} ${line}:${column}` : 'undefined'}\n` +

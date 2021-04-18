@@ -1,13 +1,15 @@
 import kleur from 'kleur';
 
 
-export const logger: {
+export const LoggerService: {
     startTime?: number;
     lastTime?: number;
     endTime?: number;
 
-    start(): typeof logger;
-    reset(): typeof logger;
+    new(): typeof LoggerService;
+
+    start(): typeof LoggerService;
+    reset(): typeof LoggerService;
     stop(): number;
     getTime(): number;
 
@@ -18,6 +20,6 @@ export const logger: {
     warn(message: string, src?: string): void;
 };
 
-export const config: {
+export const ConfigService: {
     get(name: string, back?: string): string;
 };

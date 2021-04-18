@@ -1,10 +1,9 @@
 import express from 'express';
+import { Constructible } from './utils';
 
 
 /** middleware type */
-export interface TMiddleware extends Function {
-    new (): IMiddleware;
-}
+export type TMiddleware = Constructible<IMiddleware>;
 
 /** middleware interface */
 export interface IMiddleware {

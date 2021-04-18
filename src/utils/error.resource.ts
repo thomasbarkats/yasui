@@ -41,7 +41,7 @@ export class ErrorResource {
     }
 
     private setData(err: IEError): void {
-        /** get other eventual fields of Error extented instance */
+        /** get other eventual fields of Error extended instance */
         const otherKeys: string[] = Object.keys(err)
             .filter(key => Object.keys(this).indexOf(key) === -1);
 

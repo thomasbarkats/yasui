@@ -1,6 +1,9 @@
 import kleur from 'kleur';
 
+import { Injectable } from '../decorators';
 
+
+@Injectable()
 export class LoggerService {
     public startTime?: number;
     public lastTime?: number;

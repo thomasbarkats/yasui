@@ -1,24 +1,20 @@
 import { RequestHandler, Router } from 'express';
 import { RouteMethods } from '../enums';
+import { ClassInstance, Constructible } from './utils.i';
 import { TMiddleware } from './middleware.i';
+import { Core } from '../../core';
 
 
 /** controller type */
-export type TController = {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    new (...args: any[]): IController;
-}
+export type TController = Constructible<IController>;
 
-/** controller interface */
-export interface IController {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [index: string]: any;
-}
+/** controller instance type */
+export type IController = ClassInstance;
 
-/** controller decorated interface */
+/** decorated controller interface */
 export interface IDController extends IController {
     path: string,
-    configureRoutes: (self: this, debug?: boolean) => Router,
+    configureRoutes: (self: this, core: Core) => Router,
 }
 
 

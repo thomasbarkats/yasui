@@ -1,10 +1,9 @@
 import express from 'express';
+import { Constructible } from './utils.i';
 
 
 /** middleware type */
-export type TMiddleware = {
-    new (): IMiddleware;
-}
+export type TMiddleware = Constructible<IMiddleware>;
 
 /** middleware interface */
 export interface IMiddleware {
@@ -12,7 +11,7 @@ export interface IMiddleware {
     use: (...args: any[]) => void | express.Response,
 }
 
-/** middleware decorated interface */
+/** decorated middleware interface */
 export interface IDMiddleware extends IMiddleware {
     run: (self: this) => express.RequestHandler,
 }
