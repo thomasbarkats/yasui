@@ -45,8 +45,8 @@ export class Injector {
     ): T {
         const runningInstance: ClassInstance = this.get(Provided.name);
         if (!runningInstance) {
-            this.debug && this.logger.debug(`load ${Provided.name} {${args.length}}`);
             this.instancies[Provided.name] = new Provided(...args);
+            this.debug && this.logger.debug(`bind ${Provided.name} {${args.length}}`);
         }
         return this.get(Provided.name);
     }

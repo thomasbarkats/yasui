@@ -3,7 +3,7 @@ import { Constructible } from './utils';
 
 
 /** middleware type */
-export type TMiddleware = Constructible<IMiddleware>;
+export declare type TMiddleware = Constructible<IMiddleware>;
 
 /** middleware interface */
 export interface IMiddleware {

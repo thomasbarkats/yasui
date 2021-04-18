@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export type Constructible<T = ClassInstance> = {
+export declare type Constructible<T = ClassInstance> = {
     new (...args: any[]): T;
 }
 
-export type ClassInstance = {
+export declare type ClassInstance = {
     [index: string]: any;
 }

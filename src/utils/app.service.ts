@@ -25,8 +25,6 @@ export class AppService {
             return next();
         }
         res.sendStatus(HttpStatus.FORBIDDEN);
-
-        this.logger.reset();
         this.logger.error(`Access denied (query attempt on ${italic(`${req.method} ${req.path}`)})`);
     }
 
@@ -35,8 +33,8 @@ export class AppService {
         res: express.Response,
         next: express.NextFunction,
     ): void {
-        this.logger.reset();
-        this.logger.debug(`request ${italic(`${req.method} ${req.path}`)}`);
+        const logger: LoggerService = req.logger || this.logger;
+        logger.debug(`request ${italic(`${req.method} ${req.path}`)}`);
         next();
     }
 
@@ -47,8 +45,6 @@ export class AppService {
     ): void {
         const message = `Cannot resolve ${req.method} ${req.path}`;
         res.sendStatus(HttpStatus.NOT_FOUND);
-
-        this.logger.reset();
         this.logger.error(message);
     }
 
@@ -66,8 +62,8 @@ export class AppService {
         const errResource = new ErrorResource(err, req);
         res.status(errResource.status).json(errResource);
 
-        const reqLogger: LoggerService = req.logger || this.logger.reset();
-        reqLogger.error(`${err.constructor.name}`, req.source);
+        const logger: LoggerService = req.logger || this.logger;
+        logger.error(`${err.constructor.name}`, req.source);
         console.error(red(
             `source: ${filename ? `${filename} ${line}:${column}` : 'undefined'}\n` +
             errResource.toString(),

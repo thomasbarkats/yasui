@@ -9,7 +9,7 @@
       "removeComments": true,
       "experimentalDecorators": true,
       "emitDecoratorMetadata": true,
-      "forceConsistentCasingInFileNames": true,
+      "forceConsistentCasingInFileNames": true
     },
     "include": ["src/**/*"],
     "exclude": ["**/*.spec.ts"]

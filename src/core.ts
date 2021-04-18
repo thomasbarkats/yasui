@@ -13,12 +13,14 @@ export class Core {
     public config: BaseConfig;
     public logger: LoggerService;
 
+    private appService: AppService;
     private injector: Injector;
     private app: express.Application;
 
     constructor(conf: BaseConfig) {
         this.config = conf;
         this.logger = new LoggerService();
+        this.appService = new AppService(this.config.apiKey);
         this.injector = new Injector(conf.debug, this.logger);
         this.app = express();
     }
@@ -28,17 +30,15 @@ export class Core {
         this.logger.start();
         this.app.use(json());
 
-        const appService = new AppService(this.config.apiKey);
-
         /** client authentication */
         if (this.config.apiKey) {
-            this.app.use(appService.auth.bind(appService));
+            this.app.use(this.appService.auth.bind(this.appService));
         }
 
         /** logs for debugging */
         if (this.config.debug) {
             this.logger.warn('debug mode is enabled');
-            this.app.use(appService.logRequest.bind(appService));
+            this.app.use(this.appService.logRequest.bind(this.appService));
         }
 
         /** use other optional middlewares */
@@ -48,8 +48,8 @@ export class Core {
         this.loadControllers();
 
         this.app.get('/', (req: express.Request, res: express.Response) => res.sendStatus(200));
-        this.app.use(appService.handleNotFound.bind(appService));
-        this.app.use(appService.handleErrors.bind(appService));
+        this.app.use(this.appService.handleNotFound.bind(this.appService));
+        this.app.use(this.appService.handleErrors.bind(this.appService));
 
         return this.app;
     }
