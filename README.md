@@ -23,7 +23,7 @@ Use `yasui.createApp({ })`, that return an express application, if you want to p
 
 &nbsp;
 ## Configuration
-`createServer` and `createApp` takes a configuration object that can take the following parameters:
+`createServer` and `createApp` takes a configuration object with the following parameters:
 
 | Parameter | Description |
 | :-------- | :-----------|
@@ -99,4 +99,9 @@ export class HelloMiddleware {
 // [...]
 ```
 
-See `src/examples` folder for more details.
+&nbsp;
+## Injections
+
+Not yet documented.
+
+See `src/examples` folder for examples.
