@@ -1,4 +1,5 @@
 import kleur from 'kleur';
+import { ClassInstance, Constructible } from './interfaces/utils';
 
 
 export declare class LoggerService {
@@ -20,4 +21,14 @@ export declare class LoggerService {
 
 export declare abstract class ConfigService {
     static get(name: string, back?: string): string;
+}
+
+export declare class Injector {
+    private debug;
+    private instancies;
+    private logger;
+    constructor(debug?: boolean, logger?: LoggerService);
+    get<T>(name: string): T;
+    build<T extends ClassInstance>(Provided: Constructible<T>): T;
+    private bind;
 }

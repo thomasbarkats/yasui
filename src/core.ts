@@ -54,7 +54,7 @@ export class Core {
         return this.app;
     }
 
-    public build<T>(Provided: Constructible<T>): T | ClassInstance {
+    public build<T extends ClassInstance>(Provided: Constructible<T>): T {
         return this.injector.build(Provided);
     }
 

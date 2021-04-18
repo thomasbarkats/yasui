@@ -2,7 +2,7 @@ import * as http from 'http';
 import express from 'express';
 import { blue, bold, magenta } from 'kleur';
 
-import { BaseConfig } from '../@types/interfaces';
+import { BaseConfig } from './types/interfaces';
 import { Core } from './core';
 
 

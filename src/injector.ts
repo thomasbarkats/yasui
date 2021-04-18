@@ -15,7 +15,7 @@ export class Injector {
     }
 
 
-    public get<T>(name: string): T {
+    public get<T extends ClassInstance>(name: string): T {
         return this.instancies[name] as T;
     }
 
@@ -25,8 +25,8 @@ export class Injector {
     ): T {
         /** get auto-generated constructor param types meta as dependencies */
         const depTypes: Constructible[] = Reflect.getMetadata('design:paramtypes', Provided);
-        let depInstancies: ClassInstance[] = [];
 
+        let depInstancies: ClassInstance[] = [];
         if (depTypes) {
             depInstancies = depTypes.map((Dep: Constructible) => this.build(Dep));
         }
@@ -43,7 +43,7 @@ export class Injector {
         Provided: Constructible<T>,
         args: ClassInstance[]
     ): T {
-        const runningInstance: ClassInstance = this.get(Provided.name);
+        const runningInstance: T = this.get(Provided.name);
         if (!runningInstance) {
             this.instancies[Provided.name] = new Provided(...args);
             this.debug && this.logger.debug(`bind ${Provided.name} {${args.length}}`);
