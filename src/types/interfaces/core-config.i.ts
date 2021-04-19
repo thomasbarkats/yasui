@@ -2,7 +2,7 @@ import { TController } from './controller.i';
 import { TMiddleware } from './middleware.i';
 
 
-export interface BaseConfig {
+export interface CoreConfig {
     controllers?: TController[],
     middlewares?: TMiddleware[],
     environment?: string;

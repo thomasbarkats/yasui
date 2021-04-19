@@ -3,7 +3,7 @@
   "types": [
     {
       "value": "fix",
-      "description": "Bug(s) correction"
+      "description": "Issue(s) fixing"
     },
     {
       "value": "feat",
@@ -15,7 +15,7 @@
     },
     {
       "value": "config",
-      "description": "Change(s) related to project configuration"
+      "description": "Project configuration"
     },
     {
       "value": "test",

@@ -2,7 +2,7 @@ import { TController } from './controller';
 import { TMiddleware } from './middleware';
 
 
-export interface BaseConfig {
+export interface YasuiConfig {
     controllers?: TController[],
     middlewares?: TMiddleware[],
     environment?: string;

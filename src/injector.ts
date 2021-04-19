@@ -6,12 +6,9 @@ export class Injector {
     private instancies: Record<string, ClassInstance>;
     private logger: LoggerService
 
-    constructor(
-        private debug = false,
-        logger?: LoggerService,
-    ) {
+    constructor(private debug = false) {
         this.instancies = {};
-        this.logger = logger || new LoggerService();
+        this.logger = new LoggerService();
     }
 
 
@@ -24,11 +21,15 @@ export class Injector {
         Provided: Constructible<T>
     ): T {
         /** get auto-generated constructor param types meta as dependencies */
-        const depTypes: Constructible[] = Reflect.getMetadata('design:paramtypes', Provided);
+        const deepDeps: Constructible[] = Reflect.getMetadata('design:paramtypes', Provided);
+
+        if (Object.keys(this.instancies).length < 1 && !deepDeps) {
+            this.logger.start();
+        }
 
         let depInstancies: ClassInstance[] = [];
-        if (depTypes) {
-            depInstancies = depTypes.map((Dep: Constructible) => this.build(Dep));
+        if (deepDeps) {
+            depInstancies = deepDeps.map((Dep: Constructible) => this.build(Dep));
         }
         try {
             return this.bind(Provided, depInstancies);

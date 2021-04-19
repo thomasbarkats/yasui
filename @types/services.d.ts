@@ -27,8 +27,8 @@ export declare class Injector {
     private debug;
     private instancies;
     private logger;
-    constructor(debug?: boolean, logger?: LoggerService);
-    get<T>(name: string): T;
+    constructor(debug?: boolean);
+    get<T extends ClassInstance>(name: string): T;
     build<T extends ClassInstance>(Provided: Constructible<T>): T;
     private bind;
 }

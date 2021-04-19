@@ -1,6 +1,6 @@
 import express from 'express';
 import { Server } from 'http';
-import { BaseConfig } from './interfaces';
+import { YasuiConfig } from './interfaces';
 
 
 export as namespace yasui;
@@ -9,5 +9,5 @@ export * from './decorators';
 export * from './services';
 export * from './enums';
 
-export function createServer(conf: BaseConfig): Server;
-export function createApp(conf: BaseConfig): express.Application;
+export function createServer(conf: YasuiConfig): Server;
+export function createApp(conf: YasuiConfig): express.Application;

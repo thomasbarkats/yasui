@@ -5,23 +5,23 @@ import { italic } from 'kleur';
 import { ClassInstance, Constructible, IDController, IDMiddleware } from './types/interfaces';
 import { AppService } from './utils/app.service';
 import { LoggerService } from './services';
-import { BaseConfig } from './types/interfaces';
+import { CoreConfig } from './types/interfaces';
 import { Injector } from './injector';
 
 
 export class Core {
-    public config: BaseConfig;
+    public config: CoreConfig;
     public logger: LoggerService;
 
     private appService: AppService;
     private injector: Injector;
     private app: express.Application;
 
-    constructor(conf: BaseConfig) {
+    constructor(conf: CoreConfig) {
         this.config = conf;
         this.logger = new LoggerService();
         this.appService = new AppService(this.config.apiKey);
-        this.injector = new Injector(conf.debug, this.logger);
+        this.injector = new Injector(conf.debug);
         this.app = express();
     }
 

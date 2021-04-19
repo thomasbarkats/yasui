@@ -2,11 +2,11 @@ import * as http from 'http';
 import express from 'express';
 import { blue, bold, magenta } from 'kleur';
 
-import { BaseConfig } from './types/interfaces';
+import { CoreConfig } from './types/interfaces';
 import { Core } from './core';
 
 
-export function createServer(conf: BaseConfig): http.Server {
+export function createServer(conf: CoreConfig): http.Server {
     const core: Core = new Core(conf);
 
     console.clear();
@@ -26,7 +26,7 @@ export function createServer(conf: BaseConfig): http.Server {
     return server;
 }
 
-export function createApp(conf: BaseConfig): express.Application {
+export function createApp(conf: CoreConfig): express.Application {
     const core: Core = new Core(conf);
     return core.createApp();
 }
