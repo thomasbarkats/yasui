@@ -34,6 +34,9 @@ export class TestsController {
 
     @Put('/')
     private error(): void {
-        throw new Error('I just simulate an error.');
+        throw {
+            message: 'I just simulate an error.',
+            status: HttpStatus.BAD_REQUEST // 500 by default
+        };
     }
 }

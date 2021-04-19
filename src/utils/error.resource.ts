@@ -9,6 +9,7 @@ export interface IEError extends Error {
     [index: string]: any,
 }
 
+
 export class ErrorResource {
     public url: string;
     public path: string;
@@ -31,6 +32,7 @@ export class ErrorResource {
         this.data = {};
         this.setData(err);
     }
+
 
     public toString(): string {
         return `url: ${this.url}\n` +

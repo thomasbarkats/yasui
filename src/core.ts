@@ -2,7 +2,7 @@ import express from 'express';
 import { json } from 'body-parser';
 import { italic } from 'kleur';
 
-import { ClassInstance, Constructible, IDController, IDMiddleware } from './types/interfaces';
+import { Instance, Constructible, IDController, IDMiddleware } from './types/interfaces';
 import { AppService } from './utils/app.service';
 import { LoggerService } from './services';
 import { CoreConfig } from './types/interfaces';
@@ -54,7 +54,7 @@ export class Core {
         return this.app;
     }
 
-    public build<T extends ClassInstance>(Provided: Constructible<T>): T {
+    public build<T extends Instance>(Provided: Constructible<T>): T {
         return this.injector.build(Provided);
     }
 

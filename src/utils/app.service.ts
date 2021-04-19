@@ -15,6 +15,7 @@ export class AppService {
         this.apiKey = apiKey;
     }
 
+
     /** restrict access to api with client key */ 
     public auth(
         req: express.Request,

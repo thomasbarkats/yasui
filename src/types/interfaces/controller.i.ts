@@ -1,6 +1,6 @@
 import { RequestHandler, Router } from 'express';
 import { RouteMethods } from '../enums';
-import { ClassInstance, Constructible } from './utils.i';
+import { Instance, Constructible } from './utils.i';
 import { TMiddleware } from './middleware.i';
 import { Core } from '../../core';
 
@@ -9,7 +9,7 @@ import { Core } from '../../core';
 export type TController = Constructible<IController>;
 
 /** controller instance type */
-export type IController = ClassInstance;
+export type IController = Instance;
 
 /** decorated controller interface */
 export interface IDController extends IController {

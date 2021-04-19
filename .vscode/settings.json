@@ -5,10 +5,10 @@
         "kleur",
         "linebreak",
         "middlewares",
+        "paramtypes",
         "precommit",
         "preversion",
-        "yasui",
-        "paramtypes"
+        "yasui"
     ],
     "files.exclude": {
         "**/node_modules": true

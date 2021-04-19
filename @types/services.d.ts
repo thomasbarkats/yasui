@@ -1,5 +1,5 @@
 import kleur from 'kleur';
-import { ClassInstance, Constructible } from './interfaces/utils';
+import { Instance, Constructible } from './interfaces/utils';
 
 
 export declare class LoggerService {
@@ -28,7 +28,7 @@ export declare class Injector {
     private instancies;
     private logger;
     constructor(debug?: boolean);
-    get<T extends ClassInstance>(name: string): T;
-    build<T extends ClassInstance>(Provided: Constructible<T>): T;
+    get<T extends Instance>(name: string): T;
+    build<T extends Instance>(Provided: Constructible<T>): T;
     private bind;
 }
