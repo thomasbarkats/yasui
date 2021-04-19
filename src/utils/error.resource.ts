@@ -3,10 +3,11 @@ import express from 'express';
 import { HttpStatus, HttpStatusMap } from '../types/enums';
 
 
+/** extended error interface */
 export interface IEError extends Error {
-    status?: number,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [index: string]: any,
+    status?: number,
 }
 
 

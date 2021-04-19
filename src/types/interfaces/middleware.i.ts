@@ -1,12 +1,12 @@
 import express from 'express';
-import { Constructible } from './utils.i';
+import { Constructible, Instance } from './utils.i';
 
 
 /** middleware type */
 export type TMiddleware = Constructible<IMiddleware>;
 
 /** middleware interface */
-export interface IMiddleware {
+export interface IMiddleware extends Instance {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     use: (...args: any[]) => void | express.Response,
 }

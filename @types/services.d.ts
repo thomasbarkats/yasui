@@ -15,8 +15,6 @@ export declare class LoggerService {
     success(message: string, src?: string): void;
     error(message: string, src?: string): void;
     warn(message: string, src?: string): void;
-    private getDate;
-    private getText;
 }
 
 export declare abstract class ConfigService {
@@ -30,5 +28,4 @@ export declare class Injector {
     constructor(debug?: boolean);
     get<T extends Instance>(name: string): T;
     build<T extends Instance>(Provided: Constructible<T>): T;
-    private bind;
 }

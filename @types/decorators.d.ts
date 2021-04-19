@@ -3,6 +3,8 @@ import { TMiddleware } from './interfaces';
 
 export function Controller(path: string, ...middlewares: TMiddleware[]): ClassDecorator;
 export function Middleware(): ClassDecorator;
+
+/** injections related decorators */
 export function Injectable(): ClassDecorator;
 
 /** controller route-methods decorators */

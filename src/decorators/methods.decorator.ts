@@ -61,7 +61,7 @@ export function routeHandler(
         const self: IController = Reflect.getMetadata('SELF', target);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const routeHandlerArgs = {req, res, next} as any;
+        const routeHandlerArgs = { req, res, next } as any;
 
         /** redefine route function args with mapped params path */
         const args: unknown[] = [];

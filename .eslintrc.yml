@@ -36,6 +36,20 @@ rules:
   dot-notation: error
   no-multi-spaces: warn
   require-await: warn
+  keyword-spacing:
+    - error
+    - before: true
+      after: true
+  func-call-spacing:
+    - error
+    - never
+  object-curly-spacing:
+    - error
+    - always
+    - arraysInObjects: false
+      objectsInObjects: false
   '@typescript-eslint/no-explicit-any': error
+  '@typescript-eslint/member-ordering': error
   '@typescript-eslint/no-require-imports': error
   '@typescript-eslint/explicit-function-return-type': error
+  '@typescript-eslint/type-annotation-spacing': error
