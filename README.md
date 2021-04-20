@@ -21,7 +21,7 @@ yasui.createServer({ });
 `createServer` will create an http server and listen it.
 Use `yasui.createApp({ })`, that return an express application, if you want to perform additional operations on it before listening the server and use your own listening method.
 
-Browse the [`src/examples`](https://github.com/sendups/yasui/tree/master/src/examples) folder to get an example of a simple server using the various basic features of Yasui.
+Browse the [`src/examples`](https://github.com/sendups/yasui/tree/master/src/examples) folder to get an example of a simple server using the basic features of Yasui.
 
 &nbsp;
 ## Configuration
