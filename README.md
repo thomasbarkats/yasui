@@ -21,6 +21,8 @@ yasui.createServer({ });
 `createServer` will create an http server and listen it.
 Use `yasui.createApp({ })`, that return an express application, if you want to perform additional operations on it before listening the server and use your own listening method.
 
+Browse the [`src/examples`](https://github.com/sendups/yasui/tree/master/src/examples) folder to get an example of a simple server using the various basic features of Yasui.
+
 &nbsp;
 ## Configuration
 `createServer` and `createApp` takes a configuration object with the following parameters:
@@ -43,6 +45,8 @@ The `Controller` decorator takes in parameter the root path of its endpoints.
 The methods of your controller can be decorated with the following: `@Get`, `@Post`, `@Put`, `@Delete`, `@Patch`. These take in parameter the relative path of the endpoint.
 
 The parameters of your endpoint can be decorated with the following: `@Res`, `@Req`, `@Next`, to reflect express arguments, or with `@Param`, `@Body`, `@Query`, `@Header` to select a specific parameter from the query, or a subset of it ; they can take the name of the desired parameter as a parameter, in which case they will return the whole set.
+
+`@Logger` also provides a query-specific timed logger service.
 
 ### Example
 ```ts
@@ -100,7 +104,7 @@ export class HelloMiddleware {
 ```
 
 &nbsp;
-## Injections
+## Dependency injections
 
 Not yet documented.
 

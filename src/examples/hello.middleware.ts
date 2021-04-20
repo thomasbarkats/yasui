@@ -14,7 +14,7 @@ export class HelloMiddleware {
     /** middlewares must have an unique use() method */
     use(
         @Req() req: express.Request,
-        @Logger() logger: LoggerService,
+        @Logger() logger: LoggerService, // each request has its own timed logger
         @Next() next: express.NextFunction
     ): void {
         logger.log(`Request ${req.method} ${req.path} ...`, req.source);

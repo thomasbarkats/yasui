@@ -1,5 +1,6 @@
 import kleur from 'kleur';
-import { Instance, Constructible } from './interfaces/utils';
+import { Instance, Constructible } from './interfaces';
+import { Scopes } from './enums';
 
 
 export declare class LoggerService {
@@ -22,10 +23,7 @@ export declare abstract class ConfigService {
 }
 
 export declare class Injector {
-    private debug;
-    private instancies;
-    private logger;
     constructor(debug?: boolean);
-    get<T extends Instance>(name: string): T;
-    build<T extends Instance>(Provided: Constructible<T>): T;
+    get<T extends Instance>(name: string | symbol): T;
+    build<T extends Instance>(Provided: Constructible<T>, scope?: Scopes): T
 }

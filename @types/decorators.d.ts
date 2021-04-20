@@ -6,6 +6,7 @@ export function Middleware(): ClassDecorator;
 
 /** injections related decorators */
 export function Injectable(): ClassDecorator;
+export function Local(): ParameterDecorator;
 
 /** controller route-methods decorators */
 export function Get(path: string, ...middlewares: TMiddleware[]): MethodDecorator;

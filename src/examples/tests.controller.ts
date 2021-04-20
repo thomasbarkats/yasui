@@ -34,9 +34,10 @@ export class TestsController {
 
     @Put('/')
     private error(): void {
-        throw {
-            message: 'I just simulate an error.',
-            status: HttpStatus.BAD_REQUEST // 500 by default
-        };
+        /**
+         * custom error must inherit from Error and have a status property
+         * 500 (Internal server error) is returned by default
+         */
+        throw new Error('I just simulate an error.');
     }
 }

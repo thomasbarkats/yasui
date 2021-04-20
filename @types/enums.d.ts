@@ -3,4 +3,5 @@
  * file not included in final package
  */
 
-export { };
+declare enum Scopes {}
+export { Scopes };

@@ -1,58 +1,79 @@
+import { yellow } from 'kleur';
+
 import { LoggerService } from './services';
+import { InheritedScopes, Scopes } from './types/enums';
 import { Instance, Constructible } from './types/interfaces';
 
 
 export class Injector {
-    private instancies: Record<string, Instance>;
+    private instancies: Map<string | symbol, Instance>;
     private logger: LoggerService
 
     constructor(private debug = false) {
-        this.instancies = {};
+        this.instancies = new Map<string | symbol, Instance>();
         this.logger = new LoggerService();
     }
 
 
-    public get<T extends Instance>(name: string): T {
-        return this.instancies[name] as T;
+    public get<T extends Instance>(name: string | symbol): T {
+        return this.instancies.get(name) as T;
     }
 
     /** instantiates constructible by deeply binding dependencies */
     public build<T extends Instance>(
-        Provided: Constructible<T>
+        Provided: Constructible<T>,
+        scope: Scopes = Scopes.SHARED
     ): T {
         /** get auto-generated constructor param types meta as dependencies */
-        const deps: Constructible[] = Reflect.getMetadata('design:paramtypes', Provided);
+        const deps: Constructible[] = Reflect.getMetadata('design:paramtypes', Provided) || [];
 
-        if (Object.keys(this.instancies).length < 1 && !deps) {
+        if (Object.keys(this.instancies).length < 1 && deps.length < 1) {
             this.logger.start();
         }
 
-        let depInstancies: Instance[] = [];
-        if (deps) {
-            /** build provider dependencies to bind deep-level deps. */
-            depInstancies = deps.map((Dep: Constructible) => this.build(Dep));
+        const token: string | symbol = this.getToken(Provided.name, scope);
+        const runningInstance: T = this.get(token);
+
+        if (!runningInstance) {
+            const depScopes: Record<number, Scopes> = Reflect.getMetadata('DEPENDENCIES', Provided) || {};
+
+            /** build provider dependencies to bind deep-level dependencies */
+            const depInstancies: Instance[] = deps.map((Dep: Constructible) => this.build(
+                Dep,
+                /** spread current scope according to its type */
+                InheritedScopes.includes(scope) ? scope : depScopes[deps.indexOf(Dep)]
+            ));
+
+            this.register(token, Provided, depInstancies);
         }
-        try {
-            return this.bind(Provided, depInstancies);
-        } catch (err) {
-            this.logger.error(`failed to load ${Provided.name || '<invalid constructible>'}\n${err}`);
-            throw err;
+        return this.get(token);
+    }
+
+    private register<T extends Instance>(
+        token: string | symbol,
+        Provided: Constructible<T>,
+        args: Instance[]
+    ): void {
+        this.instancies.set(token, new Provided(...args));
+
+        if (this.debug) {
+            const name: string = (typeof token === 'symbol')
+                ? yellow(Provided.name)
+                : Provided.name;
+            this.logger.debug(`register ${name} {${args.length}}`);
         }
     }
 
-
-    private bind<T extends Instance>(
-        Provided: Constructible<T>,
-        args: Instance[]
-    ): T {
-        const runningInstance: T = this.get(Provided.name);
-
-        if (!runningInstance) {
-            /** register provider instance */
-            this.instancies[Provided.name] = new Provided(...args);
-
-            this.debug && this.logger.debug(`bind ${Provided.name} {${args.length}}`);
+    private getToken(
+        name: string,
+        scope?: Scopes
+    ): string | symbol {
+        switch (scope) {
+        case Scopes.LOCAL:
+            return Symbol(name);
+        case Scopes.SHARED:
+        default:
+            return name;
         }
-        return this.get(Provided.name);
     }
 }
