@@ -9,14 +9,14 @@ export function Injectable(): ClassDecorator {
     };
 }
 
-export function Local(): ParameterDecorator {
+export function Inject(scope: Scopes = Scopes.SHARED): ParameterDecorator {
     return function (
         target: Object,
         propertyKey: string | symbol,
         index: number
     ): void {
         const deps: Record<number, Scopes> = Reflect.getMetadata('DEPENDENCIES', target) || {};
-        deps[index] = Scopes.LOCAL;
+        deps[index] = scope;
         Reflect.defineMetadata(
             'DEPENDENCIES',
             deps,
@@ -24,3 +24,5 @@ export function Local(): ParameterDecorator {
         );
     };
 }
+
+export const Local = Inject(Scopes.LOCAL);

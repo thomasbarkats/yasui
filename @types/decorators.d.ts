@@ -1,4 +1,5 @@
 import { TMiddleware } from './interfaces';
+import { Scopes } from './enums';
 
 
 export function Controller(path: string, ...middlewares: TMiddleware[]): ClassDecorator;
@@ -6,7 +7,8 @@ export function Middleware(): ClassDecorator;
 
 /** injections related decorators */
 export function Injectable(): ClassDecorator;
-export function Local(): ParameterDecorator;
+export function Inject(scope?: Scopes): ParameterDecorator
+export function Local(): ParameterDecorator
 
 /** controller route-methods decorators */
 export function Get(path: string, ...middlewares: TMiddleware[]): MethodDecorator;
