@@ -22,7 +22,7 @@ export function Controller(
             core.logger.start();
             const router: Router = Router();
 
-            /** bind target impl to metadata to use this arg in route function */
+            /** add target instance metadata to bind his args in route function */
             Reflect.defineMetadata('SELF', self, target.prototype);
 
             /** enrich query with controller infos for logs and errors handling */

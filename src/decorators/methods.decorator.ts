@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
 import express from 'express';
+
 import { RouteMethods } from '../types/enums';
-import { IController, IControllerRoute, IRouteParam, TMiddleware } from '../types/interfaces';
+import { IControllerRoute, Instance, IRouteParam, TMiddleware } from '../types/interfaces';
 
 
 /** create express method-routing decorator */
@@ -42,7 +43,7 @@ function addRoute(
 }
 
 
-/** create express-route-handler from controller method */
+/** create express-route-handler from controller/middleware method */
 export function routeHandler(
     target: Object,
     propertyKey: string | symbol,
@@ -55,13 +56,13 @@ export function routeHandler(
         res: express.Response,
         next: express.NextFunction,
     ): void => {
-        /** get params metadata of controller method */
+        /** get params metadata of route */
         const KEY = String(propertyKey);
         const params: IRouteParam[] = Reflect.getMetadata(`${KEY}_PARAMS`, target) || [];
-        const self: IController = Reflect.getMetadata('SELF', target);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const routeHandlerArgs = { req, res, next } as any;
+        const self: Instance = Reflect.getMetadata('SELF', target);
 
         /** redefine route function args with mapped params path */
         const args: unknown[] = [];

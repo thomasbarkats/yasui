@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
 import { RequestHandler } from 'express';
+
 import { IMiddleware } from '../types/interfaces';
 import { routeHandler } from './methods.decorator';
 
@@ -15,7 +16,7 @@ export const Middleware = (): ClassDecorator => {
                 throw new Error('middleware must implement use() method');
             }
 
-            /** bind target impl to metadata to use this arg in route function */
+            /** add target instance metadata to bind his args in route function */
             Reflect.defineMetadata('SELF', self, target.prototype);
 
             return routeHandler(target.prototype, 'use', descriptor);
