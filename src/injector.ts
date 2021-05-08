@@ -35,32 +35,50 @@ export class Injector {
         const runningInstance: T = this.get(token);
 
         if (!runningInstance) {
-            const depScopes: Record<number, Scopes> = Reflect.getMetadata('DEPENDENCIES', Provided) || {};
+            const depScopes: Record<number, Scopes> = Reflect.getMetadata('DEP_SCOPES', Provided) || {};
+            const depsMap: Record<number, string> = Reflect.getMetadata('DEPENDENCIES', Provided) || {};
 
             /** build provider dependencies to bind deep-level dependencies */
-            const depInstancies: Instance[] = deps.map((Dep: Constructible) => this.build(
+            const depInstancies: Instance[] = deps.map((Dep: Constructible, index: number) => this.map(
                 Dep, /** spread current scope according to its type */
-                InheritedScopes.includes(scope) ? scope : depScopes[deps.indexOf(Dep)]
+                InheritedScopes.includes(scope) ? scope : depScopes[index],
+                depsMap[index]
             ));
 
-            this.register(token, Provided, depInstancies);
+            this.register(token, new Provided(...depInstancies));
         }
         return this.get(token);
     }
 
-    private register<T extends Instance>(
+    public register<T extends Instance>(
         token: string | symbol,
-        Provided: Constructible<T>,
-        args: Instance[]
+        instance: T,
     ): void {
-        this.instancies.set(token, new Provided(...args));
+        this.instancies.set(token, instance);
 
         if (this.debug) {
-            const name: string = (typeof token === 'symbol')
-                ? yellow(Provided.name)
-                : Provided.name;
-            this.logger.debug(`register ${name} {${args.length}}`);
+            const name: string = (typeof token === 'symbol' && token.description)
+                ? yellow(token.description)
+                : token.toString();
+            this.logger.debug(`register ${name}`);
         }
+    }
+
+
+    /** build sub-dependency or directly map specified injection */
+    private map(
+        Dep: Constructible,
+        scope: Scopes,
+        token?: string,
+    ): Instance {
+        if (token) {
+            const instance: Instance = this.get(token);
+            if (!instance) {
+                throw new Error(`Unregistered dependency ${token}`);
+            }
+            return instance;
+        }
+        return this.build(Dep, scope);
     }
 
     private getToken(

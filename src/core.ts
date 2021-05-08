@@ -41,6 +41,11 @@ export class Core {
             this.app.use(this.appService.logRequest.bind(this.appService));
         }
 
+        /** register custom injections */
+        for (const injection of this.config.injections || []) {
+            this.injector.register(injection.token, injection.provide);
+        }
+
         /** use other optional middlewares */
         this.loadMiddlewares();
 

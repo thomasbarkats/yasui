@@ -6,6 +6,7 @@ import express from 'express';
 export interface YasuiConfig {
     controllers?: TController[],
     middlewares?: TMiddleware[],
+    injections?: Injection<Instance>[],
     environment?: string;
     port?: number | string;
     debug?: boolean,
@@ -18,6 +19,10 @@ export declare type Constructible<T = Instance> = {
 }
 export declare type Instance = {
     [index: string]: any;
+}
+export type Injection<T extends Instance> = {
+    token: string;
+    provide: T;
 }
 
 /** controller type */

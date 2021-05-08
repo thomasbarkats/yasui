@@ -9,14 +9,14 @@ export function Injectable(): ClassDecorator {
     };
 }
 
-export function Inject(scope: Scopes = Scopes.SHARED): ParameterDecorator {
+export function Inject(token: string): ParameterDecorator {
     return function (
         target: Object,
         propertyKey: string | symbol,
         index: number
     ): void {
-        const deps: Record<number, Scopes> = Reflect.getMetadata('DEPENDENCIES', target) || {};
-        deps[index] = scope;
+        const deps: Record<number, string> = Reflect.getMetadata('DEPENDENCIES', target) || {};
+        deps[index] = token;
         Reflect.defineMetadata(
             'DEPENDENCIES',
             deps,
@@ -25,4 +25,18 @@ export function Inject(scope: Scopes = Scopes.SHARED): ParameterDecorator {
     };
 }
 
-export const Local = Inject(Scopes.LOCAL);
+export function Scope(scope: Scopes): ParameterDecorator {
+    return function (
+        target: Object,
+        propertyKey: string | symbol,
+        index: number
+    ): void {
+        const deps: Record<number, Scopes> = Reflect.getMetadata('DEP_SCOPES', target) || {};
+        deps[index] = scope;
+        Reflect.defineMetadata(
+            'DEP_SCOPES',
+            deps,
+            target
+        );
+    };
+}

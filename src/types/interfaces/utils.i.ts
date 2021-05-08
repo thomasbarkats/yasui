@@ -7,3 +7,8 @@ export type Constructible<T = Instance> = {
 export type Instance = {
     [index: string]: any;
 }
+
+export type Injection<T extends Instance> = {
+    token: string;
+    provide: T;
+}

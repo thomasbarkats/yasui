@@ -25,5 +25,6 @@ export declare abstract class ConfigService {
 export declare class Injector {
     constructor(debug?: boolean);
     get<T extends Instance>(name: string | symbol): T;
-    build<T extends Instance>(Provided: Constructible<T>, scope?: Scopes): T
+    build<T extends Instance>(Provided: Constructible<T>, scope?: Scopes): T;
+    register<T extends Instance>(token: string | symbol, instance: T): void;
 }
