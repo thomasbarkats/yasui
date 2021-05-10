@@ -48,7 +48,7 @@ export class ErrorResource {
         const otherKeys: string[] = Object.keys(err)
             .filter(key => Object.keys(this).indexOf(key) === -1);
 
-        for (const key in otherKeys) {
+        for (const key of otherKeys) {
             /** add value to data error resource field */
             this.data[key] = err[key];
         }

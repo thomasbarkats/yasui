@@ -13,7 +13,7 @@ function routeParamDecorator(source: RouteParamTypes): Function {
 }
 
 /** create express route-request-parameter decorator */
-function routeRequestParamDecorator(type: RouteRequestParamTypes): Function {
+export function routeRequestParamDecorator(type: RouteRequestParamTypes): Function {
     return function (
         varName?: string
     ): ParameterDecorator {

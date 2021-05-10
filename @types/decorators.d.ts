@@ -26,3 +26,4 @@ export function Param(varName?: string): ParameterDecorator;
 export function Query(varName?: string): ParameterDecorator;
 export function Body(varName?: string): ParameterDecorator;
 export function Logger(): ParameterDecorator;
+export function routeRequestParamDecorator(type: string): (varName?: string) => ParameterDecorator;

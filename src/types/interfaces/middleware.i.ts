@@ -8,7 +8,7 @@ export type TMiddleware = Constructible<IMiddleware>;
 /** middleware interface */
 export interface IMiddleware extends Instance {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    use: (...args: any[]) => void | express.Response,
+    use: (...args: any[]) => void | express.Response | Promise<void> | Promise<express.Response>,
 }
 
 /** decorated middleware interface */
