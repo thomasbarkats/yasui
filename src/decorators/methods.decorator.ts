@@ -69,7 +69,10 @@ export function routeHandler(
         for (const param of params) {
             args[param.index] = param.path.reduce((prev, curr) => prev && prev[curr] || null, routeHandlerArgs);
         }
-        return routeFunction.apply(self, args);
+        /** apply route function as Promise to handle errors */
+        Promise
+            .resolve(routeFunction.apply(self, args))
+            .catch((err: Error) => next(err));
     };
 }
 

@@ -2,7 +2,7 @@
 import express from 'express';
 
 
-/** configuration for yasui core */
+/** configuration interface for yasui core */
 export interface YasuiConfig {
     controllers?: TController[],
     middlewares?: TMiddleware[],
@@ -38,3 +38,9 @@ export declare type TMiddleware = Constructible<IMiddleware>;
 export interface IMiddleware {
     use: (...args: any[]) => void | express.Response | Promise<void> | Promise<express.Response>,
 }
+
+/** express util exports for controllers, to avoid install it */
+export type ExpressApplication = express.Application;
+export type Response = express.Response;
+export type Request = express.Request;
+export type NextFunction = express.NextFunction;

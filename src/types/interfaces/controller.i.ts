@@ -24,3 +24,9 @@ export interface IControllerRoute {
     middlewares: TMiddleware[],
     function: RequestHandler,
 }
+
+
+export interface IRouteParam {
+    index: number,
+    path: string[],
+}

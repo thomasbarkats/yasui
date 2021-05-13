@@ -83,7 +83,6 @@ export class Core {
                 const router: express.Router = controller.configureRoutes(controller, this);
                 this.app.use(path, router);
                 this.logger.success(`${italic(`${path}`)} routes loaded`);
-
             } catch (err) {
                 this.logger.error(`failed to load ${Controller.name || '<invalid controller>'} routes\n${err}`);
             }
