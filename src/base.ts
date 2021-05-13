@@ -1,5 +1,5 @@
 import * as http from 'http';
-import express from 'express';
+import { Application } from 'express';
 import { blue, bold, magenta } from 'kleur';
 
 import { CoreConfig } from './types/interfaces';
@@ -15,7 +15,7 @@ export function createServer(conf: CoreConfig): http.Server {
     const envDefined: boolean = conf.environment !== undefined;
     envDefined && core.logger.log(`run as ${conf.environment} environment`, 'app', blue);
 
-    const app: express.Application = core.createApp();
+    const app: Application = core.createApp();
     const server: http.Server = http.createServer(app);
     const port: number | string = conf.port || 3000;
 
@@ -26,7 +26,7 @@ export function createServer(conf: CoreConfig): http.Server {
     return server;
 }
 
-export function createApp(conf: CoreConfig): express.Application {
+export function createApp(conf: CoreConfig): Application {
     const core: Core = new Core(conf);
     return core.createApp();
 }

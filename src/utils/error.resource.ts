@@ -1,5 +1,6 @@
 import { italic } from 'kleur';
-import express from 'express';
+import { Request } from 'express';
+
 import { HttpStatus, HttpStatusMap } from '../types/enums';
 
 
@@ -21,7 +22,7 @@ export class ErrorResource {
     public status: number;
     public data: Record<string, string>;
 
-    constructor(err: IEError, req: express.Request) {
+    constructor(err: IEError, req: Request) {
         this.url = `${req.protocol}://${req.headers.host}${req.originalUrl}`;
         this.path = req.path;
         this.method = req.method;

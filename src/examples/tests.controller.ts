@@ -1,4 +1,4 @@
-import express from 'express';
+import { Response } from 'express';
 import {
     Controller, Get, Post, Put,
     Res, Param, Header,
@@ -18,7 +18,7 @@ export class TestsController {
     @Get('/:name')
     private get(
         @Param('name') name: string,
-        @Res() res: express.Response
+        @Res() res: Response
     ): void {
         const message: string = this.testsService.getMessage(name);
         res.status(HttpStatus.OK).json({ message });
@@ -27,7 +27,7 @@ export class TestsController {
     @Post('/')
     private post(
         @Header('name') name: string,
-        @Res() res: express.Response
+        @Res() res: Response
     ): void {
         res.status(HttpStatus.OK).json({ message: `${name} say hello!` });
     }

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import express from 'express';
+import { Application, Request, Response, NextFunction } from 'express';
 
 
 /** configuration interface for yasui core */
@@ -36,11 +36,8 @@ export declare type TMiddleware = Constructible<IMiddleware>;
 
 /** middleware interface */
 export interface IMiddleware {
-    use: (...args: any[]) => void | express.Response | Promise<void> | Promise<express.Response>,
+    use: (...args: any[]) => void | Response | Promise<void> | Promise<Response>,
 }
 
-/** express util exports for controllers, to avoid install it */
-export type ExpressApplication = express.Application;
-export type Response = express.Response;
-export type Request = express.Request;
-export type NextFunction = express.NextFunction;
+/** express util exports for controllers */
+export { Application, Request, Response, NextFunction };
