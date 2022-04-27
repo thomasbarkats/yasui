@@ -7,7 +7,7 @@ import { Instance, Constructible } from './types/interfaces';
 
 export class Injector {
     private instancies: Map<string | symbol, Instance>;
-    private logger: LoggerService
+    private logger: LoggerService;
 
     constructor(private debug = false) {
         this.instancies = new Map<string | symbol, Instance>();
