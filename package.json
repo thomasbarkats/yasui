@@ -39,16 +39,17 @@
     "!@types/enums.d.ts"
   ],
   "dependencies": {
-    "express": "^4.18.0",
-    "kleur": "^4.1.4",
-    "reflect-metadata": "^0.1.13"
+    "express": "^4.19.2",
+    "kleur": "^4.1.5",
+    "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
-    "@types/express": "^4.17.13",
-    "@typescript-eslint/eslint-plugin": "^5.21.0",
-    "@typescript-eslint/parser": "^5.21.0",
-    "eslint": "^8.14.0",
-    "format-commit": "^0.1.10",
-    "typescript": "^4.6.3"
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.13",
+    "@typescript-eslint/eslint-plugin": "^7.11.0",
+    "@typescript-eslint/parser": "^7.11.0",
+    "eslint": "^8.56.0",
+    "format-commit": "^0.2.2",
+    "typescript": "^5.4.5"
   }
 }

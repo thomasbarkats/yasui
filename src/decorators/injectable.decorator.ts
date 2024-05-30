@@ -12,7 +12,7 @@ export function Injectable(): ClassDecorator {
 export function Inject(token: string): ParameterDecorator {
     return function (
         target: Object,
-        propertyKey: string | symbol,
+        propertyKey: string | symbol | undefined,
         index: number
     ): void {
         const deps: Record<number, string> = Reflect.getMetadata('DEPENDENCIES', target) || {};
@@ -28,7 +28,7 @@ export function Inject(token: string): ParameterDecorator {
 export function Scope(scope: Scopes): ParameterDecorator {
     return function (
         target: Object,
-        propertyKey: string | symbol,
+        propertyKey: string | symbol | undefined,
         index: number
     ): void {
         const deps: Record<number, Scopes> = Reflect.getMetadata('DEP_SCOPES', target) || {};

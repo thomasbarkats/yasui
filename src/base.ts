@@ -1,4 +1,4 @@
-import * as http from 'http';
+import { Server, createServer as createHttpServer } from 'http';
 import { Application } from 'express';
 import { blue, bold, magenta } from 'kleur';
 
@@ -6,7 +6,7 @@ import { CoreConfig } from './types/interfaces';
 import { Core } from './core';
 
 
-export function createServer(conf: CoreConfig): http.Server {
+export function createServer(conf: CoreConfig): Server {
     const core: Core = new Core(conf);
 
     console.clear();
@@ -16,7 +16,7 @@ export function createServer(conf: CoreConfig): http.Server {
     envDefined && core.logger.log(`run as ${conf.environment} environment`, 'app', blue);
 
     const app: Application = core.createApp();
-    const server: http.Server = http.createServer(app);
+    const server: Server = createHttpServer(app);
     const port: number | string = conf.port || 3000;
 
     server.listen(port, () => {

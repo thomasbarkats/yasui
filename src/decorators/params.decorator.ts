@@ -30,7 +30,7 @@ function extractParam(
 ): ParameterDecorator {
     return function (
         target: Object,
-        propertyKey: string | symbol,
+        propertyKey: string | symbol | undefined,
         parameterIndex: number
     ): void {
         /** construct param access path */
