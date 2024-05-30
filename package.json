@@ -1,6 +1,6 @@
 {
   "name": "yasui",
-  "version": "1.3.4",
+  "version": "1.3.5",
   "description": "Light framework using Express for Node.js applications",
   "license": "ISC",
   "author": "Thomas BARKATS",
