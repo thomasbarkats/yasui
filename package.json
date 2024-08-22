@@ -22,7 +22,7 @@
   "main": "./lib/index.js",
   "typings": "./@types/index.d.ts",
   "scripts": {
-    "example": "npm run build && node lib/examples/app.js",
+    "example": "nodemon",
     "build": "tsc && npm run types-build",
     "types-build": "cd src/types/ && tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -50,6 +50,7 @@
     "@typescript-eslint/parser": "^7.11.0",
     "eslint": "^8.56.0",
     "format-commit": "^0.2.2",
+    "nodemon": "^3.1.3",
     "typescript": "^5.4.5"
   }
 }
