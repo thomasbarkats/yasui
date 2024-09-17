@@ -9,5 +9,4 @@ yasui.createServer({
     environment: 'development',
     port: 8080, // 3000 by default
     debug: true, // false by default
-    apiKey: 'TEST',
 });

@@ -34,7 +34,6 @@ Browse the [`src/examples`](https://github.com/sendups/yasui/tree/master/src/exa
 | environment | The name of your environment. |
 | port | The listening port of your server (not needed in `createApp`). *3000* by default |
 | debug | Boolean, display logs more provided if true, and logs all incoming requests. |
-| apiKey | Authentication key for your API. If provided, all requests should contain the x-api-key header. |
 
 &nbsp;
 ## Controllers
@@ -45,6 +44,8 @@ The `Controller` decorator takes in parameter the root path of its endpoints.
 The methods of your controller can be decorated with the following: `@Get`, `@Post`, `@Put`, `@Delete`, `@Patch`. These take in parameter the relative path of the endpoint.
 
 The parameters of your endpoint can be decorated with the following: `@Res`, `@Req`, `@Next`, to reflect express arguments, or with `@Param`, `@Body`, `@Query`, `@Header` to select a specific parameter from the query, or a subset of it ; they can take the name of the desired parameter as a parameter, in which case they will return the whole set.
+
+You can directly return any kind of data, it will be automatically sended to the client in JSON format with status code 200 by default. `@HttpStatus` decorator allow you to specify the default status code.
 
 `@Logger` also provides a query-specific timed logger service.
 
@@ -60,8 +61,8 @@ export class MyController {
     private hello(
         @Param('name') name: string,
         @Res() res: express.Response
-    ): void {
-        res.status(200).json({ message: `Hello ${name}!` });
+    ): string {
+        return `Hello ${name}!`;
     }
 }
 ```
@@ -74,7 +75,7 @@ The `Middleware` decorator does not take parameter.
 
 The parameters of your middleware can be decorated with the same decorators as controller endpoints.
 
-Your middleware must obligatorily implement an `use()` method, which will define the execution function of it.
+Your middleware must obligatorily implement an `use()` method, which will define the execution function of it. `next()` will be automatically executed at the end if nothing is returned.
 
 ### Example
 ```ts
@@ -85,10 +86,8 @@ import { logger, Middleware, Param, Next } from '..';
 export class HelloMiddleware {
     use(
         @Param('name') name: string,
-        @Next() next: express.NextFunction
     ): void {
         logger.log(`Hello ${name}`);
-        next();
     }
 }
 ```
@@ -108,4 +107,4 @@ export class HelloMiddleware {
 
 Not yet documented.
 
-See `src/examples` folder for examples.
+See [src/examples](src/examples) folder for examples.
