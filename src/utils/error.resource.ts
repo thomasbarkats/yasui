@@ -1,7 +1,7 @@
 import { italic } from 'kleur';
 import { Request } from 'express';
 
-import { HttpStatus, HttpStatusMap } from '../types/enums';
+import { HttpCode, HttpCodeMap } from '../types/enums';
 
 
 /** extended error interface */
@@ -26,8 +26,8 @@ export class ErrorResource {
         this.url = `${req.protocol}://${req.headers.host}${req.originalUrl}`;
         this.path = req.path;
         this.method = req.method;
-        this.status = err.status || HttpStatus.INTERNAL_SERVER_ERROR;
-        this.statusMessage = HttpStatusMap[this.status];
+        this.status = err.status || HttpCode.INTERNAL_SERVER_ERROR;
+        this.statusMessage = HttpCodeMap[this.status];
         this.message = err.message;
         this.name = err.constructor.name;
 

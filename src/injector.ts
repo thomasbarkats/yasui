@@ -9,7 +9,7 @@ export class Injector {
     private instancies: Map<string | symbol, Instance>;
     private logger: LoggerService;
 
-    constructor(private debug = false) {
+    constructor(private readonly debug = false) {
         this.instancies = new Map<string | symbol, Instance>();
         this.logger = new LoggerService();
     }

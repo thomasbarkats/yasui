@@ -1,7 +1,7 @@
 import express from 'express';
 import { italic, red } from 'kleur';
 
-import { HttpStatus } from '../types/enums';
+import { HttpCode } from '../types/enums';
 import { ErrorResource } from './error.resource';
 import { LoggerService } from '../services/logger.service';
 
@@ -25,7 +25,7 @@ export class AppService {
         if (req.headers['x-api-key'] === this.apiKey) {
             return next();
         }
-        res.sendStatus(HttpStatus.FORBIDDEN);
+        res.sendStatus(HttpCode.FORBIDDEN);
         this.logger.error(`Access denied (query attempt on ${italic(`${req.method} ${req.path}`)})`);
     }
 
@@ -45,7 +45,7 @@ export class AppService {
         res: express.Response,
     ): void {
         const message = `Cannot resolve ${req.method} ${req.path}`;
-        res.sendStatus(HttpStatus.NOT_FOUND);
+        res.sendStatus(HttpCode.NOT_FOUND);
         this.logger.error(message);
     }
 

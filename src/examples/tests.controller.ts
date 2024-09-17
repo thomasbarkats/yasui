@@ -1,9 +1,4 @@
-import { Response } from 'express';
-import {
-    Controller, Get, Post, Put,
-    Res, Param, Header,
-    HttpStatus
-} from '..';
+import { Controller, Get, Post, Put, HttpCode, Param, Header, HttpStatus } from '..';
 import { HelloMiddleware } from './hello.middleware';
 import { TestsService } from './tests.service';
 
@@ -12,24 +7,22 @@ import { TestsService } from './tests.service';
 export class TestsController {
 
     /** controllers allow service injections */
-    constructor(private testsService: TestsService) {}
-
+    constructor(private readonly testsService: TestsService) {}
 
     @Get('/:name')
     private get(
         @Param('name') name: string,
-        @Res() res: Response
-    ): void {
+    ): string {
         const message: string = this.testsService.getMessage(name);
-        res.status(HttpStatus.OK).json({ message });
+        return message;
     }
 
     @Post('/')
+    @HttpStatus(HttpCode.CREATED)
     private post(
         @Header('name') name: string,
-        @Res() res: Response
-    ): void {
-        res.status(HttpStatus.OK).json({ message: `${name} say hello!` });
+    ): string {
+        return `${name} say hello!`;
     }
 
     @Put('/')

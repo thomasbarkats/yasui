@@ -36,7 +36,7 @@ export declare type TMiddleware = Constructible<IMiddleware>;
 
 /** middleware interface */
 export interface IMiddleware {
-    use: (...args: any[]) => void | Response | Promise<void> | Promise<Response>,
+    use: (...args: any[]) => any,
 }
 
 /** express util exports for controllers */

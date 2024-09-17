@@ -2,7 +2,7 @@
 
 import express from 'express';
 
-import { RouteMethods } from '../types/enums';
+import { HttpCode, RouteMethods } from '../types/enums';
 import { IControllerRoute, Instance, IRouteParam, TMiddleware } from '../types/interfaces';
 
 
@@ -47,15 +47,15 @@ function addRoute(
 export function routeHandler(
     target: Object,
     propertyKey: string | symbol,
-    descriptor: PropertyDescriptor
+    descriptor: PropertyDescriptor,
 ): express.RequestHandler {
     const routeFunction: Function = descriptor.value;
 
-    return (
+    return async (
         req: express.Request,
         res: express.Response,
         next: express.NextFunction,
-    ): void => {
+    ): Promise<void> => {
         /** get params metadata of route */
         const KEY = String(propertyKey);
         const params: IRouteParam[] = Reflect.getMetadata(`${KEY}_PARAMS`, target) || [];
@@ -69,10 +69,17 @@ export function routeHandler(
         for (const param of params) {
             args[param.index] = param.path.reduce((prev, curr) => prev && prev[curr] || null, routeHandlerArgs);
         }
-        /** apply route function as Promise to handle errors */
-        Promise
-            .resolve(routeFunction.apply(self, args))
-            .catch((err: Error) => next(err));
+
+        try {
+            const result: unknown = await routeFunction.apply(self, args);
+            if (!result) {
+                return next();
+            }
+            const customStatus: HttpCode = Reflect.getMetadata('HTTP_STATUS', routeFunction);
+            res.status(customStatus || HttpCode.OK).json(result);
+        } catch (err) {
+            next(err);
+        }
     };
 }
 
