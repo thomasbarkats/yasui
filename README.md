@@ -1,10 +1,25 @@
 # Yasui
-Light framework using Express for Node.js applications.
+
+[![npm version](https://badge.fury.io/js/yasui.svg)](https://badge.fury.io/js/yasui)
+[![Node.js Version](https://img.shields.io/node/v/yasui.svg)](https://nodejs.org/)
+[![npm downloads](https://img.shields.io/npm/dm/yasui.svg)](https://www.npmjs.com/package/yasui)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+
+Lightweight Express-based framework for REST and web APIs.
 
 <img src="https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot.png" alt="Logo" height=170></a>
 
-Yasui can mean "easy" in Japanese. Yasui is meant to be easy to use, light, going to essentials only, with few dependencies.
-Yasui simplifies REST API development by providing you tools to quickly implement your controllers, middleware, endpoints, server, and also provides complete errors management (logs and client responses), logging service, and dependency injection system.
+Yasui can mean "easy" in Japanese. Yasui is designed to be easy to use, lightweight, and focused on essentials with minimal dependencies.
+Yasui simplifies REST API development with tools for controllers, middleware, endpoints, plus complete error management, logging, and dependency injection.
+
+## Features Summary
+- **Lightweight**: Built on Express with minimal dependencies
+- **Decorator-based**: Clean, readable code with TypeScript decorators
+- **Dependency Injection**: Automatic resolution with scope management
+- **Auto Error Handling**: Comprehensive error catching, logging, and formatting
+- **Built-in Logging**: Timed logging service with color-coded output
+- **Flexible Middleware**: Application, controller, and endpoint-level middleware support
+- **Type-safe**: Full TypeScript support with proper typing
 
 ## Get started
 ```sh
@@ -16,7 +31,7 @@ yasui.createServer({ });
 ```
 
 `createServer` will create an http server and listen it.
-Use `yasui.createApp({ })`, that return an express application, if you want to perform additional operations on it before listening the server and use your own listening method.
+Use `yasui.createApp({ })`, that return an Express application, if you want to perform additional operations on it before listening the server and use your own listening method.
 
 Browse the [`src/examples`](./src/examples) folder to get a simple example of a server with Yasui, including controllers, services, middlewares, dependency injection, and error handling. Run it with `npm run example`.
 
@@ -25,21 +40,20 @@ Browse the [`src/examples`](./src/examples) folder to get a simple example of a 
 
 | Parameter | Description |
 | :-------- | :-----------|
-| controllers | An array containing your controllers (classes using the `@Controller` decorator). |
-| middlewares | An array containing your application level middlewares (classes using the `@Middleware` decorator). |
-| environment | The name of your environment. |
-| port | The listening port of your server (not needed in `createApp`). *3000* by default |
-| debug | Boolean, display logs more provided if true, and logs all incoming requests. |
+| controllers | Array of controllers (classes using the `@Controller` decorator) |
+| middlewares | Array of middlewares at application level (classes using the `@Middleware` decorator) |
+| environment | Name of your environment (String) |
+| port | Listening port of your server (only for `createServer` - Number - *3000* by default) |
+| debug | Display more logs and logs all incoming requests if true (Boolean) |
 
 ## Controllers
 Yasui provides decorators to define your controllers and endpoints.
 
-The `Controller` decorator takes in parameter the root path of its endpoints.
-The methods of your controller can be decorated with the following: `@Get`, `@Post`, `@Put`, `@Delete`, `@Patch`. These take in parameter the relative path of the endpoint.
+The `Controller` decorator takes the root path of its endpoints as parameter. Your controller methods can be decorated with `Get`, `Post`, `Put`, `Delete`, and `Patch`, each taking the relative path of the endpoint.
 
-The parameters of your endpoint can be decorated with the following: `@Res`, `@Req`, `@Next`, to reflect express arguments, or with `@Param`, `@Body`, `@Query`, `@Header` to select a specific parameter from the query, or a subset of it ; they can take the name of the desired parameter as a parameter, in which case they will return the whole set.
+Method parameters can be decorated with `Res`, `Req`, `Next` to access Express objects, or with `Param`, `Body`, `Query`, `Header` to extract specific request data. These decorators can take a parameter name to select a specific value, or be used without parameters to get the entire object.
 
-You can directly return any kind of data, it will be automatically sended to the client in JSON format with status code 200 by default. `@HttpStatus` decorator allow you to specify the default status code.
+You can directly return any data from your methods - it will be automatically sent as JSON with status 200. Use the `HttpStatus` decorator to specify a different default status code.
 
 ### Example
 ```ts
@@ -60,11 +74,9 @@ export class MyController {
 ```
 
 ## Middlewares
-Yasui provides also decorators to define your middlewares like controllers and use its at application, controller, or endpoint level.
+Yasui provides decorators to define middlewares and use them at application, controller, or endpoint level.
 
-The `Middleware` decorator does not take parameter.
-The parameters of your middleware can be decorated with the same decorators as controller endpoints.
-Your middleware must obligatorily implement an `use()` method, which will define the execution function of it. `next()` will be automatically executed at the end if nothing is returned.
+The `Middleware` decorator takes no parameters. Middleware parameters use the same decorators as controller endpoints. Your middleware must implement a `use()` method that defines its behavior. `next()` is automatically called at the end if nothing is returned.
 
 ### Example
 ```ts
@@ -99,7 +111,7 @@ private myEndpoint() { /* ... */ }
 ```
 
 ## Dependency Injection
-Yasui provides a complete dependency injection system with automatic resolution of dependencies and sophisticated scope management.
+Yasui provides a complete dependency injection system with automatic resolution of dependencies and scope management.
 
 ### Injectable Services
 Use the `@Injectable()` decorator to mark a class as injectable:
@@ -137,10 +149,6 @@ export class MyService {
     ) {}
 }
 ```
-
-**Scope Inheritance:**
-- `LOCAL` and `DEEP_LOCAL` scopes are inherited by sub-dependencies
-- `SHARED` scope doesn't propagate, allowing sub-dependencies to use their own specified scope
 
 ### Custom Injection Tokens
 For more complex scenarios, use custom injection tokens with `@Inject()`. This is useful for injecting primitive values, configurations, or when you need multiple instances of the same class:
@@ -184,7 +192,6 @@ Yasui includes a built-in logging service with timing capabilities and color-cod
 ```ts
 import { logger } from 'yasui';
 
-// Basic logging
 logger.log('Application started');
 logger.debug('Debug information');
 logger.success('Operation completed');
@@ -250,16 +257,6 @@ Errors are automatically formatted and include:
 - Additional error data
 
 The client receives a structured JSON error response, while detailed logs are written server-side.
-
-
-## Features Summary
-- **Lightweight**: Built on Express with minimal dependencies
-- **Decorator-based**: Clean, readable code with TypeScript decorators
-- **Dependency Injection**: Automatic resolution with scope management
-- **Auto Error Handling**: Comprehensive error catching, logging, and formatting
-- **Built-in Logging**: Timed logging service with color-coded output
-- **Flexible Middleware**: Application, controller, and endpoint-level middleware support
-- **Type-safe**: Full TypeScript support with proper typing
 
 ## Contributing
 Contributions are welcome! Please feel free to submit issues and pull requests.

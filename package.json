@@ -1,15 +1,21 @@
 {
   "name": "yasui",
   "version": "1.4.0",
-  "description": "Light framework using Express for Node.js applications",
+  "description": "Lightweight Express-based framework for REST and web APIs",
   "license": "AGPL-3.0-or-later",
   "author": "Thomas BARKATS",
   "keywords": [
     "express",
     "framework",
-    "base",
-    "light",
-    "minimalist"
+    "lightweight",
+    "minimalist",
+    "API",
+    "REST",
+    "typescript",
+    "decorators",
+    "dependency-injection",
+    "middleware",
+    "nodejs"
   ],
   "repository": {
     "type": "git",
@@ -21,6 +27,9 @@
   },
   "main": "./lib/index.js",
   "typings": "./@types/index.d.ts",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "example": "nodemon",
     "build": "tsc && npm run types-build",
