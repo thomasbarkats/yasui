@@ -52,7 +52,7 @@ export class Core {
         this.logger.log('load routes from controllers...');
         this.loadControllers();
 
-        this.app.get('/', (req: express.Request, res: express.Response) => res.sendStatus(200));
+        this.app.get('/', (req: express.Request, res: express.Response) => { res.sendStatus(200); });
         this.app.use(this.appService.handleNotFound.bind(this.appService));
         this.app.use(this.appService.handleErrors.bind(this.appService));
 

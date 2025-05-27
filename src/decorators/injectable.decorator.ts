@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
-
 import { Scopes } from '../types/enums';
 
 
@@ -11,7 +9,7 @@ export function Injectable(): ClassDecorator {
 
 export function Inject(token: string): ParameterDecorator {
     return function (
-        target: Object,
+        target: object,
         propertyKey: string | symbol | undefined,
         index: number
     ): void {
@@ -27,7 +25,7 @@ export function Inject(token: string): ParameterDecorator {
 
 export function Scope(scope: Scopes): ParameterDecorator {
     return function (
-        target: Object,
+        target: object,
         propertyKey: string | symbol | undefined,
         index: number
     ): void {

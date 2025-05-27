@@ -12,8 +12,9 @@ export function createServer(conf: CoreConfig): Server {
     console.clear();
     core.logger.log(bold('（◠‿◠）やすいです！'), 'yasui', magenta);
 
-    const envDefined: boolean = conf.environment !== undefined;
-    envDefined && core.logger.log(`run as ${conf.environment} environment`, 'app', blue);
+    if (conf.environment) {
+        core.logger.log(`run as ${conf.environment} environment`, 'app', blue);
+    }
 
     const app: Application = core.createApp();
     const server: Server = createHttpServer(app);

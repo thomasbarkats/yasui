@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
-
 import express from 'express';
 
 import { HttpCode, RouteMethods } from '../types/enums';
@@ -23,7 +21,7 @@ function addRoute(
     ...middlewares: TMiddleware[]
 ): MethodDecorator {
     return function (
-        target: Object,
+        target: object,
         propertyKey: string | symbol,
         descriptor: PropertyDescriptor
     ): void {
@@ -45,7 +43,7 @@ function addRoute(
 
 /** create express-route-handler from controller/middleware method */
 export function routeHandler(
-    target: Object,
+    target: object,
     propertyKey: string | symbol,
     descriptor: PropertyDescriptor,
 ): express.RequestHandler {

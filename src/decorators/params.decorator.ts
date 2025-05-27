@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
-
 import { RouteParamTypes } from '../types/enums';
 import { RouteRequestParamTypes } from '../types/enums';
 import { IRouteParam } from '../types/interfaces';
@@ -29,14 +27,16 @@ function extractParam(
     varName?: string
 ): ParameterDecorator {
     return function (
-        target: Object,
+        target: object,
         propertyKey: string | symbol | undefined,
         parameterIndex: number
     ): void {
         /** construct param access path */
         const path: string[] = [source];
         for (const node of [type, varName]) {
-            node ? path.push(node) : true;
+            if (node) {
+                path.push(node);
+            }
         }
 
         const routeParam: IRouteParam = {

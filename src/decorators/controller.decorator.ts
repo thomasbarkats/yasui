@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
-
 import { RequestHandler, Router } from 'express';
 import { italic } from 'kleur';
 
@@ -42,10 +40,12 @@ export function Controller(
             const routes: IControllerRoute[] = Reflect.getMetadata('ROUTES', target.prototype) || [];
 
             for (const route of routes) {
-                core.config.debug && core.logger.debug(
-                    `stack route ${italic(`${route.method.toUpperCase()} ${route.path}`)}`,
-                    target.name
-                );
+                if (core.config.debug) {
+                    core.logger.debug(
+                        `stack route ${italic(`${route.method.toUpperCase()} ${route.path}`)}`,
+                        target.name
+                    );
+                }
 
                 /** stack route and middlewares on controller router */
                 const middlewares: RequestHandler[] = route.middlewares.map((Middleware: TMiddleware) => {

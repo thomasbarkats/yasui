@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
-
 import { RequestHandler } from 'express';
 
 import { IMiddleware } from '../types/interfaces';
