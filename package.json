@@ -2,7 +2,7 @@
   "name": "yasui",
   "version": "1.4.0",
   "description": "Light framework using Express for Node.js applications",
-  "license": "ISC",
+  "license": "AGPL-3.0-or-later",
   "author": "Thomas BARKATS",
   "keywords": [
     "express",
@@ -30,7 +30,7 @@
     "prepublishOnly": "npm run build && npm run lint",
     "preversion": "npm run lint",
     "precommit": "npm run lint",
-    "commit": "format-commit"
+    "commit": "npm run lint && format-commit"
   },
   "files": [
     "lib/**/*",
