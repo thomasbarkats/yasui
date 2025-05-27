@@ -13,11 +13,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sendups/yasui.git"
+    "url": "git+https://github.com/thomasbarkats/yasui.git"
   },
-  "homepage": "https://github.com/sendups/yasui#readme",
+  "homepage": "https://github.com/thomasbarkats/yasui#readme",
   "bugs": {
-    "url": "https://github.com/sendups/yasui/issues"
+    "url": "https://github.com/thomasbarkats/yasui/issues"
   },
   "main": "./lib/index.js",
   "typings": "./@types/index.d.ts",
