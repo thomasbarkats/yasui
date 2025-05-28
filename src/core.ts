@@ -21,7 +21,7 @@ export class Core {
         this.config = conf;
         this.logger = new LoggerService();
         this.appService = new AppService(this.config.apiKey);
-        this.injector = new Injector(conf.debug);
+        this.injector = new Injector(this.logger, conf.debug);
         this.app = express();
     }
 

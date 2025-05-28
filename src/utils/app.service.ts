@@ -8,11 +8,9 @@ import { LoggerService } from '../services/logger.service';
 
 export class AppService {
     private logger: LoggerService;
-    private apiKey?: string;
 
-    constructor(apiKey?: string) {
+    constructor(private readonly apiKey?: string) {
         this.logger = new LoggerService();
-        this.apiKey = apiKey;
     }
 
 

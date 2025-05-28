@@ -9,15 +9,19 @@ import { Request } from 'express';
 export class HelloMiddleware implements IMiddleware {
 
     /** middlewares allow service injections */
-    constructor(private readonly testsService: TestsService) {}
+    constructor(
+        private readonly testsService: TestsService,
+    ) { }
 
 
     /** middlewares must have an unique use() method */
     use(
         @Req() req: Request,
-        @Logger() logger: LoggerService, // each request has its own timed logger
+        @Logger() logger: LoggerService, // each request has a dedicated timed log instance
     ): void {
-        logger.log(`Request ${req.method} ${req.path} ...`, req.source);
-        this.testsService.helloWorld(req.source);
+        const logSource: string = `${req.source} > ${HelloMiddleware.name}`;
+
+        logger.log(`Request ${req.method} ${req.path} ...`, logSource);
+        this.testsService.helloWorld(logSource);
     }
 }

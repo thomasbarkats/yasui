@@ -7,7 +7,9 @@ import { TestsService } from './tests.service';
 export class TestsController {
 
     /** controllers allow service injections */
-    constructor(private readonly testsService: TestsService) {}
+    constructor(
+        private readonly testsService: TestsService,
+    ) { }
 
     @Get('/:name')
     private get(

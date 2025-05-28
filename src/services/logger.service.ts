@@ -8,7 +8,7 @@ export class LoggerService {
     public startTime?: number;
     public lastTime?: number;
     public endTime?: number;
-
+    
     public start(): this {
         this.startTime = new Date().getTime();
         this.lastTime = this.startTime;

@@ -5,7 +5,9 @@ import { Injectable, LoggerService } from '..';
 export class TestsService {
 
     /** services allow deep injections */
-    constructor(private readonly logger: LoggerService) {}
+    constructor(
+        private readonly logger: LoggerService,
+    ) { }
 
 
     public getMessage(name: string): string {

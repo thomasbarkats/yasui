@@ -7,11 +7,13 @@ import { Instance, Constructible } from './types/interfaces';
 
 export class Injector {
     private instancies: Map<string | symbol, Instance>;
-    private logger: LoggerService;
+    private buildStack = new Set<string>();
 
-    constructor(private readonly debug = false) {
+    constructor(
+        private readonly logger: LoggerService,
+        private readonly debug = false,
+    ) {
         this.instancies = new Map<string | symbol, Instance>();
-        this.logger = new LoggerService();
     }
 
 
@@ -24,6 +26,21 @@ export class Injector {
         Provided: Constructible<T>,
         scope: Scopes = Scopes.SHARED
     ): T {
+        const className = Provided.name;
+        
+        // Circular dependencies detection
+        if (this.buildStack.has(className)) {
+            const cycle = Array.from(this.buildStack).join(' -> ') + ' -> ' + className;
+            throw new Error(`Circular dependency detected: ${cycle}`);
+        }
+
+        const token: string | symbol = this.getToken(className, scope);
+        const runningInstance: T = this.get(token);
+
+        if (runningInstance) {
+            return runningInstance;
+        }
+
         /** get auto-generated constructor param types meta as dependencies */
         const deps: Constructible[] = Reflect.getMetadata('design:paramtypes', Provided) || [];
 
@@ -31,13 +48,12 @@ export class Injector {
             this.logger.start();
         }
 
-        const token: string | symbol = this.getToken(Provided.name, scope);
-        const runningInstance: T = this.get(token);
+        const depScopes: Record<number, Scopes> = Reflect.getMetadata('DEP_SCOPES', Provided) || {};
+        const depsMap: Record<number, string> = Reflect.getMetadata('DEPENDENCIES', Provided) || {};
 
-        if (!runningInstance) {
-            const depScopes: Record<number, Scopes> = Reflect.getMetadata('DEP_SCOPES', Provided) || {};
-            const depsMap: Record<number, string> = Reflect.getMetadata('DEPENDENCIES', Provided) || {};
+        this.buildStack.add(className);
 
+        try {
             /** build provider dependencies to bind deep-level dependencies */
             const depInstancies: Instance[] = deps.map((Dep: Constructible, index: number) => this.map(
                 Dep, /** spread current scope according to its type */
@@ -46,7 +62,10 @@ export class Injector {
             ));
 
             this.register(token, new Provided(...depInstancies));
+        } finally {
+            this.buildStack.delete(className);
         }
+
         return this.get(token);
     }
 
