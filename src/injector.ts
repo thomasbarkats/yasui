@@ -57,7 +57,7 @@ export class Injector {
             /** build provider dependencies to bind deep-level dependencies */
             const depInstancies: Instance[] = deps.map((Dep: Constructible, index: number) => this.map(
                 Dep, /** spread current scope according to its type */
-                InheritedScopes.includes(scope) ? scope : depScopes[index],
+                InheritedScopes.includes(scope) ? scope : (depScopes[index] || Scopes.SHARED),
                 depsMap[index]
             ));
 

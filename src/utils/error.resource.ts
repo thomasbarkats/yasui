@@ -27,7 +27,7 @@ export class ErrorResource {
         this.path = req.path;
         this.method = req.method;
         this.status = err.status || HttpCode.INTERNAL_SERVER_ERROR;
-        this.statusMessage = HttpCodeMap[this.status];
+        this.statusMessage = HttpCodeMap[this.status] || '';
         this.message = err.message;
         this.name = err.constructor.name;
 

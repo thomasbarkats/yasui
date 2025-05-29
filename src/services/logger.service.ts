@@ -5,9 +5,9 @@ import { Injectable } from '../decorators';
 
 @Injectable()
 export class LoggerService {
-    public startTime?: number;
-    public lastTime?: number;
-    public endTime?: number;
+    public startTime: number | undefined;
+    public lastTime: number | undefined;
+    public endTime: number | undefined;
     
     public start(): this {
         this.startTime = new Date().getTime();
