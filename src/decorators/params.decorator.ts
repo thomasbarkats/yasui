@@ -11,11 +11,11 @@ function routeParamDecorator(source: RouteParamTypes): Function {
 }
 
 /** create express route-request-parameter decorator */
-export function routeRequestParamDecorator(type: RouteRequestParamTypes): Function {
+export function routeRequestParamDecorator(reqProperty: string): Function {
     return function (
         varName?: string
     ): ParameterDecorator {
-        return extractParam(RouteParamTypes.REQ, type, varName);
+        return extractParam(RouteParamTypes.REQ, reqProperty, varName);
     };
 }
 
@@ -23,7 +23,7 @@ export function routeRequestParamDecorator(type: RouteRequestParamTypes): Functi
 /** extract route param from express req object */
 function extractParam(
     source: RouteParamTypes,
-    type?: RouteRequestParamTypes,
+    reqProperty?: string,
     varName?: string
 ): ParameterDecorator {
     return function (
@@ -33,7 +33,7 @@ function extractParam(
     ): void {
         /** construct param access path */
         const path: string[] = [source];
-        for (const node of [type, varName]) {
+        for (const node of [reqProperty, varName]) {
             if (node) {
                 path.push(node);
             }

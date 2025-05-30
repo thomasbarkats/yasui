@@ -58,7 +58,7 @@ You can directly return any data from your methods - it will be automatically se
 ### Example
 ```ts
 import express from 'express';
-import { Get, Controller, Res, Param, Logger, HttpStatus } from 'yasui';
+import { Get, Controller, Res, Param, HttpStatus } from 'yasui';
 
 @Controller('/')
 export class MyController {
@@ -81,7 +81,7 @@ The `Middleware` decorator takes no parameters. Middleware parameters use the sa
 ### Example
 ```ts
 import express from 'express';
-import { logger, Middleware, Param, Next } from 'yasui';
+import { logger, Middleware, Param } from 'yasui';
 
 @Middleware()
 export class HelloMiddleware {
@@ -104,7 +104,7 @@ export class MyController { /* ... */ }
 private myEndpoint() { /* ... */ }
 
 // Multiple middlewares can be attached, and will be called in order
-@Controller('/:name', MyMiddleware1, MyMiddleware2)
+@Controller('/:name', YourMiddleware1, YourMiddleware2)
 private myEndpoint() { /* ... */ }
 
 // Controller middleware(s) will precede endpoint middleware(s)
@@ -117,15 +117,28 @@ Yasui provides a complete dependency injection system with automatic resolution 
 Use the `@Injectable()` decorator to mark a class as injectable:
 
 ```ts
-import { Injectable, LoggerService } from 'yasui';
+import { Injectable } from 'yasui';
 
-@Injectable()
+@Injectable() // Required
 export class UserService {
-    constructor(private readonly logger: LoggerService) {}
-    
+
     getUser(id: string) {
-        this.logger.log(`Fetching user ${id}`);
-        // Your logic here
+        // Your logic...
+    }
+}
+```
+
+### Using Services in Controllers
+Simply inject your services in controller constructors:
+
+```ts
+@Controller('/users')
+export class UserController {
+    constructor(private readonly userService: UserService) {}
+
+    @Get('/:id')
+    getUser(@Param('id') id: string) {
+        return this.userService.getUser(id);
     }
 }
 ```
@@ -175,33 +188,25 @@ yasui.createServer({
 });
 ```
 
-### Using Services in Controllers
-Simply inject your services in controller constructors:
-
-```ts
-@Controller('/users')
-export class UserController {
-    constructor(private readonly userService: UserService) {}
-
-    @Get('/:id')
-    getUser(@Param('id') id: string) {
-        return this.userService.getUser(id);
-    }
-}
-```
-
 ## Logging Service
 Yasui includes a built-in logging service with timing capabilities and color-coded output.
 
 ### Basic Usage
 ```ts
-import { logger } from 'yasui';
+import { Injectable, LoggerService } from 'yasui';
 
-logger.log('Application started');
-logger.debug('Debug information');
-logger.success('Operation completed');
-logger.warn('Warning message');
-logger.error('Error occurred');
+@Injectable()
+export class YourService {
+    constructor(private readonly logger: LoggerService) {}
+    
+    yourMethod(id: string) {
+        logger.log('Application started');
+        logger.debug('Debug information');
+        logger.success('Operation completed');
+        logger.warn('Warning message');
+        logger.error('Error occurred');
+    }
+}
 ```
 
 ### Timed Logging
@@ -225,9 +230,8 @@ Use the `@Logger()` decorator to get a request-specific logger instance:
 export class ApiController {
     @Get('/data')
     getData(@Logger() logger: LoggerService) {
-        logger.start();
         // ... fetch data
-        logger.success(`Data fetched in ${logger.stop()}ms`);
+        logger.success(`Data fetched in ${logger.getTime()}ms`);
         return data;
     }
 }
@@ -262,6 +266,11 @@ Errors are automatically formatted and include:
 - Additional error data
 
 The client receives a structured JSON error response, while detailed logs are written server-side.
+
+### Decorator Validation
+Yasui automatically validates your decorators at startup to catch common configuration errors, such as circular dependencies or missing parameter decorators. These errors don't stop the server from running but will cancel the build of the affected controller and display error details after server initialization.
+
+You can disable these controls in the Yasui configuration with `enableDecoratorValidation: false` (unsafe!!)
 
 ## Contributing
 Contributions are welcome! Please feel free to submit issues and pull requests.
