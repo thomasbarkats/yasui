@@ -59,7 +59,7 @@
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
     "eslint": "^9.27.0",
-    "format-commit": "^0.2.2",
+    "format-commit": "^0.3.1",
     "globals": "^16.2.0",
     "nodemon": "^3.1.10",
     "typescript": "^5.8.3"
