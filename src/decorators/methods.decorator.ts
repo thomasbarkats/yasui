@@ -30,6 +30,7 @@ function addRoute(
             path,
             middlewares,
             function: routeHandler(target, propertyKey, descriptor),
+            methodName: String(propertyKey)
         };
         const routes: IControllerRoute[] = Reflect.getMetadata('ROUTES', target) || [];
         Reflect.defineMetadata(

@@ -1,16 +1,20 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Application, Request, Response, NextFunction } from 'express';
 
 
 /** configuration interface for yasui core */
 export interface YasuiConfig {
-    controllers?: TController[],
-    middlewares?: TMiddleware[],
-    injections?: Injection<Instance>[],
+    controllers?: TController[];
+    middlewares?: TMiddleware[];
+    injections?: Injection<Instance>[];
     environment?: string;
     port?: number | string;
-    debug?: boolean,
-    apiKey?: string,
+    debug?: boolean;
+    apiKey?: string;
+    /**
+     * If false, disables all validation checks on decorators (unsafe)
+     * @default true
+     */
+    enableDecoratorValidation?: boolean;
 }
 
 /** util types */

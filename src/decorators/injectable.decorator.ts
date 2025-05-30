@@ -13,13 +13,9 @@ export function Inject(token: string): ParameterDecorator {
         propertyKey: string | symbol | undefined,
         index: number
     ): void {
-        const deps: Record<number, string> = Reflect.getMetadata('DEPENDENCIES', target) || {};
+        const deps: Record<number, string> = Reflect.getMetadata('PRE_INJECTED_DEPS', target) || {};
         deps[index] = token;
-        Reflect.defineMetadata(
-            'DEPENDENCIES',
-            deps,
-            target
-        );
+        Reflect.defineMetadata('PRE_INJECTED_DEPS', deps, target);
     };
 }
 
@@ -31,10 +27,6 @@ export function Scope(scope: Scopes): ParameterDecorator {
     ): void {
         const deps: Record<number, Scopes> = Reflect.getMetadata('DEP_SCOPES', target) || {};
         deps[index] = scope;
-        Reflect.defineMetadata(
-            'DEP_SCOPES',
-            deps,
-            target
-        );
+        Reflect.defineMetadata('DEP_SCOPES', deps, target);
     };
 }

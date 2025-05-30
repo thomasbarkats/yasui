@@ -13,20 +13,21 @@ export type IController = Instance;
 
 /** decorated controller interface */
 export interface IDController extends IController {
-    path: string,
-    configureRoutes: (self: this, core: Core) => Router,
+    path: string;
+    configureRoutes: (self: this, core: Core) => Router;
 }
 
 
 export interface IControllerRoute {
-    method: RouteMethods,
-    path: string,
-    middlewares: TMiddleware[],
-    function: RequestHandler,
+    method: RouteMethods;
+    path: string;
+    middlewares: TMiddleware[];
+    function: RequestHandler;
+    methodName: string;
 }
 
 
 export interface IRouteParam {
-    index: number,
-    path: string[],
+    index: number;
+    path: string[];
 }

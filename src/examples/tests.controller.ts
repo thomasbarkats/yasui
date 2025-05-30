@@ -15,8 +15,7 @@ export class TestsController {
     private get(
         @Param('name') name: string,
     ): string {
-        const message: string = this.testsService.getMessage(name);
-        return message;
+        return this.testsService.getMessage(name);
     }
 
     @Post('/')

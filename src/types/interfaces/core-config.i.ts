@@ -4,11 +4,12 @@ import { Injection, Instance } from './utils.i';
 
 
 export interface CoreConfig {
-    controllers?: TController[],
-    middlewares?: TMiddleware[],
-    injections?: Injection<Instance>[],
+    controllers?: TController[];
+    middlewares?: TMiddleware[];
+    injections?: Injection<Instance>[];
     environment?: string;
     port?: number | string;
-    debug?: boolean,
-    apiKey?: string,
+    debug?: boolean;
+    apiKey?: string;
+    enableDecoratorValidation?: boolean;
 }

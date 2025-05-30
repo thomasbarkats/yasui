@@ -3,17 +3,20 @@ import { yellow } from 'kleur';
 import { LoggerService } from './services';
 import { InheritedScopes, Scopes } from './types/enums';
 import { Instance, Constructible } from './types/interfaces';
+import { DecoratorValidator } from './utils/decorator-validator';
 
 
 export class Injector {
     private instancies: Map<string | symbol, Instance>;
-    private buildStack = new Set<string>();
+    private buildStack: Set<string>;
 
     constructor(
         private readonly logger: LoggerService,
+        private readonly decoratorValidator: DecoratorValidator | null,
         private readonly debug = false,
     ) {
         this.instancies = new Map<string | symbol, Instance>();
+        this.buildStack = new Set<string>();
     }
 
 
@@ -27,12 +30,6 @@ export class Injector {
         scope: Scopes = Scopes.SHARED
     ): T {
         const className = Provided.name;
-        
-        // Circular dependencies detection
-        if (this.buildStack.has(className)) {
-            const cycle = Array.from(this.buildStack).join(' -> ') + ' -> ' + className;
-            throw new Error(`Circular dependency detected: ${cycle}`);
-        }
 
         const token: string | symbol = this.getToken(className, scope);
         const runningInstance: T = this.get(token);
@@ -44,23 +41,23 @@ export class Injector {
         /** get auto-generated constructor param types meta as dependencies */
         const deps: Constructible[] = Reflect.getMetadata('design:paramtypes', Provided) || [];
 
-        if (Object.keys(this.instancies).length < 1 && deps.length < 1) {
-            this.logger.start();
-        }
-
         const depScopes: Record<number, Scopes> = Reflect.getMetadata('DEP_SCOPES', Provided) || {};
-        const depsMap: Record<number, string> = Reflect.getMetadata('DEPENDENCIES', Provided) || {};
+        const preInjectedDeps: Record<number, string> = Reflect.getMetadata('PRE_INJECTED_DEPS', Provided) || {};
 
         this.buildStack.add(className);
 
         try {
             /** build provider dependencies to bind deep-level dependencies */
-            const depInstancies: Instance[] = deps.map((Dep: Constructible, index: number) => this.map(
-                Dep, /** spread current scope according to its type */
-                InheritedScopes.includes(scope) ? scope : (depScopes[index] || Scopes.SHARED),
-                depsMap[index]
-            ));
-
+            const depInstancies: Instance[] = deps.map((Dep: Constructible, index: number) => 
+                this.buildDependency(
+                    Dep,
+                    /** spread current scope according to its type */
+                    InheritedScopes.includes(scope)
+                        ? scope
+                        : (depScopes[index] || Scopes.SHARED),
+                    preInjectedDeps[index]
+                )
+            );
             this.register(token, new Provided(...depInstancies));
         } finally {
             this.buildStack.delete(className);
@@ -85,19 +82,19 @@ export class Injector {
 
 
     /** build sub-dependency or directly map specified injection */
-    private map(
+    private buildDependency(
         Dep: Constructible,
         scope: Scopes,
-        token?: string,
+        preRegisteredToken?: string,
     ): Instance {
-        if (token) {
-            const instance: Instance = this.get(token);
-            if (!instance) {
-                throw new Error(`Unregistered dependency ${token}`);
-            }
-            return instance;
-        }
-        return this.build(Dep, scope);
+        this.decoratorValidator?.validateInjectable(
+            Dep,
+            scope,
+            this.buildStack,
+        );
+        return preRegisteredToken
+            ? this.get(preRegisteredToken)
+            : this.build(Dep, scope);
     }
 
     private getToken(
