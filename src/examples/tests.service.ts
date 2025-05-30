@@ -4,7 +4,6 @@ import { Injectable, LoggerService } from '..';
 @Injectable()
 export class TestsService {
 
-    /** services allow deep injections */
     constructor(
         private readonly logger: LoggerService,
     ) { }

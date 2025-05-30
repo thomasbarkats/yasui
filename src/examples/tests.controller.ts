@@ -6,7 +6,6 @@ import { TestsService } from './tests.service';
 @Controller('/tests', HelloMiddleware)
 export class TestsController {
 
-    /** controllers allow service injections */
     constructor(
         private readonly testsService: TestsService,
     ) { }

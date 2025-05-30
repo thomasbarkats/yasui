@@ -36,7 +36,7 @@ Use `yasui.createApp({ })`, that return an Express application, if you want to p
 Browse the [`src/examples`](./src/examples) folder to get a simple example of a server with Yasui, including controllers, services, middlewares, dependency injection, and error handling. Run it with `npm run example`.
 
 ## Configuration
-`createServer` and `createApp` takes a configuration object with the following parameters:
+`createServer` and `createApp` takes a configuration object including the following parameters:
 
 | Parameter | Description |
 | :-------- | :-----------|
@@ -165,9 +165,14 @@ export class DatabaseService {
 
 **Registering custom tokens:**
 ```ts
-// You need to register these tokens before building your services
-injector.register('DATABASE_URL', 'postgresql://localhost:5432/mydb');
-injector.register('CONFIG', { apiKey: 'xxx', timeout: 5000 });
+// You need to register custom tokens in your app config
+yasui.createServer({
+    ...yourConfig,
+    injections: [
+        { token: 'DATABASE_URL', provide: 'postgresql://localhost:5432/mydb' },
+        { token: 'CONFIG', provide: { apiKey: 'xxx', timeout: 5000 } }
+    ]
+});
 ```
 
 ### Using Services in Controllers
@@ -177,7 +182,7 @@ Simply inject your services in controller constructors:
 @Controller('/users')
 export class UserController {
     constructor(private readonly userService: UserService) {}
-    
+
     @Get('/:id')
     getUser(@Param('id') id: string) {
         return this.userService.getUser(id);

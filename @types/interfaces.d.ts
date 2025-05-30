@@ -5,7 +5,7 @@ import { Application, Request, Response, NextFunction } from 'express';
 export interface YasuiConfig {
     controllers?: TController[];
     middlewares?: TMiddleware[];
-    injections?: Injection<Instance>[];
+    injections?: Injection<any>[];
     environment?: string;
     port?: number | string;
     debug?: boolean;

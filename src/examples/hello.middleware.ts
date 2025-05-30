@@ -8,7 +8,6 @@ import { Request } from 'express';
 @Middleware()
 export class HelloMiddleware implements IMiddleware {
 
-    /** middlewares allow service injections */
     constructor(
         private readonly testsService: TestsService,
     ) { }
