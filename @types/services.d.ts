@@ -1,6 +1,4 @@
 import kleur from 'kleur';
-import { Instance, Constructible } from './interfaces';
-import { Scopes } from './enums';
 
 
 export declare class LoggerService {
@@ -19,12 +17,10 @@ export declare class LoggerService {
 }
 
 export declare abstract class ConfigService {
+    /**
+     * Safe method to read an environment variable
+     * @param name environment variable name
+     * @param back optional default / fallback value
+     */
     static get(name: string, back?: string): string;
-}
-
-export declare class Injector {
-    constructor(debug?: boolean);
-    get<T extends Instance>(name: string | symbol): T;
-    build<T extends Instance>(Provided: Constructible<T>, scope?: Scopes): T;
-    register<T extends Instance>(token: string | symbol, instance: T): void;
 }
