@@ -8,7 +8,7 @@ export type Instance = {
     [index: string]: any;
 }
 
-export type Injection<T extends Instance> = {
+export type Injection<T = any> = {
     token: string;
     provide: T;
 }

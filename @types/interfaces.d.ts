@@ -6,7 +6,7 @@ export interface YasuiConfig {
     controllers?: TController[];
     middlewares?: TMiddleware[];
     /** Pre-registered customs injections */
-    injections?: Injection<any>[];
+    injections?: Injection[];
     environment?: string;
     /**
      * Listening port of your server
@@ -35,7 +35,7 @@ export declare type Constructible<T = Instance> = {
 export declare type Instance = {
     [index: string]: any;
 }
-export type Injection<T extends Instance> = {
+export type Injection<T = any> = {
     token: string;
     provide: T;
 }

@@ -6,8 +6,7 @@ import { Injection } from './utils.i';
 export interface CoreConfig {
     controllers?: TController[];
     middlewares?: TMiddleware[];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    injections?: Injection<any>[];
+    injections?: Injection[];
     environment?: string;
     port?: number | string;
     debug?: boolean;

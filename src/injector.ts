@@ -7,7 +7,8 @@ import { DecoratorValidator } from './utils/decorator-validator';
 
 
 export class Injector {
-    private instancies: Map<string | symbol, Instance>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private registry: Map<string | symbol, any>;
     private buildStack: Set<string>;
 
     constructor(
@@ -15,13 +16,13 @@ export class Injector {
         private readonly decoratorValidator: DecoratorValidator | null,
         private readonly debug = false,
     ) {
-        this.instancies = new Map<string | symbol, Instance>();
+        this.registry = new Map<string | symbol, Instance>();
         this.buildStack = new Set<string>();
     }
 
 
     public get<T extends Instance>(name: string | symbol): T {
-        return this.instancies.get(name) as T;
+        return this.registry.get(name) as T;
     }
 
     /** instantiates constructible by deeply binding dependencies */
@@ -66,11 +67,11 @@ export class Injector {
         return this.get(token);
     }
 
-    public register<T extends Instance>(
+    public register<T>(
         token: string | symbol,
-        instance: T,
+        instance: T
     ): void {
-        this.instancies.set(token, instance);
+        this.registry.set(token, instance);
 
         if (this.debug) {
             const name: string = (typeof token === 'symbol' && token.description)
@@ -85,7 +86,7 @@ export class Injector {
     private buildDependency(
         Dep: Constructible,
         scope: Scopes,
-        preRegisteredToken?: string,
+        preRegisteredToken?: string
     ): Instance {
         this.decoratorValidator?.validateInjectable(
             Dep,
