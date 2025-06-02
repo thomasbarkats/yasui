@@ -3,5 +3,6 @@
 /.git
 /lib
 /@types/enums
+/@types/openapi
 package-lock.json
 /.vscode

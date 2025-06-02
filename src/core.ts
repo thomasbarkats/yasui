@@ -8,11 +8,13 @@ import { DecoratorValidator } from './utils/decorator-validator';
 import { LoggerService } from './services';
 import { CoreConfig } from './types/interfaces';
 import { Injector } from './injector';
+import { SwaggerService } from './utils/swagger.service';
 
 
 export class Core {
     public config: CoreConfig;
     public logger: LoggerService;
+    public swagger: SwaggerService;
     public decoratorValidator: DecoratorValidator | null;
 
     private appService: AppService;
@@ -26,6 +28,7 @@ export class Core {
         }
         this.logger = new LoggerService();
         this.appService = new AppService(this.config.apiKey);
+        this.swagger = new SwaggerService();
         this.decoratorValidator = this.config.enableDecoratorValidation
             ? new DecoratorValidator(this.config)
             : null;
@@ -64,6 +67,9 @@ export class Core {
         this.logger.log('load routes from controllers...');
         this.loadControllers();
 
+        /** setup swagger documentation if enabled */
+        this.setupSwagger();
+
         this.app.get('/', (req: express.Request, res: express.Response) => { res.sendStatus(200); });
         this.app.use(this.appService.handleNotFound.bind(this.appService));
         this.app.use(this.appService.handleErrors.bind(this.appService));
@@ -98,10 +104,43 @@ export class Core {
                 const router: express.Router = controller.configureRoutes(controller, this);
                 this.app.use(path, router);
 
+                if (this.config.swagger?.generate) {
+                    this.swagger.registerControllerRoutes(Controller, path);
+                }
+
                 this.logger.success(`${italic(`${path}`)} routes loaded`);
 
             } catch (err) {
                 this.logger.error(`failed to load ${Controller.name || '<invalid controller>'} routes\n${err}`);
+            } 
+        }
+    }
+
+    private setupSwagger(): void {
+        if (!this.config.swagger?.generate) {
+            return;
+        }
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const swaggerUi = require('swagger-ui-express');
+            let swaggerPath = this.config.swagger.path || '/api-docs';
+            if (!swaggerPath.startsWith('/')) {
+                swaggerPath = '/' + swaggerPath;
+            }
+            const swaggerConfig = this.swagger.getSwaggerConfig(this.config.swagger?.info, !!this.config.apiKey);
+
+            this.app.use(swaggerPath, swaggerUi.serve);
+            this.app.get(swaggerPath, swaggerUi.setup(swaggerConfig));
+            this.app.get(`${swaggerPath}/swagger.json`, (req, res) => {
+                res.json(swaggerConfig);
+            });
+
+            this.logger.success(`${italic(`${swaggerPath}`)} swagger documentation loaded`);
+
+        } catch (err) {
+            this.logger.warn('swagger-ui-express not found. Install it to enable swagger documentation: npm install swagger-ui-express');
+            if (this.config.debug) {
+                this.logger.error(`swagger setup error: ${err}`);
             }
         }
     }

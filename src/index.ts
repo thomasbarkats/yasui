@@ -5,6 +5,7 @@ import * as base from './base';
 import * as services from './services';
 import * as decorators from './decorators';
 import * as enums from './types/enums';
+import * as openapi from './types/openapi';
 
 
 const scope = {
@@ -12,6 +13,7 @@ const scope = {
     ...decorators,
     ...services,
     ...enums,
+    ...openapi,
 };
 
 const yasui = {

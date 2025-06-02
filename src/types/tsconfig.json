@@ -1,13 +1,16 @@
 {
     "compilerOptions": {
-      "target": "ESNext",
-      "module": "CommonJS",
-      "types": [],
-      "declarationDir": "../../@types",
-      "declaration": true,
-      "emitDeclarationOnly": true,
-      "baseUrl": "../",
-      "rootDir": "./",
+        "target": "ESNext",
+        "module": "CommonJS",
+        "types": [],
+        "declarationDir": "../../@types",
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "baseUrl": "../",
+        "rootDir": "./",
     },
-    "include": ["enums/**/*"],
+    "include": [
+        "enums/**/*",
+        "openapi/**/*"
+    ]
 }

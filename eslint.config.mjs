@@ -56,7 +56,8 @@ export default [
             '.git/**',
             '.vscode/**',
             'lib/**',
-            '**/*.d.ts'
+            '@types/enums/**',
+            '@types/openapi/**'
         ]
     }
 ];

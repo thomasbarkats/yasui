@@ -1,5 +1,6 @@
 import { TMiddleware } from './interfaces';
 import { Scopes } from './enums';
+import { OpenAPISchema } from './openapi';
 
 
 export function Controller(path: string, ...middlewares: TMiddleware[]): ClassDecorator;
@@ -27,3 +28,11 @@ export function Query(varName?: string): ParameterDecorator;
 export function Body(varName?: string): ParameterDecorator;
 export function Logger(): ParameterDecorator;
 export function routeRequestParamDecorator(type: string): (varName?: string) => ParameterDecorator;
+
+/** swagger decorators */
+export function ApiOperation(summary: string, description?: string, tags?: string[]): MethodDecorator;
+export function ApiResponse(statusCode: number, description: string, schema?: OpenAPISchema): MethodDecorator;
+export function ApiBody(description?: string, schema?: OpenAPISchema, contentType?: string): MethodDecorator;
+export function ApiParam(name: string, description?: string, required?: boolean, schema?: OpenAPISchema): MethodDecorator;
+export function ApiQuery(name: string, description?: string, required?: boolean, schema?: OpenAPISchema): MethodDecorator;
+export function ApiHeader(name: string, description?: string, required?: boolean, schema?: OpenAPISchema): MethodDecorator;
