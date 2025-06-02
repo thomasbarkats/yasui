@@ -45,7 +45,8 @@
     "lib/**/*",
     "!lib/examples/**/*",
     "@types/**/*",
-    "!@types/enums.d.ts"
+    "!@types/enums.d.ts",
+    "!@types/openapi.d.ts"
   ],
   "dependencies": {
     "express": "^5.1.0",
@@ -62,6 +63,7 @@
     "format-commit": "^0.3.1",
     "globals": "^16.2.0",
     "nodemon": "^3.1.10",
+    "swagger-ui-express": "^5.0.1",
     "typescript": "^5.8.3"
   }
 }

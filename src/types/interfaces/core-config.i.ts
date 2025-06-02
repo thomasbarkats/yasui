@@ -12,4 +12,13 @@ export interface CoreConfig {
     debug?: boolean;
     apiKey?: string;
     enableDecoratorValidation?: boolean;
+    swagger?: {
+        generate: boolean;
+        path?: string;
+        info?: {
+            title?: string;
+            version?: string;
+            description?: string;
+        };
+    };
 }
