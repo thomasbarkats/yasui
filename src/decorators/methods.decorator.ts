@@ -25,19 +25,27 @@ function addRoute(
         propertyKey: string | symbol,
         descriptor: PropertyDescriptor
     ): void {
+        const methodName: string = String(propertyKey);
+        const defaultStatus: HttpCode = Reflect.getMetadata('HTTP_STATUS', target, propertyKey);
+        const params: IRouteParam[] = Reflect.getMetadata('PARAMS', target, methodName) || [];
+
         const route: IControllerRoute = {
             method,
             path,
             middlewares,
-            function: routeHandler(target, propertyKey, descriptor),
-            methodName: String(propertyKey)
+            function: routeHandler(
+                target,
+                descriptor,
+                params,
+                defaultStatus
+            ),
+            methodName,
+            defaultStatus,
+            params,
         };
+
         const routes: IControllerRoute[] = Reflect.getMetadata('ROUTES', target) || [];
-        Reflect.defineMetadata(
-            'ROUTES',
-            [...routes, route],
-            target
-        );
+        Reflect.defineMetadata('ROUTES', [...routes, route], target);
     };
 }
 
@@ -45,8 +53,9 @@ function addRoute(
 /** create express-route-handler from controller/middleware method */
 export function routeHandler(
     target: object,
-    propertyKey: string | symbol,
     descriptor: PropertyDescriptor,
+    params: IRouteParam[],
+    defaultStatus: HttpCode = HttpCode.OK,
 ): express.RequestHandler {
     const routeFunction: Function = descriptor.value;
 
@@ -55,10 +64,6 @@ export function routeHandler(
         res: express.Response,
         next: express.NextFunction,
     ): Promise<void> => {
-        /** get params metadata of route */
-        const KEY = String(propertyKey);
-        const params: IRouteParam[] = Reflect.getMetadata(`${KEY}_PARAMS`, target) || [];
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const routeHandlerArgs = { req, res, next } as any;
         const self: Instance = Reflect.getMetadata('SELF', target);
@@ -74,8 +79,7 @@ export function routeHandler(
             if (!result) {
                 return next();
             }
-            const customStatus: HttpCode = Reflect.getMetadata('HTTP_STATUS', routeFunction);
-            res.status(customStatus || HttpCode.OK).json(result);
+            res.status(defaultStatus).json(result);
         } catch (err) {
             next(err);
         }

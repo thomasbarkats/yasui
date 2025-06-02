@@ -1,4 +1,10 @@
-import { Constructible, CoreConfig, IController, IControllerRoute, Injection, IRouteParam } from '../types/interfaces';
+import {
+    Constructible,
+    CoreConfig,
+    IController,
+    IControllerRoute,
+    Injection,
+} from '../types/interfaces';
 import { LoggerService } from '../services';
 import { Scopes } from '../types/enums';
 
@@ -56,7 +62,7 @@ export class DecoratorValidator {
         }
 
         routes.forEach((route: IControllerRoute) => {
-            this.validateRouteMethod(className, target.prototype, route.methodName);
+            this.validateRouteMethod(className, target.prototype, route);
         });
 
         this.throwError(className);
@@ -130,23 +136,23 @@ export class DecoratorValidator {
     private validateRouteMethod(
         className: string,
         prototype: Record<string, Function>,
-        methodName: string,
+        route: IControllerRoute,
     ): void {
-        if (!prototype[methodName]) {
+        if (!prototype[route.methodName]) {
             return;
         }
-        const paramTypes = Reflect.getMetadata('design:paramtypes', prototype, methodName) || [];
-        const paramNames: string[] = this.getParameterNames(prototype[methodName]);
+        const paramTypes = Reflect.getMetadata('design:paramtypes', prototype, route.methodName) || [];
+        const paramNames: string[] = this.getParameterNames(prototype[route.methodName]);
 
         // Ensure parameter decorators usage
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         paramTypes.forEach((type: any, index: number) => {
             if (type === String || type === Number || type === Boolean) {
-                const hasDecorator = this.hasParameterDecorator(prototype, methodName, index);
+                const hasDecorator = route.params.some(param => param.index === index);
                 if (!hasDecorator) {
                     this.addError(
                         className,
-                        `Parameter '${paramNames[index]}' in ${methodName}() needs a decorator`,
+                        `Parameter '${paramNames[index]}' in ${route.methodName}() needs a decorator`,
                         'Add @Req, @Res, @Next, @Header, @Param, @Query, @Body, or @Logger decorator'
                     );
                 }
@@ -154,15 +160,6 @@ export class DecoratorValidator {
         });
     }
 
-
-    private hasParameterDecorator(
-        prototype: Record<string, Function>,
-        methodName: string,
-        paramIndex: number,
-    ): boolean {
-        const routeParams: IRouteParam[] = Reflect.getMetadata(`${methodName}_PARAMS`, prototype) || [];
-        return routeParams.some(param => param.index === paramIndex);
-    }
 
     private getParameterNames(func: Function): string[] {
         const funcStr: string = func.toString();

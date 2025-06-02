@@ -49,7 +49,7 @@ export class Injector {
 
         try {
             /** build provider dependencies to bind deep-level dependencies */
-            const depInstancies: Instance[] = deps.map((Dep: Constructible, index: number) => 
+            const depInstancies: Instance[] = deps.map((Dep: Constructible, index: number) =>
                 this.buildDependency(
                     Dep,
                     /** spread current scope according to its type */
@@ -103,12 +103,12 @@ export class Injector {
         scope?: Scopes
     ): string | symbol {
         switch (scope) {
-        case Scopes.LOCAL:
-        case Scopes.DEEP_LOCAL:
-            return Symbol(name);
-        case Scopes.SHARED:
-        default:
-            return name;
+            case Scopes.LOCAL:
+            case Scopes.DEEP_LOCAL:
+                return Symbol(name);
+            case Scopes.SHARED:
+            default:
+                return name;
         }
     }
 }

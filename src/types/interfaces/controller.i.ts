@@ -1,5 +1,5 @@
 import { RequestHandler, Router } from 'express';
-import { RouteMethods } from '../enums';
+import { HttpCode, RouteMethods } from '../enums';
 import { Instance, Constructible } from './utils.i';
 import { TMiddleware } from './middleware.i';
 import { Core } from '../../core';
@@ -24,6 +24,8 @@ export interface IControllerRoute {
     middlewares: TMiddleware[];
     function: RequestHandler;
     methodName: string;
+    defaultStatus?: HttpCode;
+    params: IRouteParam[];
 }
 
 

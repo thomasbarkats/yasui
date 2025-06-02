@@ -21,7 +21,7 @@ export default [
         rules: {
             ...js.configs.recommended.rules,
             ...tseslint.configs.recommended.rules,
-            'indent': ['error', 4],
+            'indent': ['error', 4, { 'SwitchCase': 1 }],
             'linebreak-style': ['warn', 'unix'],
             'quotes': ['error', 'single'],
             'semi': ['error', 'always'],
@@ -39,8 +39,8 @@ export default [
             'keyword-spacing': ['error', { before: true, after: true }],
             'func-call-spacing': ['error', 'never'],
             'object-curly-spacing': ['error', 'always', {
-                arraysInObjects: false,
-                objectsInObjects: false
+                arraysInObjects: true,
+                objectsInObjects: true
             }],
             '@typescript-eslint/no-explicit-any': 'error',
             '@typescript-eslint/member-ordering': 'error',
