@@ -2,14 +2,8 @@ import { italic } from 'kleur';
 import { Request } from 'express';
 
 import { HttpCode, HttpCodeMap } from '../types/enums';
-
-
-/** extended error interface */
-export interface IEError extends Error {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [index: string]: any,
-    status?: number,
-}
+import { OpenAPISchema } from '../types/openapi';
+import { HttpError } from '../types/interfaces';
 
 
 export class ErrorResource {
@@ -19,10 +13,10 @@ export class ErrorResource {
     public name: string;
     public message: string;
     public statusMessage: string;
-    public status: number;
+    public status: HttpCode;
     public data: Record<string, string>;
 
-    constructor(err: IEError, req: Request) {
+    constructor(err: HttpError, req: Request) {
         this.url = `${req.protocol}://${req.headers.host}${req.originalUrl}`;
         this.path = req.path;
         this.method = req.method;
@@ -44,7 +38,7 @@ export class ErrorResource {
             `data: ${JSON.stringify(this.data, null, 2)}`;
     }
 
-    private setData(err: IEError): void {
+    private setData(err: HttpError): void {
         /** get other eventual fields of Error extended instance */
         const otherKeys: string[] = Object.keys(err)
             .filter(key => Object.keys(this).indexOf(key) === -1);
@@ -55,3 +49,72 @@ export class ErrorResource {
         }
     }
 }
+
+
+/** error schema for Swagger/OpenAPI response decorators */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function ErrorResourceSchema<T extends Record<string, any> = Record<string, any>>(
+    additionalProperties: Record<string, OpenAPISchema> = {},
+    additionalPropertiesExample?: T,
+): OpenAPISchema {
+    return {
+        type: 'object',
+        properties: {
+            url: {
+                type: 'string',
+                format: 'uri',
+                description: 'Full URL of the request that caused the error',
+                example: 'http://localhost:3000/api/tests'
+            },
+            path: {
+                type: 'string',
+                description: 'Request path',
+                example: '/api/tests'
+            },
+            method: {
+                type: 'string',
+                enum: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
+                description: 'HTTP method used',
+                example: 'PUT'
+            },
+            name: {
+                type: 'string',
+                description: 'Error class name',
+                example: 'Error'
+            },
+            message: {
+                type: 'string',
+                description: 'Error message',
+                example: 'I just simulate an error.'
+            },
+            statusMessage: {
+                type: 'string',
+                description: 'HTTP status message',
+                example: 'Internal Server Error'
+            },
+            status: {
+                type: 'integer',
+                minimum: 100,
+                maximum: 599,
+                description: 'HTTP status code',
+                example: 500
+            },
+            data: {
+                type: 'object',
+                properties: additionalProperties,
+                description: 'Additional error data and extended properties',
+                example: {}
+            }
+        },
+        example: {
+            url: 'http://localhost:3000/api/tests',
+            path: '/api/tests',
+            method: 'PUT',
+            name: 'Error',
+            message: 'I just simulate an error.',
+            statusMessage: 'Internal Server Error',
+            status: 500,
+            data: additionalPropertiesExample || {},
+        }
+    };
+};
