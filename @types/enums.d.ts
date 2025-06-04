@@ -1,7 +1,8 @@
 /**
- * Auto-generated from sources
+ * Auto-generated AS-IS from sources
  * file not included in final package
  */
 
 declare enum Scopes {}
-export { Scopes };
+declare enum HttpCode {}
+export { HttpCode, Scopes };
