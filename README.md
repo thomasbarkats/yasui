@@ -243,34 +243,85 @@ Yasui provides automatic error handling and formatting for both logging and clie
 ### Automatic Error Catching
 All controller methods are automatically wrapped with error handling. Any thrown error will be:
 - Logged with detailed information (URL, method, status, message)
-- Formatted and sent to the client as a JSON response
-- Include appropriate HTTP status codes
+- Formatted and sent to the client as a JSON response including HTTP status code, error details, request information, and any additional error data (see "Custom Error Handling")
 
 ### Custom Error Handling
-Create custom errors with specific status codes:
+Create custom errors with specific status codes and additional data by extending the `HttpError` interface. Your custom error must include a `status` property and can include any additional properties:
 
 ```ts
+import { Get, HttpCode, HttpError } from 'yasui';
+
+class CustomError extends HttpError {
+    status: HttpCode;
+    customAttribute: any;
+
+    constructor(message: string, customAttribute: any) {
+        super(message);
+        this.status = HttpCode.BAD_REQUEST;
+        this.customAttribute = customAttribute;
+    }
+}
+
 @Get('/protected')
 getProtectedData() {
-    const error = new Error('Access denied');
-    error.status = 403;
-    throw error;
+    throw new CustomError('Access denied', ...yourData);
 }
 ```
-
-### Error Response Format
-Errors are automatically formatted and include:
-- HTTP status code and message
-- Error details
-- Request information (URL, method, path)
-- Additional error data
-
-The client receives a structured JSON error response, while detailed logs are written server-side.
 
 ### Decorator Validation
 Yasui automatically validates your decorators at startup to catch common configuration errors, such as circular dependencies or missing parameter decorators. These errors don't stop the server from running but will cancel the build of the affected controller and display error details after server initialization.
 
 You can disable these controls in the Yasui configuration with `enableDecoratorValidation: false` (unsafe!!)
+
+## API Documentation (Swagger)
+Yasui provides OpenAPI documentation generation with optional Swagger UI integration.
+
+### Basic Usage
+
+Enable Swagger by adding configuration to your app:
+
+```ts
+yasui.createServer({
+    // ... your config
+    swagger: {
+        enabled: true,
+        path: '/api-docs', // optional, defaults to '/api-docs'
+        info: {
+            title: 'My API',
+            version: '1.0.0',
+            description: 'API documentation'
+        }
+    }
+});
+```
+
+**Note**: You need to install `swagger-ui-express` separately:
+```sh
+npm install swagger-ui-express
+```
+
+Yasui automatically generates documentation from your existing decorators, then accessible through specified path. JSON specification will always be accessible via `/api-docs.json`.
+
+### Enhanced Documentation
+Enrich the default API documentation with optional decorators, all to be attached to the endpoint's method:
+
+- `@ApiOperation(summary, description?, tags?)` - Describe the endpoint
+- `@ApiParam(name, description?, required?, schema?)` - Document path parameters
+- `@ApiQuery(name, description?, required?, schema?)` - Document query parameters  
+- `@ApiHeader(name, description?, required?, schema?)` - Document headers
+- `@ApiBody(description?, schema?)` - Document request body
+- `@ApiResponse(statusCode, description, schema?)` - Document responses
+
+### Error Response Documentation
+
+`ErrorResourceSchema` generates a schema for Yasui's error wrapper format (see "Custom Error Handling" section). You can optionally define the additional fields that will be included in the `data` property for your custom errors :
+```ts
+@ApiResponse(400, 'Bad Request ...', ErrorResourceSchema({
+    customAttribute: { type: 'string', description: 'Custom attribute' },
+}, {
+    customAttribute: 'Additional information',
+}))
+```
 
 ## Contributing
 Contributions are welcome! Please feel free to submit issues and pull requests.
