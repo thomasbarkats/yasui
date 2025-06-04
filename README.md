@@ -1,16 +1,18 @@
-# Yasui
+# YasuiJS
 
 [![npm version](https://badge.fury.io/js/yasui.svg)](https://badge.fury.io/js/yasui)
 [![Node.js Version](https://img.shields.io/node/v/yasui.svg)](https://nodejs.org/)
 [![npm downloads](https://img.shields.io/npm/dm/yasui.svg)](https://www.npmjs.com/package/yasui)
+[![npm bundle size](https://img.shields.io/npm/unpacked-size/yasui)](https://www.npmjs.com/package/yasui)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
-Lightweight Express-based framework for REST and web APIs.
+Ship production-ready REST APIs in minutes⚡
 
 <img src="https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot.png" alt="Logo" height=170></a>
 
-Yasui can mean "easy" in Japanese. Yasui is designed to be easy to use, lightweight, and focused on essentials with minimal dependencies.
-Yasui simplifies REST API development with tools for controllers, middleware, endpoints, plus complete error management, logging, and dependency injection.
+Yasui -*that can mean "easy" in Japanese*- is a lightweight Express-based framework for Node.js that simplifies REST API development with decorators to build your endpoints, plus complete error management, logging, dependency injection, Swagger integration, and more.
+
+Compared to other frameworks, Yasui's philosophy is to keep things minimal and focus on essentials, with minimal dependencies.
 
 ## Features Summary
 - **Lightweight**: Built on Express with minimal dependencies
