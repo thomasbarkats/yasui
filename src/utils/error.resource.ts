@@ -3,8 +3,18 @@ import { Request } from 'express';
 
 import { HttpCode, HttpCodeMap } from '../types/enums';
 import { OpenAPISchema } from '../types/openapi';
-import { HttpError } from '../types/interfaces';
 
+
+export class HttpError extends Error {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [index: string]: any;
+    public status?: HttpCode;
+
+    constructor(status: HttpCode, message: string) {
+        super(message);
+        this.status = status;
+    }
+}
 
 export class ErrorResource {
     public url: string;
@@ -22,7 +32,7 @@ export class ErrorResource {
         this.method = req.method;
         this.status = err.status || HttpCode.INTERNAL_SERVER_ERROR;
         this.statusMessage = HttpCodeMap[this.status] || '';
-        this.message = err.message;
+        this.message = err?.message || '';
         this.name = err.constructor.name;
 
         this.data = {};

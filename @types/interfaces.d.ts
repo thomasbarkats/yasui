@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { Application, Request, Response, NextFunction } from 'express';
-import { HttpCode } from './enums';
 
 
 /** configuration interface for yasui core */
@@ -41,12 +40,6 @@ export declare type Instance = {
 export type Injection<T = any> = {
     token: string;
     provide: T;
-}
-
-/** error interface for custom error handling */
-export interface HttpError extends Error {
-    [index: string]: any;
-    status?: HttpCode;
 }
 
 
