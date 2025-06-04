@@ -3,7 +3,7 @@ import { italic, red } from 'kleur';
 
 import { HttpCode } from '../types/enums';
 import { ErrorResource } from './error.resource';
-import { LoggerService } from '../services/logger.service';
+import { LoggerService } from '../services';
 
 
 export class AppService {

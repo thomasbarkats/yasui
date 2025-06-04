@@ -8,8 +8,15 @@ import * as enums from './types/enums';
 import * as openapi from './types/openapi';
 import * as utils from './utils';
 
+export * from './base';
+export * from './services';
+export * from './decorators';
+export * from './types/enums';
+export * from './types/openapi';
+export * from './utils';
 
-const scope = {
+
+const yasui = {
     ...base,
     ...decorators,
     ...services,
@@ -18,9 +25,7 @@ const scope = {
     ...utils,
 };
 
-const yasui = {
-    ...scope,
-    default: scope,
-};
+export default yasui;
 
-export = yasui;
+// for CommonJS
+module.exports = Object.assign(yasui, { default: yasui });
