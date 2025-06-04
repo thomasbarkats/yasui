@@ -3,5 +3,5 @@
  * file not included in final package
  */
 
-declare enum OpenAPISchema {}
+type OpenAPISchema = object
 export { OpenAPISchema };
