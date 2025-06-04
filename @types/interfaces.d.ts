@@ -27,6 +27,15 @@ export interface YasuiConfig {
      * @default true
      */
     enableDecoratorValidation?: boolean;
+    swagger?: {
+        generate: boolean;
+        path?: string;
+        info?: {
+            title?: string;
+            version?: string;
+            description?: string;
+        };
+    };
 }
 
 
