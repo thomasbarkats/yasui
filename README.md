@@ -246,18 +246,16 @@ All controller methods are automatically wrapped with error handling. Any thrown
 - Formatted and sent to the client as a JSON response including HTTP status code, error details, request information, and any additional error data (see "Custom Error Handling")
 
 ### Custom Error Handling
-Create custom errors with specific status codes and additional data by extending the `HttpError` interface. Your custom error must include a `status` property and can include any additional properties:
+Create custom errors with specific status codes and additional data by extending the `HttpError` class. Your custom error must set `status` and `message` properties and can include any additional properties:
 
 ```ts
 import { Get, HttpCode, HttpError } from 'yasui';
 
 class CustomError extends HttpError {
-    status: HttpCode;
     customAttribute: any;
 
-    constructor(message: string, customAttribute: any) {
-        super(message);
-        this.status = HttpCode.BAD_REQUEST;
+    constructor(customAttribute: any) {
+        super(HttpCode.BAD_REQUEST, 'My Custom Error');
         this.customAttribute = customAttribute;
     }
 }

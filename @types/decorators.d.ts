@@ -1,5 +1,5 @@
 import { TMiddleware } from './interfaces';
-import { Scopes } from './enums';
+import { HttpCode, Scopes } from './enums';
 import { OpenAPISchema } from './openapi';
 
 
@@ -27,6 +27,7 @@ export function Param(varName?: string): ParameterDecorator;
 export function Query(varName?: string): ParameterDecorator;
 export function Body(varName?: string): ParameterDecorator;
 export function Logger(): ParameterDecorator;
+export function HttpStatus(status: HttpCode): MethodDecorator;
 export function routeRequestParamDecorator(type: string): (varName?: string) => ParameterDecorator;
 
 /** swagger decorators */
