@@ -1,19 +1,21 @@
-import { 
-    Controller, 
-    Get, 
-    Post, 
-    Put, 
-    Param, 
+import {
+    Controller,
+    Get,
+    Post,
+    Put,
+    Param,
     Header,
     Body,
     HttpStatus,
-    ApiOperation, 
-    ApiParam, 
+    ApiOperation,
+    ApiParam,
     ApiResponse,
     ErrorResourceSchema,
 } from '..';
+
 import { HttpCode } from '../types/enums';
 import { TestsService } from './tests.service';
+
 
 @Controller('/tests')
 export class TestsController {

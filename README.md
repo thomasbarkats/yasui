@@ -19,6 +19,7 @@ Yasui simplifies REST API development with tools for controllers, middleware, en
 - **Auto Error Handling**: Comprehensive error catching, logging, and formatting
 - **Built-in Logging**: Timed logging service with color-coded output
 - **Flexible Middleware**: Application, controller, and endpoint-level middleware support
+- **Swagger Integration**: Self-generated and editable Swagger documentation
 - **Type-safe**: Full TypeScript support with proper typing
 
 ## Get started
@@ -310,7 +311,7 @@ Enrich the default API documentation with optional decorators, all to be attache
 - `@ApiBody(description?, schema?)` - Document request body
 - `@ApiResponse(statusCode, description, schema?)` - Document responses
 
-### Error Response Documentation
+### Error Responses
 
 `ErrorResourceSchema` generates a schema for Yasui's error wrapper format (see "Custom Error Handling" section). You can optionally define the additional fields that will be included in the `data` property for your custom errors :
 ```ts

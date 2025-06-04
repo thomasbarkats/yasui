@@ -4,12 +4,13 @@ import { italic, red } from 'kleur';
 import { HttpCode } from '../types/enums';
 import { ErrorResource } from './error.resource';
 import { LoggerService } from '../services';
+import { CoreConfig } from '../types/interfaces';
 
 
 export class AppService {
     private logger: LoggerService;
 
-    constructor(private readonly apiKey?: string) {
+    constructor(private readonly appConfig: CoreConfig) {
         this.logger = new LoggerService();
     }
 
@@ -20,7 +21,7 @@ export class AppService {
         res: express.Response,
         next: express.NextFunction,
     ): void {
-        if (req.headers['x-api-key'] === this.apiKey) {
+        if (req.headers['x-api-key'] === this.appConfig.apiKey) {
             return next();
         }
         res.sendStatus(HttpCode.FORBIDDEN);
@@ -63,10 +64,12 @@ export class AppService {
 
         const logger: LoggerService = req.logger || this.logger;
         logger.error(`${err.constructor.name}`, req.source);
-        console.error(red(
-            `source: ${filename ? `${filename} ${line}:${column}` : 'undefined'}\n` +
-            errResource.toString(),
-        ));
+        if (this.appConfig.debug || errResource.status === HttpCode.INTERNAL_SERVER_ERROR) {
+            console.error(red(
+                `source: ${filename ? `${filename} ${line}:${column}` : 'undefined'}\n` +
+                errResource.toString(),
+            ));
+        }
         next();
     }
 }

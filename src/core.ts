@@ -27,7 +27,7 @@ export class Core {
             this.config.enableDecoratorValidation = true;
         }
         this.logger = new LoggerService();
-        this.appService = new AppService(this.config.apiKey);
+        this.appService = new AppService(this.config);
         this.swagger = new SwaggerService();
         this.decoratorValidator = this.config.enableDecoratorValidation
             ? new DecoratorValidator(this.config)

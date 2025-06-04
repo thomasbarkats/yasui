@@ -76,9 +76,6 @@ export function routeHandler(
 
         try {
             const result: unknown = await routeFunction.apply(self, args);
-            if (!result) {
-                return next();
-            }
             res.status(defaultStatus).json(result);
         } catch (err) {
             next(err);
