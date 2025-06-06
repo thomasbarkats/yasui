@@ -1,9 +1,10 @@
-/** route params */
+/** Express route params */
 export enum RouteParamTypes {
     REQ = 'req',
     RES = 'res',
     NEXT = 'next',
 }
+
 export enum RouteRequestParamTypes {
     HEADER = 'headers',
     PARAM = 'params',
@@ -12,7 +13,6 @@ export enum RouteRequestParamTypes {
     LOGGER = 'logger',
 }
 
-/** route methods */
 export enum RouteMethods {
     GET = 'get',
     POST = 'post',

@@ -1,21 +1,26 @@
 /** OpenAPI 3.0 simplified schema with generic typing */
 
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface BaseSchema<T = any> {
     description?: string;
     example?: T;
     default?: T;
+    /** Allows null values in addition to the defined type */
     nullable?: boolean;
+    /** Property is only returned in responses, never accepted in requests */
     readOnly?: boolean;
+    /** Property is only accepted in requests, never returned in responses */
     writeOnly?: boolean;
     deprecated?: boolean;
 }
 
 export interface StringSchema extends BaseSchema<string> {
     type: 'string';
+    /** Validates string format (e.g., 'email' enforces email pattern) */
     format?: 'date' | 'date-time' | 'email' | 'uri' | 'uuid' | 'binary' | 'byte' | 'password';
+    /** Regular expression pattern for validation */
     pattern?: string;
+    /** Restricts value to one of the specified strings */
     enum?: string[];
     minLength?: number;
     maxLength?: number;
@@ -23,22 +28,30 @@ export interface StringSchema extends BaseSchema<string> {
 
 export interface NumberSchema extends BaseSchema<number> {
     type: 'number';
+    /** Precision hint for serialization */
     format?: 'float' | 'double';
     minimum?: number;
     maximum?: number;
+    /** If true, value must be > minimum (not >= minimum) */
     exclusiveMinimum?: boolean;
+    /** If true, value must be < maximum (not <= maximum) */
     exclusiveMaximum?: boolean;
+    /** Value must be a multiple of this number */
     multipleOf?: number;
     enum?: number[];
 }
 
 export interface IntegerSchema extends BaseSchema<number> {
     type: 'integer';
+    /** Bit width constraint for serialization */
     format?: 'int32' | 'int64';
     minimum?: number;
     maximum?: number;
+    /** If true, value must be > minimum (not >= minimum) */
     exclusiveMinimum?: boolean;
+    /** If true, value must be < maximum (not <= maximum) */
     exclusiveMaximum?: boolean;
+    /** Value must be a multiple of this number */
     multipleOf?: number;
     enum?: number[];
 }
@@ -50,8 +63,11 @@ export interface BooleanSchema extends BaseSchema<boolean> {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ObjectSchema<T = Record<string, any>> extends BaseSchema<T> {
     type: 'object';
+    /** Schema definitions for each object property */
     properties?: Record<string, OpenAPISchema>;
+    /** Array of property names that must be present */
     required?: string[];
+    /** If false, extra properties are forbidden; if schema, validates extra properties */
     additionalProperties?: boolean | OpenAPISchema;
     minProperties?: number;
     maxProperties?: number;
@@ -60,13 +76,16 @@ export interface ObjectSchema<T = Record<string, any>> extends BaseSchema<T> {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ArraySchema<T = any[]> extends BaseSchema<T> {
     type: 'array';
+    /** Schema for validating each array element */
     items: OpenAPISchema;
     minItems?: number;
     maxItems?: number;
+    /** If true, all array elements must be unique */
     uniqueItems?: boolean;
 }
 
 export interface RefSchema {
+    /** Reference path to another schema (e.g., "#/components/schemas/User") */
     $ref: string;
 }
 

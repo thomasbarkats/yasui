@@ -3,7 +3,6 @@ import { TMiddleware } from './middleware.i';
 import { Injection } from './utils.i';
 
 
-/** configuration interface for yasui core */
 export interface YasuiConfig {
     controllers?: TController[];
     middlewares?: TMiddleware[];
@@ -28,7 +27,15 @@ export interface YasuiConfig {
      */
     enableDecoratorValidation?: boolean;
     swagger?: {
+        /**
+         * Whether to generate swagger documentation
+         * @default false
+         */
         generate: boolean;
+        /**
+         * Output path for generated swagger documentation
+         * @default /api-docs
+         */
         path?: string;
         info?: {
             title?: string;
