@@ -4,10 +4,10 @@ import { Instance, Constructible } from './utils.i';
 import { TMiddleware } from './middleware.i';
 
 
-/** controller type */
+/** Controller type */
 export type TController = Constructible<IController>;
 
-/** controller instance type */
+/** Controller instance type */
 export type IController = Instance;
 
 
