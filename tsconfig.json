@@ -3,6 +3,9 @@
     "target": "ESNext",
     "module": "CommonJS",
     "outDir": "./lib",
+    "paths": {
+      "~types/*": ["./@types/*"]
+    },
     "strict": true,
     "esModuleInterop": true,
     "inlineSourceMap": true,

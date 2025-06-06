@@ -55,9 +55,7 @@ export default [
             'node_modules/**',
             '.git/**',
             '.vscode/**',
-            'lib/**',
-            '@types/enums/**',
-            '@types/openapi/**'
+            'lib/**'
         ]
     }
 ];

@@ -1,12 +1,12 @@
 import {
     Constructible,
-    CoreConfig,
+    YasuiConfig,
     IController,
     IControllerRoute,
     Injection,
-} from '../types/interfaces';
+} from '~types/interfaces';
+import { Scopes } from '~types/enums';
 import { LoggerService } from '../services';
-import { Scopes } from '../types/enums';
 
 
 interface ValidationError {
@@ -19,7 +19,7 @@ interface ValidationError {
 export class DecoratorValidator {
     private errors: Record<string, ValidationError[]>;
 
-    constructor(private readonly appConfig: CoreConfig) {
+    constructor(private readonly appConfig: YasuiConfig) {
         this.errors = {};
     }
 

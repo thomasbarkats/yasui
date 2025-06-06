@@ -1,7 +1,12 @@
 import express from 'express';
 
-import { HttpCode, RouteMethods } from '../types/enums';
-import { IControllerRoute, Instance, IRouteParam, TMiddleware } from '../types/interfaces';
+import { HttpCode, RouteMethods } from '~types/enums';
+import {
+    IControllerRoute,
+    Instance,
+    IRouteParam,
+    TMiddleware,
+} from '~types/interfaces';
 
 
 /** create express method-routing decorator */

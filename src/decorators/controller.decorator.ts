@@ -3,7 +3,12 @@ import { italic } from 'kleur';
 
 import { Core } from '../core';
 import { LoggerService } from '../services';
-import { IController, IControllerRoute, IDMiddleware, TMiddleware } from '../types/interfaces';
+import {
+    IController,
+    IControllerRoute,
+    IDMiddleware,
+    TMiddleware,
+} from '~types/interfaces';
 
 
 export function Controller(

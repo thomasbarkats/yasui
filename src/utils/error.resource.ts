@@ -1,8 +1,8 @@
 import { italic } from 'kleur';
 import { Request } from 'express';
 
-import { HttpCode, HttpCodeMap } from '../types/enums';
-import { OpenAPISchema } from '../types/openapi';
+import { HttpCode, HttpCodeMap } from '~types/enums';
+import { OpenAPISchema } from '~types/openapi';
 
 
 export class HttpError extends Error {

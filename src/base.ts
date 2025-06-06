@@ -2,11 +2,11 @@ import { Server, createServer as createHttpServer } from 'http';
 import { Application } from 'express';
 import { blue, bold, magenta } from 'kleur';
 
-import { CoreConfig } from './types/interfaces';
+import { YasuiConfig } from '~types/interfaces';
 import { Core } from './core';
 
 
-export function createServer(conf: CoreConfig): Server {
+export function createServer(conf: YasuiConfig): Server {
     const core: Core = new Core(conf);
 
     console.clear();
@@ -33,7 +33,7 @@ export function createServer(conf: CoreConfig): Server {
     return server;
 }
 
-export function createApp(conf: CoreConfig): Application {
+export function createApp(conf: YasuiConfig): Application {
     const core: Core = new Core(conf);
     const app: Application = core.createApp();
     core.decoratorValidator?.outputErrors();

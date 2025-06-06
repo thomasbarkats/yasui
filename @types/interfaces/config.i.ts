@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import { Application, Request, Response, NextFunction } from 'express';
+import { TController } from './controller.i';
+import { TMiddleware } from './middleware.i';
+import { Injection } from './utils.i';
 
 
 /** configuration interface for yasui core */
@@ -37,35 +37,3 @@ export interface YasuiConfig {
         };
     };
 }
-
-
-/** util types */
-export declare type Constructible<T = Instance> = {
-    new (...args: any[]): T;
-}
-export declare type Instance = {
-    [index: string]: any;
-}
-export type Injection<T = any> = {
-    token: string;
-    provide: T;
-}
-
-
-/** controller type */
-export type TController = Constructible<IController>;
-
-/** controller instance type */
-export type IController = Instance;
-
-/** middleware type */
-export declare type TMiddleware = Constructible<IMiddleware>;
-
-/** middleware interface */
-export interface IMiddleware {
-    use: (...args: any[]) => any,
-}
-
-
-/** express util exports for controllers */
-export { Application, Request, Response, NextFunction };
