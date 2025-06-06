@@ -1,8 +1,8 @@
 import { yellow } from 'kleur';
 
 import { LoggerService } from './services';
-import { InheritedScopes, Scopes } from './types/enums';
-import { Instance, Constructible } from './types/interfaces';
+import { InheritedScopes, Scopes } from '~types/enums';
+import { Instance, Constructible } from '~types/interfaces';
 import { DecoratorValidator } from './utils/decorator-validator';
 
 

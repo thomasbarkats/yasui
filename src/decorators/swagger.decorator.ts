@@ -3,7 +3,7 @@ import {
     OpenAPIOperation,
     OpenAPIResponses,
     OpenAPIParamater,
-} from '../types/openapi';
+} from '~types/openapi';
 
 
 /** swagger operation decorator */

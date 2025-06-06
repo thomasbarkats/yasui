@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 
-import { IMiddleware, IRouteParam } from '../types/interfaces';
+import { IMiddleware, IRouteParam } from '~types/interfaces';
 import { routeHandler } from './methods.decorator';
 
 

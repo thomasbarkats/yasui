@@ -1,16 +1,16 @@
-import { HttpCode, HttpCodeMap } from '../types/enums';
+import { HttpCode, HttpCodeMap } from '~types/enums';
 import {
     IControllerRoute,
     IRouteParam,
     ISwaggerConfig,
     ISwaggerRoute,
     TController,
-} from '../types/interfaces';
+} from '~types/interfaces';
 import {
     OpenAPIOperation,
     OpenAPIParamater,
     OpenAPIResponses,
-} from '../types/openapi';
+} from '~types/openapi';
 
 
 export class SwaggerService {
@@ -69,7 +69,8 @@ export class SwaggerService {
                 config.paths[route.fullPath] = {};
             }
             const operation: OpenAPIOperation = this.buildOperation(route);
-            config.paths[route.fullPath][route.method] = operation;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (config.paths[route.fullPath] as any)[route.method] = operation;
         }
 
         return config;

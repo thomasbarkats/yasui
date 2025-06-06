@@ -1,16 +1,16 @@
 import express from 'express';
 import { italic, red } from 'kleur';
 
-import { HttpCode } from '../types/enums';
+import { HttpCode } from '~types/enums';
+import { YasuiConfig } from '~types/interfaces';
 import { ErrorResource } from './error.resource';
 import { LoggerService } from '../services';
-import { CoreConfig } from '../types/interfaces';
 
 
 export class AppService {
     private logger: LoggerService;
 
-    constructor(private readonly appConfig: CoreConfig) {
+    constructor(private readonly appConfig: YasuiConfig) {
         this.logger = new LoggerService();
     }
 

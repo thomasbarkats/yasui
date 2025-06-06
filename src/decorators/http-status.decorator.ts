@@ -1,4 +1,4 @@
-import { HttpCode } from '../types/enums';
+import { HttpCode } from '~types/enums';
 
 /** create express method-routing decorator with custom status */
 export function HttpStatus(status: HttpCode): MethodDecorator {

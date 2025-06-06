@@ -13,7 +13,7 @@ import {
     ErrorResourceSchema,
 } from '..';
 
-import { HttpCode } from '../types/enums';
+import { HttpCode } from '~types/enums';
 import { TestsService } from './tests.service';
 
 

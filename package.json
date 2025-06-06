@@ -26,14 +26,14 @@
     "url": "https://github.com/thomasbarkats/yasui/issues"
   },
   "main": "./lib/index.js",
-  "typings": "./@types/index.d.ts",
+  "types": "./@types/index.d.ts",
   "engines": {
     "node": ">=18.0.0"
   },
   "scripts": {
     "example": "nodemon",
-    "build": "tsc && npm run types-build",
-    "types-build": "cd src/types/ && tsc",
+    "build": "rm -rf lib && tsc && npm run flatten-lib && tsc-alias",
+    "flatten-lib": "mv lib/src/* lib/ && rm -rf lib/src && mv lib/@types/* lib/ && rm -rf lib/@types",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --ext .ts --fix",
     "prepublishOnly": "npm run build && npm run lint",
@@ -44,9 +44,7 @@
   "files": [
     "lib/**/*",
     "!lib/examples/**/*",
-    "@types/**/*",
-    "!@types/enums.d.ts",
-    "!@types/openapi.d.ts"
+    "@types/**/*"
   ],
   "dependencies": {
     "express": "^5.1.0",
@@ -64,6 +62,7 @@
     "globals": "^16.2.0",
     "nodemon": "^3.1.10",
     "swagger-ui-express": "^5.0.1",
+    "tsc-alias": "^1.8.16",
     "typescript": "^5.8.3"
   }
 }

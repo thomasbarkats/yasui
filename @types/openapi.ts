@@ -70,7 +70,7 @@ export interface RefSchema {
     $ref: string;
 }
 
-export type OpenAPISchema = 
+export type OpenAPISchema =
     | StringSchema
     | NumberSchema
     | IntegerSchema
@@ -188,8 +188,8 @@ export interface OpenAPIOperation {
     };
 }
 
-export type OpenAPIResponses = Partial<Record<number | 'default', { 
-    description: string; 
+export type OpenAPIResponses = Partial<Record<number | 'default', {
+    description: string;
     schema?: OpenAPISchema;
     headers?: Record<string, OpenAPIParamater>;
     content?: Record<string, { schema: OpenAPISchema }>;

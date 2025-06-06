@@ -1,6 +1,6 @@
-import { RouteParamTypes } from '../types/enums';
-import { RouteRequestParamTypes } from '../types/enums';
-import { IRouteParam } from '../types/interfaces';
+import { RouteParamTypes } from '~types/enums';
+import { RouteRequestParamTypes } from '~types/enums';
+import { IRouteParam } from '~types/interfaces';
 
 
 /** create express route-parameter decorator */

@@ -1,18 +1,24 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { json } from 'body-parser';
 import { italic } from 'kleur';
 
-import { Instance, Constructible, IDController, IDMiddleware } from './types/interfaces';
+import { Instance, Constructible, IDMiddleware, IController } from '~types/interfaces';
+import { YasuiConfig } from '~types/interfaces';
 import { AppService } from './utils/app.service';
 import { DecoratorValidator } from './utils/decorator-validator';
 import { LoggerService } from './services';
-import { CoreConfig } from './types/interfaces';
 import { Injector } from './injector';
 import { SwaggerService } from './utils/swagger.service';
 
 
+interface IDController extends IController {
+    path: string;
+    configureRoutes: (self: this, core: Core) => Router;
+}
+
+
 export class Core {
-    public config: CoreConfig;
+    public config: YasuiConfig;
     public logger: LoggerService;
     public swagger: SwaggerService;
     public decoratorValidator: DecoratorValidator | null;
@@ -21,7 +27,7 @@ export class Core {
     private injector: Injector;
     private app: express.Application;
 
-    constructor(conf: CoreConfig) {
+    constructor(conf: YasuiConfig) {
         this.config = conf;
         if (conf.enableDecoratorValidation === undefined) {
             this.config.enableDecoratorValidation = true;

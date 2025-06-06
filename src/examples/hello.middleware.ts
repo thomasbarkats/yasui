@@ -1,7 +1,7 @@
 import { Logger, Middleware, Req } from '..';
 import { LoggerService } from '../services';
 import { TestsService } from './tests.service';
-import { IMiddleware } from '../types/interfaces';
+import { IMiddleware } from '~types/interfaces';
 import { Request } from 'express';
 
 

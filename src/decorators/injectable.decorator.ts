@@ -1,4 +1,4 @@
-import { Scopes } from '../types/enums';
+import { Scopes } from '~types/enums';
 
 
 export function Injectable(): ClassDecorator {
