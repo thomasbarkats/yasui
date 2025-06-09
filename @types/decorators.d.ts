@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+
 import { TMiddleware } from './interfaces';
 import { HttpCode, Scopes } from './enums';
 import { OpenAPISchema } from './openapi';
@@ -9,9 +11,24 @@ export function Middleware(): ClassDecorator;
 
 // --- Injections related decorators ---
 
+/**
+ * Mark a class as injectable —
+ * Required to detect dependency injection through class constructor parameter types
+ */
 export function Injectable(): ClassDecorator;
-/** Injects dependency by token name */
-export function Inject(token: string): ParameterDecorator;
+/**
+ * Injects a dependency by token or auto-inferred type —
+ * Usage:
+ * - Class constructor parameters: Only needed for custom token injection
+ * - Controller/middleware method parameters: Required for any dependency injection
+ */
+export function Inject(token?: string): ParameterDecorator;
+/**
+ * Define scope of dependency injection
+ * - SHARED (default): Use singleton instance shared across the application
+ * - LOCAL: New instance the injection context
+ * - DEEP_LOCAL: New instance, propagates locality to its own dependencies
+ */
 export function Scope(scope: Scopes): ParameterDecorator;
 
 

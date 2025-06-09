@@ -25,48 +25,6 @@ export class Injector {
         return this.registry.get(name) as T;
     }
 
-    /** instantiates constructible by deeply binding dependencies */
-    public build<T extends Instance>(
-        Provided: Constructible<T>,
-        scope: Scopes = Scopes.SHARED
-    ): T {
-        const className = Provided.name;
-
-        const token: string | symbol = this.getToken(className, scope);
-        const runningInstance: T = this.get(token);
-
-        if (runningInstance) {
-            return runningInstance;
-        }
-
-        /** get auto-generated constructor param types meta as dependencies */
-        const deps: Constructible[] = Reflect.getMetadata('design:paramtypes', Provided) || [];
-
-        const depScopes: Record<number, Scopes> = Reflect.getMetadata('DEP_SCOPES', Provided) || {};
-        const preInjectedDeps: Record<number, string> = Reflect.getMetadata('PRE_INJECTED_DEPS', Provided) || {};
-
-        this.buildStack.add(className);
-
-        try {
-            /** build provider dependencies to bind deep-level dependencies */
-            const depInstancies: Instance[] = deps.map((Dep: Constructible, index: number) =>
-                this.buildDependency(
-                    Dep,
-                    /** spread current scope according to its type */
-                    InheritedScopes.includes(scope)
-                        ? scope
-                        : (depScopes[index] || Scopes.SHARED),
-                    preInjectedDeps[index]
-                )
-            );
-            this.register(token, new Provided(...depInstancies));
-        } finally {
-            this.buildStack.delete(className);
-        }
-
-        return this.get(token);
-    }
-
     public register<T>(
         token: string | symbol,
         instance: T
@@ -81,21 +39,110 @@ export class Injector {
         }
     }
 
+    /** instantiates constructible by deeply binding dependencies */
+    public build<T extends Instance>(
+        Provided: Constructible<T>,
+        scope: Scopes = Scopes.SHARED
+    ): T {
+        const className = Provided.name;
 
-    /** build sub-dependency or directly map specified injection */
-    private buildDependency(
-        Dep: Constructible,
-        scope: Scopes,
-        preRegisteredToken?: string
-    ): Instance {
-        this.decoratorValidator?.validateInjectable(
-            Dep,
-            scope,
-            this.buildStack,
-        );
-        return preRegisteredToken
-            ? this.get(preRegisteredToken)
-            : this.build(Dep, scope);
+        const token: string | symbol = this.getToken(className, scope);
+        const runningInstance: T = this.get(token);
+
+        if (runningInstance) {
+            return runningInstance;
+        }
+
+        this.buildStack.add(className);
+
+        try {
+            const dependencies: Instance[] = this.buildDependencies(Provided, scope);
+            const instance: T = new Provided(...dependencies);
+            this.markMethodsDependencies(Provided, instance, scope);
+            this.register(token, instance);
+
+        } finally {
+            this.buildStack.delete(className);
+        }
+        return this.get(token);
+    }
+
+
+    /** build sub-dependencies or directly map token registered injection */
+    private buildDependencies<T extends Instance>(
+        Provided: Constructible<T>,
+        scope: Scopes
+    ): Instance[] {
+        /** inject via constructor param types or pre-registered token injections */
+        const deps: Function[] = Reflect.getMetadata('design:paramtypes', Provided) || [];
+        const preInjectedDeps: Record<number, string> = Reflect.getMetadata('PRE_INJECTED_DEPS', Provided) || {};
+
+        const depScopes: Record<number, Scopes> = Reflect.getMetadata('DEP_SCOPES', Provided) || {};
+
+        return deps.map((Dep: Function, idx: number) => {
+
+            if (preInjectedDeps[idx]) {
+                this.decoratorValidator?.validateInjectionTokenRegistration(Provided.name, preInjectedDeps[idx]);
+                return this.get(preInjectedDeps[idx]);
+            }
+
+            this.decoratorValidator?.validateInjectable(Dep, scope, this.buildStack);
+
+            /** spread current scope according to its type */
+            const depScope: Scopes = InheritedScopes.includes(scope)
+                ? scope
+                : (depScopes[idx] || Scopes.SHARED);
+
+            return this.build(<Constructible>Dep, depScope);
+        });
+    }
+
+    private markMethodsDependencies<T extends Instance>(
+        Provided: Constructible<T>,
+        instance: T,
+        scope: Scopes
+    ): void {
+        const methodsInjections = Reflect.getMetadata('METHOD_INJECTED_DEPS', Provided.prototype) || {};
+
+        for (const methodName in methodsInjections) {
+            const methodDeps = this.resolveMethodDependencies(
+                Provided,
+                methodName,
+                methodsInjections[methodName],
+                scope
+            );
+            Reflect.defineMetadata('RESOLVED_METHOD_DEPS', methodDeps, instance, methodName);
+        }
+    }
+
+    private resolveMethodDependencies(
+        Provided: Constructible,
+        methodName: string,
+        injections: Record<number, Constructible | string>,
+        scope: Scopes
+    ): Record<number, Instance> {
+        const depScopes: Record<number, Scopes>
+            = Reflect.getMetadata('DEP_SCOPES', Provided.prototype, methodName) || {};
+        const methodDeps: Record<number, Instance> = {};
+
+        for (const paramIndex in injections) {
+            const Dep: Constructible | string = injections[paramIndex];
+
+            if (typeof Dep === 'string') {
+                this.decoratorValidator?.validateInjectionTokenRegistration(Provided.name, Dep);
+                methodDeps[paramIndex] = this.get(Dep);
+                continue;
+            }
+
+            this.decoratorValidator?.validateInjectable(Dep, scope, this.buildStack);
+
+            const depScope: Scopes = InheritedScopes.includes(scope)
+                ? scope
+                : (depScopes[paramIndex] || Scopes.SHARED);
+
+            methodDeps[paramIndex] = this.build(Dep, depScope);
+        }
+        return methodDeps;
     }
 
     private getToken(
