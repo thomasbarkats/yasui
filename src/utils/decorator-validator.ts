@@ -42,11 +42,9 @@ export class DecoratorValidator {
     }
 
     public validateController(target: Constructible<IController>): void {
-        const className: string = target.name;
-
         if (typeof target !== 'function') {
             this.addError(
-                className,
+                'App',
                 'Controller must be a class',
                 'Use @Controller on a class declaration'
             );
@@ -55,81 +53,87 @@ export class DecoratorValidator {
         const routes: IControllerRoute[] = Reflect.getMetadata('ROUTES', target.prototype) || [];
         if (routes.length === 0) {
             this.addError(
-                className,
+                target.name,
                 'Controller has no route methods',
                 'Add @Get, @Post, @Put, @Delete, or @Patch methods'
             );
         }
 
         routes.forEach((route: IControllerRoute) => {
-            this.validateRouteMethod(className, target.prototype, route);
+            this.validateRouteMethod(target.name, target.prototype, route);
         });
 
-        this.throwError(className);
+        this.throwError(target.name);
     }
 
     // Middleware use() method implementation already ensured by typing
 
     public validateInjectable(
-        target: Constructible,
+        target: Function,
         scope: Scopes,
         buildStack: Set<string>
     ): void {
-        const className: string = target.name;
+        const buildStackArray: string[] = Array.from(buildStack);
+        const callerName: string = buildStackArray[buildStackArray.length - 1];
 
-        if (typeof target !== 'function') {
+        if (!this.isConstructible(target)) {
             this.addError(
-                className,
+                callerName,
                 'Injectable must be a class',
                 'Use @Injectable on a class declaration'
             );
         }
 
-        const buildStackArray: string[] = Array.from(buildStack);
-        const cycle: string = [...buildStackArray, className].join(' -> ');
+        const cycle: string = [...buildStackArray, target.name].join(' -> ');
 
-        if (buildStackArray.indexOf(className) !== -1) {
-            if (scope === Scopes.SHARED || className === buildStackArray[buildStackArray.length - 1]) {
+        if (buildStackArray.indexOf(target.name) !== -1) {
+            if (scope === Scopes.SHARED || target.name === callerName) {
                 this.addError(
-                    className,
+                    callerName,
                     `Circular dependency detected: ${cycle}`,
                     'Consider refactoring your dependencies or use @Scope(Scopes.LOCAL) for local instances'
                 );
             }
         }
 
-        const deps: Constructible[] = Reflect.getMetadata('design:paramtypes', target) || [];
+        const deps: Function[] = Reflect.getMetadata('design:paramtypes', target) || [];
         const preInjectedDeps: Record<number, string> = Reflect.getMetadata('PRE_INJECTED_DEPS', target) || {};
 
         deps.forEach((Dep, idx) => {
             if (Dep === undefined || Dep.prototype.toString() === 'function () { [native code] }') {
                 this.addError(
-                    className,
+                    callerName,
                     `Dependency at position ${idx} is undefined (${cycle} -> <?>)`,
                     'This usually means there is a circular import between files or a missing or bad import statement'
                     + '\nCheck your import statements and ensure there is no circular import between files'
                 );
 
             } else if (preInjectedDeps[idx]) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                if (!this.appConfig.injections?.find((inj: Injection<any>) => inj.token === preInjectedDeps[idx])) {
-                    this.addError(
-                        className,
-                        `Injection token '${preInjectedDeps[idx]}' is not registered`,
-                        `Register token in your app config: \`{ ..., injections: [..., { token: '${preInjectedDeps[idx]}', provide: <any> }] }\``
-                    );
-                }
+                this.validateInjectionTokenRegistration(callerName, preInjectedDeps[idx]);
 
             } else if (!Reflect.getMetadata('INJECTABLE', Dep)) {
                 this.addError(
-                    className,
-                    `Dependency at position ${idx} (${buildStackArray[buildStackArray.length-1]} -> ${Dep.name}) is not injectable`,
+                    callerName,
+                    `Dependency at position ${idx} (${callerName} -> ${Dep.name}) is not injectable`,
                     'Add @Injectable on class declaration'
                 );
             }
         });
 
-        this.throwError(className);
+        this.throwError(callerName);
+    }
+
+    public validateInjectionTokenRegistration(
+        callerName: string,
+        token: string
+    ): void {
+        if (!this.appConfig.injections?.find((inj: Injection<unknown>) => inj.token === token)) {
+            this.addError(
+                callerName,
+                `Injection token '${token}' is not registered`,
+                `Register token in your app config: \`{ ..., injections: [..., { token: '${token}', provide: <any> }] }\``
+            );
+        }
     }
 
 
@@ -141,21 +145,22 @@ export class DecoratorValidator {
         if (!prototype[route.methodName]) {
             return;
         }
-        const paramTypes = Reflect.getMetadata('design:paramtypes', prototype, route.methodName) || [];
+        const paramTypes: Function[] = Reflect.getMetadata('design:paramtypes', prototype, route.methodName) || [];
         const paramNames: string[] = this.getParameterNames(prototype[route.methodName]);
 
+        const methodsInjections: Record<string, Record<number, Constructible | string>>
+            = Reflect.getMetadata('METHOD_INJECTED_DEPS', prototype) || {};
+
         // Ensure parameter decorators usage
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        paramTypes.forEach((type: any, index: number) => {
-            if (type === String || type === Number || type === Boolean) {
-                const hasDecorator = route.params.some(param => param.index === index);
-                if (!hasDecorator) {
-                    this.addError(
-                        className,
-                        `Parameter '${paramNames[index]}' in ${route.methodName}() needs a decorator`,
-                        'Add @Req, @Res, @Next, @Header, @Param, @Query, @Body, or @Logger decorator'
-                    );
-                }
+        paramTypes.forEach((type: Function, index: number) => {
+            const hasDecorator = !!(methodsInjections[route.methodName] || {})[index]
+                || route.params.some(param => param.index === index);
+            if (!hasDecorator) {
+                this.addError(
+                    className,
+                    `Parameter '${paramNames[index]}' in ${route.methodName}() needs a decorator`,
+                    'Add @Req, @Res, @Next, @Header, @Param, @Query, @Body, @Logger or @Inject decorator'
+                );
             }
         });
     }
@@ -184,5 +189,9 @@ export class DecoratorValidator {
         if (this.errors[className]?.length) {
             throw new Error(`${className} has not passed its validation checks`);
         }
+    }
+
+    private isConstructible(fn: Function): boolean {
+        return typeof fn === 'function' && fn.prototype && fn.prototype.constructor === fn;
     }
 }

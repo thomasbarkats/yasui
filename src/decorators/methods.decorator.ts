@@ -73,10 +73,25 @@ export function routeHandler(
         const routeHandlerArgs = { req, res, next } as any;
         const self: Instance = Reflect.getMetadata('SELF', target);
 
-        /** redefine route function args with mapped params path */
-        const args: unknown[] = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const methodDeps: Record<number, any> =
+            Reflect.getMetadata('RESOLVED_METHOD_DEPS', self, String(descriptor.value.name)) || {};
+
+        const allIndexes = [
+            ...params.map(p => p.index),
+            ...Object.keys(methodDeps).map(k => parseInt(k))
+        ];
+        const maxIndex = allIndexes.length > 0 ? Math.max(...allIndexes) : -1;
+        const args: unknown[] = new Array(maxIndex + 1);
+
+        // Bind Express parameters (@Param, @Body, etc.)
         for (const param of params) {
             args[param.index] = param.path.reduce((prev, curr) => prev && prev[curr] || null, routeHandlerArgs);
+        }
+        // Bind injected dependencies (@Inject)
+        for (const indexStr in methodDeps) {
+            const index = parseInt(indexStr);
+            args[index] = methodDeps[index];
         }
 
         try {

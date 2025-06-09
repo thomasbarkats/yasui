@@ -42,16 +42,16 @@ function extractParam(
             }
         }
 
-        const paramsKey = String(propertyKey);
+        const methodName = String(propertyKey);
         const routeParam: IRouteParam = { index: parameterIndex, path };
-        const routeParams: IRouteParam[] = Reflect.getMetadata('PARAMS', target, paramsKey) || [];
+        const routeParams: IRouteParam[] = Reflect.getMetadata('PARAMS', target, methodName) || [];
 
         /** add mapped param to route metadata */
         Reflect.defineMetadata(
             'PARAMS',
             [...routeParams, routeParam],
             target,
-            paramsKey,
+            methodName,
         );
     };
 }

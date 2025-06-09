@@ -15,9 +15,10 @@ import {
 
 import { HttpCode } from '~types/enums';
 import { TestsService } from './tests.service';
+import { HelloMiddleware } from './hello.middleware';
 
 
-@Controller('/tests')
+@Controller('/tests', HelloMiddleware)
 export class TestsController {
 
     constructor(
