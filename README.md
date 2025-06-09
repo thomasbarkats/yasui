@@ -1,9 +1,8 @@
 # YasuiJS
 
-[![npm version](https://badge.fury.io/js/yasui.svg)](https://badge.fury.io/js/yasui)
-[![Node.js Version](https://img.shields.io/node/v/yasui.svg)](https://nodejs.org/)
+[![Node.js Version](https://img.shields.io/node/v/yasui.svg?color=1081C2)](https://nodejs.org/)
 [![npm downloads](https://img.shields.io/npm/dm/yasui.svg)](https://www.npmjs.com/package/yasui)
-[![npm bundle size](https://img.shields.io/npm/unpacked-size/yasui)](https://www.npmjs.com/package/yasui)
+[![npm bundle size](https://img.shields.io/npm/unpacked-size/yasui?color=4DC81F)](https://www.npmjs.com/package/yasui)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
 Ship production-ready REST APIs in minutes⚡

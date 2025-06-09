@@ -24,7 +24,8 @@ export class SwaggerService {
         const routes: IControllerRoute[] = Reflect.getMetadata('ROUTES', ControllerClass.prototype) || [];
 
         for (const route of routes) {
-            const swaggerMetadata: OpenAPIOperation = Reflect.getMetadata('SWAGGER', ControllerClass.prototype, route.methodName);
+            const swaggerMetadata: OpenAPIOperation
+                = Reflect.getMetadata('SWAGGER', ControllerClass.prototype, route.methodName);
             const swaggerRoute: ISwaggerRoute = {
                 ...route,
                 controllerName: ControllerClass.name,
