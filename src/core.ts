@@ -118,7 +118,7 @@ export class Core {
 
             } catch (err) {
                 this.logger.error(`failed to load ${Controller.name || '<invalid controller>'} routes\n${err}`);
-            } 
+            }
         }
     }
 
@@ -144,7 +144,10 @@ export class Core {
             this.logger.success(`${italic(`${swaggerPath}`)} swagger documentation loaded`);
 
         } catch (err) {
-            this.logger.warn('swagger-ui-express not found. Install it to enable swagger documentation: npm install swagger-ui-express');
+            this.logger.warn(
+                'swagger-ui-express not found.\n' +
+                'Install it to enable swagger documentation: npm install swagger-ui-express.'
+            );
             if (this.config.debug) {
                 this.logger.error(`swagger setup error: ${err}`);
             }

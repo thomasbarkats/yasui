@@ -12,16 +12,22 @@ export default [
             parser: tsparser,
             globals: {
                 ...globals.node,
-                ...globals.es2021
+                ...globals.es2021,
             }
         },
         plugins: {
-            '@typescript-eslint': tseslint
+            '@typescript-eslint': tseslint,
         },
         rules: {
             ...js.configs.recommended.rules,
             ...tseslint.configs.recommended.rules,
-            'indent': ['error', 4, { 'SwitchCase': 1 }],
+            'indent': ['error', 4, {
+                SwitchCase: 1,
+            }],
+            'max-len': ['error', {
+                code: 120,
+                ignoreTemplateLiterals: true,
+            }],
             'linebreak-style': ['warn', 'unix'],
             'quotes': ['error', 'single'],
             'semi': ['error', 'always'],
@@ -36,17 +42,20 @@ export default [
             'dot-notation': 'error',
             'no-multi-spaces': 'warn',
             'require-await': 'warn',
-            'keyword-spacing': ['error', { before: true, after: true }],
+            'keyword-spacing': ['error', {
+                before: true,
+                after: true,
+            }],
             'func-call-spacing': ['error', 'never'],
             'object-curly-spacing': ['error', 'always', {
                 arraysInObjects: true,
-                objectsInObjects: true
+                objectsInObjects: true,
             }],
             '@typescript-eslint/no-explicit-any': 'error',
             '@typescript-eslint/member-ordering': 'error',
             '@typescript-eslint/no-require-imports': 'error',
             '@typescript-eslint/explicit-function-return-type': 'error',
-            '@typescript-eslint/no-unsafe-function-type': 'off'
+            '@typescript-eslint/no-unsafe-function-type': 'off',
         }
     },
     {
@@ -55,7 +64,7 @@ export default [
             'node_modules/**',
             '.git/**',
             '.vscode/**',
-            'lib/**'
+            'lib/**',
         ]
     }
 ];
