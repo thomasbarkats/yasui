@@ -59,8 +59,7 @@ You can directly return any data from your methods - it will be automatically se
 
 ### Example
 ```ts
-import express from 'express';
-import { Get, Controller, Res, Param, HttpStatus } from 'yasui';
+import { Get, Controller, Res, Param, HttpStatus, Response } from 'yasui';
 
 @Controller('/')
 export class MyController {
@@ -68,7 +67,7 @@ export class MyController {
     @HttpStatus(201)
     private hello(
         @Param('name') name: string,
-        @Res() res: express.Response
+        @Res() res: Response
     ): string {
         return `Hello ${name}!`;
     }

@@ -1,4 +1,4 @@
-import express from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { italic, red } from 'kleur';
 
 import { HttpCode } from '~types/enums';
@@ -17,9 +17,9 @@ export class AppService {
 
     /** restrict access to api with client key */ 
     public auth(
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction,
+        req: Request,
+        res: Response,
+        next: NextFunction
     ): void {
         if (req.headers['x-api-key'] === this.appConfig.apiKey) {
             return next();
@@ -29,9 +29,9 @@ export class AppService {
     }
 
     public logRequest(
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction,
+        req: Request,
+        res: Response,
+        next: NextFunction
     ): void {
         const logger: LoggerService = req.logger || this.logger;
         logger.debug(`request ${italic(`${req.method} ${req.path}`)}`);
@@ -40,8 +40,8 @@ export class AppService {
 
     /** log and client response for 404 error */
     public handleNotFound(
-        req: express.Request,
-        res: express.Response,
+        req: Request,
+        res: Response,
     ): void {
         const message = `Cannot resolve ${req.method} ${req.path}`;
         res.sendStatus(HttpCode.NOT_FOUND);
@@ -51,9 +51,9 @@ export class AppService {
     /** pretty logs and client responses for errors */
     public handleErrors(
         err: Error,
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction,
+        req: Request,
+        res: Response,
+        next: NextFunction
     ): void {
         const regEx = new RegExp(`${process.cwd()}\\/(?!node_modules\\/)([\\/\\w-_\\.]+\\.js):(\\d*):(\\d*)`);
         const stack: string = err.stack || '';

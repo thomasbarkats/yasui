@@ -1,8 +1,14 @@
-import express, { Router } from 'express';
+import express, {
+    Application,
+    Request,
+    RequestHandler,
+    Response,
+    Router,
+} from 'express';
 import { json } from 'body-parser';
 import { italic } from 'kleur';
 
-import { Instance, Constructible, IDMiddleware, IController } from '~types/interfaces';
+import { Instance, Constructible, IDMiddleware, IController, TMiddleware } from '~types/interfaces';
 import { YasuiConfig } from '~types/interfaces';
 import { AppService } from './utils/app.service';
 import { DecoratorValidator } from './utils/decorator-validator';
@@ -25,7 +31,7 @@ export class Core {
 
     private appService: AppService;
     private injector: Injector;
-    private app: express.Application;
+    private app: Application;
 
     constructor(conf: YasuiConfig) {
         this.config = conf;
@@ -47,7 +53,7 @@ export class Core {
     }
 
 
-    public createApp(): express.Application {
+    public createApp(): Application {
         this.logger.start();
         this.app.use(json());
 
@@ -76,7 +82,7 @@ export class Core {
         /** setup swagger documentation if enabled */
         this.setupSwagger();
 
-        this.app.get('/', (req: express.Request, res: express.Response) => { res.sendStatus(200); });
+        this.app.get('/', (req: Request, res: Response) => { res.sendStatus(200); });
         this.app.use(this.appService.handleNotFound.bind(this.appService));
         this.app.use(this.appService.handleErrors.bind(this.appService));
 
@@ -87,13 +93,19 @@ export class Core {
         return this.injector.build(Provided);
     }
 
+    public useMiddleware(Middleware: TMiddleware): RequestHandler {
+        if (DecoratorValidator.isConstructible(Middleware)) {
+            const middleware = this.build(<Constructible>Middleware) as IDMiddleware;
+            return middleware.run(middleware);
+        }
+        return <RequestHandler>Middleware;
+    }
+
 
     private loadMiddlewares(): void {
         for (const Middleware of this.config.middlewares || []) {
             try {
-                const middleware = this.build(Middleware) as IDMiddleware;
-                this.app.use(middleware.run(middleware));
-
+                this.app.use(this.useMiddleware(Middleware));
             } catch (err) {
                 this.logger.error(`failed to load ${Middleware.name || '<invalid function>'} middleware\n${err}`);
             }
@@ -107,7 +119,7 @@ export class Core {
 
                 const controller = this.build(Controller) as IDController;
                 const path: string = controller.path;
-                const router: express.Router = controller.configureRoutes(controller, this);
+                const router: Router = controller.configureRoutes(controller, this);
                 this.app.use(path, router);
 
                 if (this.config.swagger?.generate) {

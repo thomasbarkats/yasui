@@ -20,7 +20,13 @@ export * from './utils';
 export function createServer(conf: YasuiConfig): Server;
 export function createApp(conf: YasuiConfig): Application;
 
-export { Application, NextFunction, Response, Request } from 'express';
+export {
+    Application,
+    NextFunction,
+    Response,
+    Request,
+    RequestHandler,
+} from 'express';
 
 
 declare const yasui: {
