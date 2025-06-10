@@ -7,7 +7,7 @@
 
 Ship production-ready REST APIs in minutes⚡
 
-<img src="https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot.png" alt="Logo" height=170></a>
+<img src="https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot.png" alt="Logo" height=160></a>
 
 Yasui -*that can mean "easy" in Japanese*- is a lightweight Express-based framework for Node.js that simplifies REST API development with decorators to build your endpoints, plus complete error management, logging, dependency injection, Swagger integration, and more.
 
@@ -43,7 +43,7 @@ Browse the [`src/examples`](./src/examples) folder to get a simple example of a 
 | Parameter | Description |
 | :-------- | :-----------|
 | controllers | Array of controllers (classes using the `@Controller` decorator) |
-| middlewares | Array of middlewares at application level (classes using the `@Middleware` decorator) |
+| middlewares | Array of middlewares at application level (classes using the `@Middleware` decorator or Express RequestHandler functions) |
 | environment | Name of your environment (String) |
 | port | Listening port of your server (only for `createServer` - Number - *3000* by default) |
 | debug | Display more logs and logs all incoming requests if true (Boolean) |
@@ -55,7 +55,7 @@ The `Controller` decorator takes the root path of its endpoints as parameter. Yo
 
 Method parameters can be decorated with `Res`, `Req`, `Next` to access Express objects, or with `Param`, `Body`, `Query`, `Header` to extract specific request data. These decorators can take a parameter name to select a specific value, or be used without parameters to get the entire object.
 
-You can directly return any data from your methods - it will be automatically sent as JSON with status 200. Use the `HttpStatus` decorator to specify a different default status code.
+You can directly return any data from your methods - it will be automatically sent as JSON with status 200. Use the `HttpStatus` decorator to specify a different default status code. See a more complete example in [`src/examples/tests.controller.ts`](./src/examples/tests.controller.ts).
 
 ### Example
 ```ts
@@ -77,25 +77,32 @@ export class MyController {
 ## Middlewares
 Yasui provides decorators to define middlewares and use them at application, controller, or endpoint level.
 
-The `Middleware` decorator takes no parameters. Middleware parameters use the same decorators as controller endpoints. Your middleware must implement a `use()` method that defines its behavior. `next()` is automatically called at the end if nothing is returned.
+### Class-based Middlewares
+The `Middleware` decorator takes no parameters. Middleware parameters use the same decorators as controller endpoints. Your middleware must implement a `use()` method that defines its behavior. `next()` is automatically called at the end if nothing is returned. See a more complete example in [`src/examples/hello.middleware.ts`](./src/examples/hello.middleware.ts).
 
-### Example
 ```ts
-import express from 'express';
-import { logger, Middleware, Param } from 'yasui';
+import { Middleware, NextFunction } from 'yasui';
 
 @Middleware()
 export class HelloMiddleware {
     use(
-        @Param('name') name: string,
+        @Next() next: NextFunction,
     ): void {
-        logger.log(`Hello ${name}`);
+        // ... your logic
+        next();
     }
 }
 ```
 
-**Usage:**
+### Usage
+Middlewares can be used at different levels, executed by the following priorities:
+
 ```ts
+// At application level (in config)
+yasui.createServer({
+    middlewares: [HelloMiddleware]
+});
+
 // At controller level
 @Controller('/', HelloMiddleware)
 export class MyController { /* ... */ }
@@ -103,12 +110,27 @@ export class MyController { /* ... */ }
 // At endpoint level
 @Get('/:name', HelloMiddleware)
 private myEndpoint() { /* ... */ }
+```
 
-// Multiple middlewares can be attached, and will be called in order
-@Controller('/:name', YourMiddleware1, YourMiddleware2)
-private myEndpoint() { /* ... */ }
+### Express RequestHandler Middlewares
+You can also use standard Express middleware functions directly:
 
-// Controller middleware(s) will precede endpoint middleware(s)
+```ts
+// External middlewares
+import helmet from 'helmet';
+import cors from 'cors';
+
+// Function that returns a RequestHandler
+function myOtherMiddleware() {
+    return (req: Request, res: Response, next: NextFunction): void => {
+        // ... your logic
+        next();
+    };
+}
+
+yasui.createServer({
+    middlewares: [cors(), helmet(), myOtherMiddleware()]
+}); // same on controller or endpoint level
 ```
 
 ## Dependency Injection
@@ -124,13 +146,13 @@ import { Injectable } from 'yasui';
 export class UserService {
 
     getUser(id: string) {
-        // Your logic...
+        // ... your logic
     }
 }
 ```
 
 ### Using Services in Controllers
-Simply inject your services in controller constructors:
+Simply inject your services in controller constructors, they will be automatically binded:
 
 ```ts
 @Controller('/users')
@@ -140,6 +162,22 @@ export class UserController {
     @Get('/:id')
     getUser(@Param('id') id: string) {
         return this.userService.getUser(id);
+    }
+}
+```
+
+### Method-level Dependency Injection
+You can also inject dependencies directly into controller or middleware method parameters using the `@Inject()` decorator (in this case type is not enough, injections are not automatically binded):
+
+```ts
+@Controller('/users')
+export class UserController {
+    @Get('/:id')
+    getUser(
+        @Param('id') id: string,
+        @Inject() userService: UserService,
+    ) {
+        return userService.getUser(id);
     }
 }
 ```
@@ -161,6 +199,7 @@ export class MyService {
         @Scope(Scopes.DEEP_LOCAL) private isolatedService: IsolatedService,
         private sharedService: SharedService // SHARED by default
     ) {}
+    // also applicable for methods injections
 }
 ```
 
@@ -173,7 +212,8 @@ export class DatabaseService {
     constructor(
         @Inject('DATABASE_URL') private dbUrl: string,
         @Inject('CONFIG') private config: AppConfig
-    ) {}
+    ) { }
+    // also applicable for methods injections
 }
 ```
 
