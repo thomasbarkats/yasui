@@ -1,4 +1,9 @@
-import express from 'express';
+import {
+    Request,
+    RequestHandler,
+    Response,
+    NextFunction,
+} from 'express';
 
 import { HttpCode, RouteMethods } from '~types/enums';
 import {
@@ -61,13 +66,13 @@ export function routeHandler(
     descriptor: PropertyDescriptor,
     params: IRouteParam[],
     defaultStatus: HttpCode = HttpCode.OK,
-): express.RequestHandler {
+): RequestHandler {
     const routeFunction: Function = descriptor.value;
 
     return async (
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction,
+        req: Request,
+        res: Response,
+        next: NextFunction,
     ): Promise<void> => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const routeHandlerArgs = { req, res, next } as any;

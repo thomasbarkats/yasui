@@ -6,7 +6,6 @@ import { LoggerService } from '../services';
 import {
     IController,
     IControllerRoute,
-    IDMiddleware,
     TMiddleware,
 } from '~types/interfaces';
 
@@ -37,8 +36,7 @@ export function Controller(
 
             /** use other optional middlewares for all controller routes */
             for (const Middleware of middlewares) {
-                const middleware = core.build(Middleware) as IDMiddleware;
-                router.use(middleware.run(middleware));
+                router.use(core.useMiddleware(Middleware));
             }
 
             /** add routes from object metadata */
@@ -53,10 +51,9 @@ export function Controller(
                 }
 
                 /** stack route and middlewares on controller router */
-                const middlewares: RequestHandler[] = route.middlewares.map((Middleware: TMiddleware) => {
-                    const middleware = core.build(Middleware) as IDMiddleware;
-                    return middleware.run(middleware);
-                });
+                const middlewares: RequestHandler[] = route.middlewares.map(
+                    (Middleware: TMiddleware) => core.useMiddleware(Middleware)
+                );
                 router[route.method](route.path, ...middlewares, route.function);
             }
             return router;

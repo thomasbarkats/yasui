@@ -23,6 +23,10 @@ export class DecoratorValidator {
         this.errors = {};
     }
 
+    public static isConstructible(fn: Function): boolean {
+        return typeof fn === 'function' && !!fn.prototype && fn.prototype.constructor === fn;
+    }
+
     public outputErrors(): void {
         if (!this.hasError()) {
             return;
@@ -76,7 +80,7 @@ export class DecoratorValidator {
         const buildStackArray: string[] = Array.from(buildStack);
         const callerName: string = buildStackArray[buildStackArray.length - 1];
 
-        if (!this.isConstructible(target)) {
+        if (!DecoratorValidator.isConstructible(target)) {
             this.addError(
                 callerName,
                 'Injectable must be a class',
@@ -189,9 +193,5 @@ export class DecoratorValidator {
         if (this.errors[className]?.length) {
             throw new Error(`${className} has not passed its validation checks`);
         }
-    }
-
-    private isConstructible(fn: Function): boolean {
-        return typeof fn === 'function' && fn.prototype && fn.prototype.constructor === fn;
     }
 }

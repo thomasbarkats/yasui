@@ -1,9 +1,9 @@
-import express from 'express';
+import { RequestHandler } from 'express';
 import { Constructible, Instance } from './utils.i';
 
 
 /** Middleware type */
-export type TMiddleware = Constructible<IMiddleware>;
+export type TMiddleware = Constructible<IMiddleware> | RequestHandler;
 
 /** Middleware interface */
 export interface IMiddleware extends Instance {
@@ -13,5 +13,5 @@ export interface IMiddleware extends Instance {
 
 /** Decorated middleware interface */
 export interface IDMiddleware extends IMiddleware {
-    run: (self: this) => express.RequestHandler;
+    run: (self: this) => RequestHandler;
 }
