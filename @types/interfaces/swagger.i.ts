@@ -1,10 +1,10 @@
 import { IControllerRoute, TController } from './controller.i';
 import {
-    OpenAPIComponents,
-    OpenAPIInfo,
-    OpenAPIOperation,
-    OpenAPIPathItem,
-    OpenAPIServer,
+  OpenAPIComponents,
+  OpenAPIInfo,
+  OpenAPIOperation,
+  OpenAPIPathItem,
+  OpenAPIServer,
 } from '../openapi';
 
 

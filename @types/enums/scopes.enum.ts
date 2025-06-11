@@ -5,5 +5,5 @@ export enum Scopes {
 }
 
 export const InheritedScopes: Scopes[] = [
-    Scopes.DEEP_LOCAL,
+  Scopes.DEEP_LOCAL,
 ];

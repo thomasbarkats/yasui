@@ -21,11 +21,11 @@ export function createServer(conf: YasuiConfig): Server;
 export function createApp(conf: YasuiConfig): Application;
 
 export {
-    Application,
-    NextFunction,
-    Response,
-    Request,
-    RequestHandler,
+  Application,
+  NextFunction,
+  Response,
+  Request,
+  RequestHandler,
 } from 'express';
 
 

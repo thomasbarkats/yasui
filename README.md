@@ -1,6 +1,6 @@
 # YasuiJS
 
-[![Node.js Version](https://img.shields.io/node/v/yasui.svg?color=1081C2)](https://nodejs.org/)
+[![Node.js Version](https://img.shields.io/node/v/yasui.svg)](https://nodejs.org/)
 [![npm downloads](https://img.shields.io/npm/dm/yasui.svg)](https://www.npmjs.com/package/yasui)
 [![npm bundle size](https://img.shields.io/npm/unpacked-size/yasui?color=4DC81F)](https://www.npmjs.com/package/yasui)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
@@ -363,8 +363,7 @@ Enrich the default API documentation with optional decorators, all to be attache
 ```
 
 ## Contributing
-Contributions are welcome! Please feel free to submit issues and pull requests.
-
+Contributions are welcome! Please feel free to submit issues and pull requests.<br>
 Please use `npm run commit` to standardize commits nomenclature.
 
 ## License

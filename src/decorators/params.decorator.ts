@@ -5,55 +5,55 @@ import { IRouteParam } from '~types/interfaces';
 
 /** create express route-parameter decorator */
 function routeParamDecorator(source: RouteParamTypes): Function {
-    return function (): ParameterDecorator {
-        return extractParam(source);
-    };
+  return function (): ParameterDecorator {
+    return extractParam(source);
+  };
 }
 
 /** create express route-request-parameter decorator */
 export function routeRequestParamDecorator(reqProperty: string): Function {
-    return function (
-        varName?: string
-    ): ParameterDecorator {
-        return extractParam(RouteParamTypes.REQ, reqProperty, varName);
-    };
+  return function (
+    varName?: string
+  ): ParameterDecorator {
+    return extractParam(RouteParamTypes.REQ, reqProperty, varName);
+  };
 }
 
 
 /** extract route param from express req object */
 function extractParam(
-    source: RouteParamTypes,
-    reqProperty?: string,
-    varName?: string
+  source: RouteParamTypes,
+  reqProperty?: string,
+  varName?: string
 ): ParameterDecorator {
-    return function (
-        target: object,
-        propertyKey: string | symbol | undefined,
-        parameterIndex: number
-    ): void {
-        if (!propertyKey) {
-            return;
-        }
-        /** construct param access path */
-        const path: string[] = [source];
-        for (const node of [reqProperty, varName]) {
-            if (node) {
-                path.push(node);
-            }
-        }
+  return function (
+    target: object,
+    propertyKey: string | symbol | undefined,
+    parameterIndex: number
+  ): void {
+    if (!propertyKey) {
+      return;
+    }
+    /** construct param access path */
+    const path: string[] = [source];
+    for (const node of [reqProperty, varName]) {
+      if (node) {
+        path.push(node);
+      }
+    }
 
-        const methodName = String(propertyKey);
-        const routeParam: IRouteParam = { index: parameterIndex, path };
-        const routeParams: IRouteParam[] = Reflect.getMetadata('PARAMS', target, methodName) || [];
+    const methodName = String(propertyKey);
+    const routeParam: IRouteParam = { index: parameterIndex, path };
+    const routeParams: IRouteParam[] = Reflect.getMetadata('PARAMS', target, methodName) || [];
 
-        /** add mapped param to route metadata */
-        Reflect.defineMetadata(
-            'PARAMS',
-            [...routeParams, routeParam],
-            target,
-            methodName,
-        );
-    };
+    /** add mapped param to route metadata */
+    Reflect.defineMetadata(
+      'PARAMS',
+      [...routeParams, routeParam],
+      target,
+      methodName,
+    );
+  };
 }
 
 

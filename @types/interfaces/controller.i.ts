@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import { HttpCode, RouteMethods } from '../enums';
-import { Instance, Constructible } from './utils.i';
+import { Constructible, Instance } from './utils.i';
 import { TMiddleware } from './middleware.i';
 
 

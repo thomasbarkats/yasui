@@ -19,13 +19,13 @@ export * from './utils';
 
 
 const yasui = {
-    ...base,
-    ...services,
-    ...decorators,
-    ...enums,
-    ...interfaces,
-    ...openpai,
-    ...utils,
+  ...base,
+  ...services,
+  ...decorators,
+  ...enums,
+  ...interfaces,
+  ...openpai,
+  ...utils,
 };
 export default yasui;
 
