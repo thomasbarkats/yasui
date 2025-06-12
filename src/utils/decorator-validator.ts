@@ -5,8 +5,9 @@ import {
   Injection,
   YasuiConfig,
 } from '~types/interfaces';
-import { Scopes } from '~types/enums';
+import { ReflectMetadata, Scopes } from '~types/enums';
 import { LoggerService } from '../services';
+import { getMetadata } from './reflect';
 
 
 interface ValidationError {
@@ -54,7 +55,7 @@ export class DecoratorValidator {
       );
     }
 
-    const routes: IControllerRoute[] = Reflect.getMetadata('ROUTES', target.prototype) || [];
+    const routes = getMetadata(ReflectMetadata.ROUTES, target.prototype) || [];
     if (routes.length === 0) {
       this.addError(
         target.name,
@@ -100,8 +101,8 @@ export class DecoratorValidator {
       }
     }
 
-    const deps: Function[] = Reflect.getMetadata('design:paramtypes', target) || [];
-    const preInjectedDeps: Record<number, string> = Reflect.getMetadata('PRE_INJECTED_DEPS', target) || {};
+    const deps = getMetadata(ReflectMetadata.DESIGN_TYPE, target) || [];
+    const preInjectedDeps = getMetadata(ReflectMetadata.PRE_INJECTED_DEPS, target) || {};
 
     deps.forEach((Dep, idx) => {
       if (Dep === undefined || Dep.prototype.toString() === 'function () { [native code] }') {
@@ -115,7 +116,7 @@ export class DecoratorValidator {
       } else if (preInjectedDeps[idx]) {
         this.validateInjectionTokenRegistration(callerName, preInjectedDeps[idx]);
 
-      } else if (!Reflect.getMetadata('INJECTABLE', Dep)) {
+      } else if (!getMetadata(ReflectMetadata.INJECTABLE, Dep)) {
         this.addError(
           callerName,
           `Dependency at position ${idx} (${callerName} -> ${Dep.name}) is not injectable`,
@@ -149,11 +150,10 @@ export class DecoratorValidator {
     if (!prototype[route.methodName]) {
       return;
     }
-    const paramTypes: Function[] = Reflect.getMetadata('design:paramtypes', prototype, route.methodName) || [];
-    const paramNames: string[] = this.getParameterNames(prototype[route.methodName]);
+    const paramTypes = getMetadata(ReflectMetadata.DESIGN_TYPE, prototype, route.methodName) || [];
+    const paramNames = this.getParameterNames(prototype[route.methodName]);
 
-    const methodsInjections: Record<string, Record<number, Constructible | string>>
-            = Reflect.getMetadata('METHOD_INJECTED_DEPS', prototype) || {};
+    const methodsInjections = getMetadata(ReflectMetadata.METHOD_INJECTED_DEPS, prototype) || {};
 
     // Ensure parameter decorators usage
     paramTypes.forEach((type: Function, index: number) => {

@@ -1,4 +1,5 @@
-import { HttpCode } from '~types/enums';
+import { HttpCode, ReflectMetadata } from '~types/enums';
+import { defineMetadata } from '../utils/reflect';
 
 /** create express method-routing decorator with custom status */
 export function HttpStatus(status: HttpCode): MethodDecorator {
@@ -6,6 +7,6 @@ export function HttpStatus(status: HttpCode): MethodDecorator {
     target: object,
     propertyKey: string | symbol,
   ): void {
-    Reflect.defineMetadata('HTTP_STATUS', status, target, propertyKey);
+    defineMetadata(ReflectMetadata.HTTP_STATUS, status, target, propertyKey);
   };
 }

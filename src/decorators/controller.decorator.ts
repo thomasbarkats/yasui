@@ -5,9 +5,10 @@ import { Core } from '../core';
 import { LoggerService } from '../services';
 import {
   IController,
-  IControllerRoute,
   TMiddleware,
 } from '~types/interfaces';
+import { ReflectMetadata } from '~types/enums';
+import { defineMetadata, getMetadata } from '../utils/reflect';
 
 
 export function Controller(
@@ -25,7 +26,7 @@ export function Controller(
       const router: Router = Router();
 
       /** add target instance metadata to bind his args in route function */
-      Reflect.defineMetadata('SELF', self, target.prototype);
+      defineMetadata(ReflectMetadata.SELF, self, target.prototype);
 
       /** enrich query with controller infos for logs and errors handling */
       router.use((req, res, next) => {
@@ -40,7 +41,7 @@ export function Controller(
       }
 
       /** add routes from object metadata */
-      const routes: IControllerRoute[] = Reflect.getMetadata('ROUTES', target.prototype) || [];
+      const routes = getMetadata(ReflectMetadata.ROUTES, target.prototype) || [];
 
       for (const route of routes) {
         if (core.config.debug) {

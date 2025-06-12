@@ -1,9 +1,10 @@
 import { yellow } from 'kleur';
 
 import { LoggerService } from './services';
-import { InheritedScopes, Scopes } from '~types/enums';
+import { InheritedScopes, ReflectMetadata, Scopes } from '~types/enums';
 import { Constructible, Instance } from '~types/interfaces';
 import { DecoratorValidator } from './utils/decorator-validator';
+import { getMetadata, defineMetadata } from './utils/reflect';
 
 
 export class Injector {
@@ -74,10 +75,10 @@ export class Injector {
     scope: Scopes
   ): Instance[] {
     /** inject via constructor param types or pre-registered token injections */
-    const deps: Function[] = Reflect.getMetadata('design:paramtypes', Provided) || [];
-    const preInjectedDeps: Record<number, string> = Reflect.getMetadata('PRE_INJECTED_DEPS', Provided) || {};
+    const deps = getMetadata(ReflectMetadata.DESIGN_TYPE, Provided) || [];
+    const preInjectedDeps = getMetadata(ReflectMetadata.PRE_INJECTED_DEPS, Provided) || {};
 
-    const depScopes: Record<number, Scopes> = Reflect.getMetadata('DEP_SCOPES', Provided) || {};
+    const depScopes = getMetadata(ReflectMetadata.DEP_SCOPES, Provided) || {};
 
     return deps.map((Dep: Function, idx: number) => {
 
@@ -102,7 +103,7 @@ export class Injector {
     instance: T,
     scope: Scopes
   ): void {
-    const methodsInjections = Reflect.getMetadata('METHOD_INJECTED_DEPS', Provided.prototype) || {};
+    const methodsInjections = getMetadata(ReflectMetadata.METHOD_INJECTED_DEPS, Provided.prototype) || {};
 
     for (const methodName in methodsInjections) {
       const methodDeps = this.resolveMethodDependencies(
@@ -111,22 +112,21 @@ export class Injector {
         methodsInjections[methodName],
         scope
       );
-      Reflect.defineMetadata('RESOLVED_METHOD_DEPS', methodDeps, instance, methodName);
+      defineMetadata(ReflectMetadata.RESOLVED_METHOD_DEPS, methodDeps, instance, methodName);
     }
   }
 
   private resolveMethodDependencies(
     Provided: Constructible,
     methodName: string,
-    injections: Record<number, Constructible | string>,
+    injections: Record<number, Function | string>,
     scope: Scopes
   ): Record<number, Instance> {
-    const depScopes: Record<number, Scopes>
-            = Reflect.getMetadata('DEP_SCOPES', Provided.prototype, methodName) || {};
+    const depScopes = getMetadata(ReflectMetadata.DEP_SCOPES, Provided.prototype, methodName) || {};
     const methodDeps: Record<number, Instance> = {};
 
     for (const paramIndex in injections) {
-      const Dep: Constructible | string = injections[paramIndex];
+      const Dep: Function | string = injections[paramIndex];
 
       if (typeof Dep === 'string') {
         this.decoratorValidator?.validateInjectionTokenRegistration(Provided.name, Dep);
@@ -140,7 +140,7 @@ export class Injector {
         ? scope
         : (depScopes[paramIndex] || Scopes.SHARED);
 
-      methodDeps[paramIndex] = this.build(Dep, depScope);
+      methodDeps[paramIndex] = this.build(<Constructible>Dep, depScope);
     }
     return methodDeps;
   }

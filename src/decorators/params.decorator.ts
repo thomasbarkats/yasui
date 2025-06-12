@@ -1,6 +1,7 @@
-import { RouteParamTypes } from '~types/enums';
+import { ReflectMetadata, RouteParamTypes } from '~types/enums';
 import { RouteRequestParamTypes } from '~types/enums';
 import { IRouteParam } from '~types/interfaces';
+import { getMetadata, defineMetadata } from '../utils/reflect';
 
 
 /** create express route-parameter decorator */
@@ -44,11 +45,11 @@ function extractParam(
 
     const methodName = String(propertyKey);
     const routeParam: IRouteParam = { index: parameterIndex, path };
-    const routeParams: IRouteParam[] = Reflect.getMetadata('PARAMS', target, methodName) || [];
+    const routeParams = getMetadata(ReflectMetadata.PARAMS, target, methodName) || [];
 
     /** add mapped param to route metadata */
-    Reflect.defineMetadata(
-      'PARAMS',
+    defineMetadata(
+      ReflectMetadata.PARAMS,
       [...routeParams, routeParam],
       target,
       methodName,

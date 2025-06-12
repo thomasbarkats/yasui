@@ -1,7 +1,9 @@
 import { RequestHandler } from 'express';
 
-import { IMiddleware, IRouteParam } from '~types/interfaces';
+import { IMiddleware } from '~types/interfaces';
 import { routeHandler } from './methods.decorator';
+import { ReflectMetadata } from '~types/enums';
+import { defineMetadata, getMetadata } from '../utils/reflect';
 
 
 /** express middleware decorator */
@@ -15,9 +17,9 @@ export const Middleware = (): ClassDecorator => {
       }
 
       /** add target instance metadata to bind his args in route function */
-      Reflect.defineMetadata('SELF', self, target.prototype);
+      defineMetadata(ReflectMetadata.SELF, self, target.prototype);
 
-      const params: IRouteParam[] = Reflect.getMetadata('PARAMS', target.prototype, 'use') || [];
+      const params = getMetadata(ReflectMetadata.PARAMS, target.prototype, 'use') || [];
 
       return routeHandler(
         target.prototype,

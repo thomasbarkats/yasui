@@ -1,6 +1,5 @@
-import { HttpCode, HttpCodeMap } from '~types/enums';
+import { HttpCode, HttpCodeMap, ReflectMetadata } from '~types/enums';
 import {
-  IControllerRoute,
   IRouteParam,
   ISwaggerConfig,
   ISwaggerRoute,
@@ -11,6 +10,7 @@ import {
   OpenAPIParamater,
   OpenAPIResponses,
 } from '~types/openapi';
+import { getMetadata } from './reflect';
 
 
 export class SwaggerService {
@@ -21,11 +21,10 @@ export class SwaggerService {
     ControllerClass: TController,
     controllerPath: string
   ): void {
-    const routes: IControllerRoute[] = Reflect.getMetadata('ROUTES', ControllerClass.prototype) || [];
+    const routes = getMetadata(ReflectMetadata.ROUTES, ControllerClass.prototype) || [];
 
     for (const route of routes) {
-      const swaggerMetadata: OpenAPIOperation
-                = Reflect.getMetadata('SWAGGER', ControllerClass.prototype, route.methodName);
+      const swaggerMetadata = getMetadata(ReflectMetadata.SWAGGER, ControllerClass.prototype, route.methodName) || {};
       const swaggerRoute: ISwaggerRoute = {
         ...route,
         controllerName: ControllerClass.name,

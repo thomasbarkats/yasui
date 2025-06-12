@@ -5,13 +5,13 @@ import {
   Response,
 } from 'express';
 
-import { HttpCode, RouteMethods } from '~types/enums';
+import { HttpCode, ReflectMetadata, RouteMethods } from '~types/enums';
 import {
   IControllerRoute,
   IRouteParam,
-  Instance,
   TMiddleware,
 } from '~types/interfaces';
+import { getMetadata, defineMetadata } from '../utils/reflect';
 
 
 /** create express method-routing decorator */
@@ -36,8 +36,8 @@ function addRoute(
     descriptor: PropertyDescriptor
   ): void {
     const methodName: string = String(propertyKey);
-    const defaultStatus: HttpCode = Reflect.getMetadata('HTTP_STATUS', target, propertyKey);
-    const params: IRouteParam[] = Reflect.getMetadata('PARAMS', target, methodName) || [];
+    const defaultStatus = getMetadata(ReflectMetadata.HTTP_STATUS, target, propertyKey) || HttpCode.OK;
+    const params = getMetadata(ReflectMetadata.PARAMS, target, methodName) || [];
 
     const route: IControllerRoute = {
       method,
@@ -54,8 +54,8 @@ function addRoute(
       params,
     };
 
-    const routes: IControllerRoute[] = Reflect.getMetadata('ROUTES', target) || [];
-    Reflect.defineMetadata('ROUTES', [...routes, route], target);
+    const routes = getMetadata(ReflectMetadata.ROUTES, target) || [];
+    defineMetadata(ReflectMetadata.ROUTES, [...routes, route], target);
   };
 }
 
@@ -76,11 +76,11 @@ export function routeHandler(
   ): Promise<void> => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const routeHandlerArgs = { req, res, next } as any;
-    const self: Instance = Reflect.getMetadata('SELF', target);
+    const self = getMetadata(ReflectMetadata.SELF, target) || {};
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const methodDeps: Record<number, any> =
-            Reflect.getMetadata('RESOLVED_METHOD_DEPS', self, String(descriptor.value.name)) || {};
+            getMetadata(ReflectMetadata.RESOLVED_METHOD_DEPS, self, String(descriptor.value.name)) || {};
 
     const allIndexes = [
       ...params.map(p => p.index),

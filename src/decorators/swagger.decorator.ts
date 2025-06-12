@@ -1,9 +1,10 @@
+import { ReflectMetadata } from '~types/enums';
 import {
-  OpenAPIOperation,
   OpenAPIParamater,
   OpenAPIResponses,
   OpenAPISchema,
 } from '~types/openapi';
+import { getMetadata, defineMetadata } from '../utils/reflect';
 
 
 /** swagger operation decorator */
@@ -25,14 +26,14 @@ function addSwaggerOperation(
     target: object,
     propertyKey: string | symbol
   ): void {
-    const swaggerMetadata: OpenAPIOperation = Reflect.getMetadata('SWAGGER', target, propertyKey) || {};
+    const swaggerMetadata = getMetadata(ReflectMetadata.SWAGGER, target, propertyKey) || {};
 
-    Reflect.defineMetadata('SWAGGER', {
+    defineMetadata(ReflectMetadata.SWAGGER, {
       ...swaggerMetadata,
       summary,
       description,
       tags,
-    } satisfies OpenAPIOperation, target, propertyKey);
+    }, target, propertyKey);
   };
 }
 
@@ -56,17 +57,17 @@ function addSwaggerResponse(
     target: object,
     propertyKey: string | symbol
   ): void {
-    const swaggerMetadata: OpenAPIOperation = Reflect.getMetadata('SWAGGER', target, propertyKey) || {};
+    const swaggerMetadata = getMetadata(ReflectMetadata.SWAGGER, target, propertyKey) || {};
     const responses: OpenAPIResponses = swaggerMetadata.responses || {};
     responses[statusCode] = { description, schema };
     if (schema) {
       responses[statusCode].content = { 'application/json': { schema: schema } };
     }
 
-    Reflect.defineMetadata('SWAGGER', {
+    defineMetadata(ReflectMetadata.SWAGGER, {
       ...swaggerMetadata,
       responses,
-    } satisfies OpenAPIOperation, target, propertyKey);
+    }, target, propertyKey);
   };
 }
 
@@ -90,9 +91,9 @@ function addSwaggerRequestBody(
     target: object,
     propertyKey: string | symbol
   ): void {
-    const swaggerMetadata: OpenAPIOperation = Reflect.getMetadata('SWAGGER', target, propertyKey) || {};
+    const swaggerMetadata = getMetadata(ReflectMetadata.SWAGGER, target, propertyKey) || {};
 
-    Reflect.defineMetadata('SWAGGER', {
+    defineMetadata(ReflectMetadata.SWAGGER, {
       ...swaggerMetadata,
       requestBody: {
         description: description || 'Request body',
@@ -102,7 +103,7 @@ function addSwaggerRequestBody(
           }
         }
       }
-    } satisfies OpenAPIOperation, target, propertyKey);
+    }, target, propertyKey);
   };
 }
 
@@ -131,7 +132,7 @@ function addSwaggerParam(
     target: object,
     propertyKey: string | symbol
   ): void {
-    const swaggerMetadata: OpenAPIOperation = Reflect.getMetadata('SWAGGER', target, propertyKey) || {};
+    const swaggerMetadata = getMetadata(ReflectMetadata.SWAGGER, target, propertyKey) || {};
     const parameters: OpenAPIParamater[] = swaggerMetadata.parameters || [];
 
     parameters.push({
@@ -142,10 +143,10 @@ function addSwaggerParam(
       schema: schema || { type: 'string' },
     });
 
-    Reflect.defineMetadata('SWAGGER', {
+    defineMetadata(ReflectMetadata.SWAGGER, {
       ...swaggerMetadata,
       parameters
-    } satisfies OpenAPIOperation, target, propertyKey);
+    }, target, propertyKey);
   };
 }
 
