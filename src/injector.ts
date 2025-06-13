@@ -13,9 +13,9 @@ export class Injector {
   private buildStack: Set<string>;
 
   constructor(
-        private readonly logger: LoggerService,
-        private readonly decoratorValidator: DecoratorValidator | null,
-        private readonly debug = false,
+    private readonly logger: LoggerService,
+    private readonly decoratorValidator: DecoratorValidator | null,
+    private readonly debug = false,
   ) {
     this.registry = new Map<string | symbol, Instance>();
     this.buildStack = new Set<string>();

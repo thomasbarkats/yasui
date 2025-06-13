@@ -18,8 +18,8 @@ import { SwaggerService } from './utils/swagger.service';
 
 
 interface IDController extends IController {
-    path: string;
-    configureRoutes: (self: this, core: Core) => Router;
+  path: string;
+  configureRoutes: (self: this, core: Core) => Router;
 }
 
 
@@ -158,7 +158,7 @@ export class Core {
     } catch (err) {
       this.logger.warn(
         'swagger-ui-express not found.\n' +
-                'Install it to enable swagger documentation: npm install swagger-ui-express.'
+        'Install it to enable swagger documentation: npm install swagger-ui-express.'
       );
       if (this.config.debug) {
         this.logger.error(`swagger setup error: ${err}`);

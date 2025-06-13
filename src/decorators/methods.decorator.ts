@@ -80,7 +80,7 @@ export function routeHandler(
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const methodDeps: Record<number, any> =
-            getMetadata(ReflectMetadata.RESOLVED_METHOD_DEPS, self, String(descriptor.value.name)) || {};
+      getMetadata(ReflectMetadata.RESOLVED_METHOD_DEPS, self, String(descriptor.value.name)) || {};
 
     const allIndexes = [
       ...params.map(p => p.index),

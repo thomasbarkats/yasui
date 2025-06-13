@@ -4,7 +4,9 @@
     "module": "CommonJS",
     "outDir": "./lib",
     "paths": {
-      "~types/*": ["./@types/*"]
+      "~types/*": [
+        "./@types/*"
+      ]
     },
     "strict": true,
     "esModuleInterop": true,
@@ -14,7 +16,6 @@
     "emitDecoratorMetadata": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-
     // Explicit typing
     "alwaysStrict": true,
     "noImplicitAny": true,

@@ -12,17 +12,17 @@ export type IController = Instance;
 
 
 export interface IControllerRoute {
-    method: RouteMethods;
-    path: string;
-    middlewares: TMiddleware[];
-    function: RequestHandler;
-    methodName: string;
-    defaultStatus?: HttpCode;
-    params: IRouteParam[];
+  method: RouteMethods;
+  path: string;
+  middlewares: TMiddleware[];
+  function: RequestHandler;
+  methodName: string;
+  defaultStatus?: HttpCode;
+  params: IRouteParam[];
 }
 
 
 export interface IRouteParam {
-    index: number;
-    path: string[];
+  index: number;
+  path: string[];
 }

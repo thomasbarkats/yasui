@@ -6,14 +6,14 @@ import { OpenAPISchema } from '~types/openapi';
 
 
 export class HttpError extends Error {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [index: string]: any;
-    public status?: HttpCode;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [index: string]: any;
+  public status?: HttpCode;
 
-    constructor(status: HttpCode, message: string) {
-      super(message);
-      this.status = status;
-    }
+  constructor(status: HttpCode, message: string) {
+    super(message);
+    this.status = status;
+  }
 }
 
 export class ErrorResource {
@@ -42,10 +42,10 @@ export class ErrorResource {
 
   public toString(): string {
     return `url: ${this.url}\n` +
-            `request: ${italic(`${this.method} ${this.path}`)}\n` +
-            `status: ${this.status} (${this.statusMessage})\n` +
-            `message: ${this.message}\n` +
-            `data: ${JSON.stringify(this.data, null, 2)}`;
+      `request: ${italic(`${this.method} ${this.path}`)}\n` +
+      `status: ${this.status} (${this.statusMessage})\n` +
+      `message: ${this.message}\n` +
+      `data: ${JSON.stringify(this.data, null, 2)}`;
   }
 
   private setData(err: HttpError): void {

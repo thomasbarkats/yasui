@@ -202,8 +202,8 @@ export class SwaggerService {
   private hasBodyParameter(route: ISwaggerRoute): boolean {
     return route.params.some(param =>
       param.path.length >= 2 &&
-            param.path[0] === 'req' &&
-            param.path[1] === 'body'
+      param.path[0] === 'req' &&
+      param.path[1] === 'body'
     );
   }
 }

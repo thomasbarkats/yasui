@@ -8,7 +8,7 @@ export class LoggerService {
   public startTime: number | undefined;
   public lastTime: number | undefined;
   public endTime: number | undefined;
-    
+
   public start(): this {
     this.startTime = new Date().getTime();
     this.lastTime = this.startTime;

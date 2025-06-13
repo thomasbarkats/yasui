@@ -63,14 +63,14 @@ import { Get, Controller, Res, Param, HttpStatus, Response } from 'yasui';
 
 @Controller('/')
 export class MyController {
-    @Get('/:name')
-    @HttpStatus(201)
-    private hello(
-        @Param('name') name: string,
-        @Res() res: Response
-    ): string {
-        return `Hello ${name}!`;
-    }
+  @Get('/:name')
+  @HttpStatus(201)
+  private hello(
+    @Param('name') name: string,
+    @Res() res: Response
+  ): string {
+    return `Hello ${name}!`;
+  }
 }
 ```
 
@@ -85,12 +85,12 @@ import { Middleware, NextFunction } from 'yasui';
 
 @Middleware()
 export class HelloMiddleware {
-    use(
-        @Next() next: NextFunction,
-    ): void {
-        // ... your logic
-        next();
-    }
+  use(
+    @Next() next: NextFunction,
+  ): void {
+    // ... your logic
+    next();
+  }
 }
 ```
 
@@ -100,7 +100,7 @@ Middlewares can be used at different levels, executed by the following prioritie
 ```ts
 // At application level (in config)
 yasui.createServer({
-    middlewares: [HelloMiddleware]
+  middlewares: [HelloMiddleware]
 });
 
 // At controller level
@@ -122,14 +122,14 @@ import cors from 'cors';
 
 // Function that returns a RequestHandler
 function myOtherMiddleware() {
-    return (req: Request, res: Response, next: NextFunction): void => {
-        // ... your logic
-        next();
-    };
+  return (req: Request, res: Response, next: NextFunction): void => {
+    // ... your logic
+    next();
+  };
 }
 
 yasui.createServer({
-    middlewares: [cors(), helmet(), myOtherMiddleware()]
+  middlewares: [cors(), helmet(), myOtherMiddleware()]
 }); // same on controller or endpoint level
 ```
 
@@ -145,9 +145,9 @@ import { Injectable } from 'yasui';
 @Injectable() // Required
 export class UserService {
 
-    getUser(id: string) {
-        // ... your logic
-    }
+  getUser(id: string) {
+    // ... your logic
+  }
 }
 ```
 
@@ -157,12 +157,12 @@ Simply inject your services in controller constructors, they will be automatical
 ```ts
 @Controller('/users')
 export class UserController {
-    constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
-    @Get('/:id')
-    getUser(@Param('id') id: string) {
-        return this.userService.getUser(id);
-    }
+  @Get('/:id')
+  getUser(@Param('id') id: string) {
+    return this.userService.getUser(id);
+  }
 }
 ```
 
@@ -172,13 +172,13 @@ You can also inject dependencies directly into controller or middleware method p
 ```ts
 @Controller('/users')
 export class UserController {
-    @Get('/:id')
-    getUser(
-        @Param('id') id: string,
-        @Inject() userService: UserService,
-    ) {
-        return userService.getUser(id);
-    }
+  @Get('/:id')
+  getUser(
+    @Param('id') id: string,
+    @Inject() userService: UserService,
+  ) {
+    return userService.getUser(id);
+  }
 }
 ```
 
@@ -194,12 +194,12 @@ Use the `@Scope()` decorator to specify the scope for individual dependencies:
 ```ts
 @Injectable()
 export class MyService {
-    constructor(
-        @Scope(Scopes.LOCAL) private tempService: TempService,
-        @Scope(Scopes.DEEP_LOCAL) private isolatedService: IsolatedService,
-        private sharedService: SharedService // SHARED by default
-    ) {}
-    // also applicable for methods injections
+  constructor(
+    @Scope(Scopes.LOCAL) private tempService: TempService,
+    @Scope(Scopes.DEEP_LOCAL) private isolatedService: IsolatedService,
+    private sharedService: SharedService // SHARED by default
+  ) { }
+  // also applicable for methods injections
 }
 ```
 
@@ -209,11 +209,11 @@ For more complex scenarios, use custom injection tokens with `@Inject()`. This i
 ```ts
 @Injectable()
 export class DatabaseService {
-    constructor(
-        @Inject('DATABASE_URL') private dbUrl: string,
-        @Inject('CONFIG') private config: AppConfig
-    ) { }
-    // also applicable for methods injections
+  constructor(
+    @Inject('DATABASE_URL') private dbUrl: string,
+    @Inject('CONFIG') private config: AppConfig
+  ) { }
+  // also applicable for methods injections
 }
 ```
 
@@ -221,11 +221,11 @@ export class DatabaseService {
 ```ts
 // You need to register custom tokens in your app config
 yasui.createServer({
-    ...yourConfig,
-    injections: [
-        { token: 'DATABASE_URL', provide: 'postgresql://localhost:5432/mydb' },
-        { token: 'CONFIG', provide: { apiKey: 'xxx', timeout: 5000 } }
-    ]
+  ...yourConfig,
+  injections: [
+    { token: 'DATABASE_URL', provide: 'postgresql://localhost:5432/mydb' },
+    { token: 'CONFIG', provide: { apiKey: 'xxx', timeout: 5000 } }
+  ]
 });
 ```
 
@@ -238,15 +238,15 @@ import { Injectable, LoggerService } from 'yasui';
 
 @Injectable()
 export class YourService {
-    constructor(private readonly logger: LoggerService) {}
-    
-    yourMethod(id: string) {
-        logger.log('Application started');
-        logger.debug('Debug information');
-        logger.success('Operation completed');
-        logger.warn('Warning message');
-        logger.error('Error occurred');
-    }
+  constructor(private readonly logger: LoggerService) { }
+
+  yourMethod(id: string) {
+    logger.log('Application started');
+    logger.debug('Debug information');
+    logger.success('Operation completed');
+    logger.warn('Warning message');
+    logger.error('Error occurred');
+  }
 }
 ```
 
@@ -269,12 +269,12 @@ Use the `@Logger()` decorator to get a request-specific logger instance:
 ```ts
 @Controller('/api')
 export class ApiController {
-    @Get('/data')
-    getData(@Logger() logger: LoggerService) {
-        // ... fetch data
-        logger.success(`Data fetched in ${logger.getTime()}ms`);
-        return data;
-    }
+  @Get('/data')
+  getData(@Logger() logger: LoggerService) {
+    // ... fetch data
+    logger.success(`Data fetched in ${logger.getTime()}ms`);
+    return data;
+  }
 }
 ```
 
@@ -293,17 +293,17 @@ Create custom errors with specific status codes and additional data by extending
 import { Get, HttpCode, HttpError } from 'yasui';
 
 class CustomError extends HttpError {
-    customAttribute: any;
+  customAttribute: any;
 
-    constructor(customAttribute: any) {
-        super(HttpCode.BAD_REQUEST, 'My Custom Error');
-        this.customAttribute = customAttribute;
-    }
+  constructor(customAttribute: any) {
+    super(HttpCode.BAD_REQUEST, 'My Custom Error');
+    this.customAttribute = customAttribute;
+  }
 }
 
 @Get('/protected')
 getProtectedData() {
-    throw new CustomError('Access denied', ...yourData);
+  throw new CustomError('Access denied', ...yourData);
 }
 ```
 
@@ -321,16 +321,16 @@ Enable Swagger by adding configuration to your app:
 
 ```ts
 yasui.createServer({
-    // ... your config
-    swagger: {
-        enabled: true,
-        path: '/api-docs', // optional, defaults to '/api-docs'
-        info: {
-            title: 'My API',
-            version: '1.0.0',
-            description: 'API documentation'
-        }
+  // ... your config
+  swagger: {
+    enabled: true,
+    path: '/api-docs', // optional, defaults to '/api-docs'
+    info: {
+      title: 'My API',
+      version: '1.0.0',
+      description: 'API documentation'
     }
+  }
 });
 ```
 
@@ -356,9 +356,9 @@ Enrich the default API documentation with optional decorators, all to be attache
 `ErrorResourceSchema` generates a schema for Yasui's error wrapper format (see "Custom Error Handling" section). You can optionally define the additional fields that will be included in the `data` property for your custom errors :
 ```ts
 @ApiResponse(400, 'Bad Request ...', ErrorResourceSchema({
-    customAttribute: { type: 'string', description: 'Custom attribute' },
+  customAttribute: { type: 'string', description: 'Custom attribute' },
 }, {
-    customAttribute: 'Additional information',
+  customAttribute: 'Additional information',
 }))
 ```
 

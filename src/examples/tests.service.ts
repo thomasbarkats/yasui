@@ -5,7 +5,7 @@ import { Injectable, LoggerService } from '..';
 export class TestsService {
 
   constructor(
-        private readonly logger: LoggerService,
+    private readonly logger: LoggerService,
   ) { }
 
 

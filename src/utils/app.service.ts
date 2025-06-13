@@ -15,7 +15,7 @@ export class AppService {
   }
 
 
-  /** restrict access to api with client key */ 
+  /** restrict access to api with client key */
   public auth(
     req: Request,
     res: Response,
@@ -57,7 +57,7 @@ export class AppService {
   ): void {
     const regEx = new RegExp(`${process.cwd()}\\/(?!node_modules\\/)([\\/\\w-_\\.]+\\.js):(\\d*):(\\d*)`);
     const stack: string = err.stack || '';
-    const [, filename, line, column ] = stack.match(regEx) || Array(0);
+    const [, filename, line, column] = stack.match(regEx) || Array(0);
 
     const errResource = new ErrorResource(err, req);
     res.status(errResource.status).json(errResource);
@@ -67,7 +67,7 @@ export class AppService {
     if (this.appConfig.debug || errResource.status === HttpCode.INTERNAL_SERVER_ERROR) {
       console.error(red(
         `source: ${filename ? `${filename} ${line}:${column}` : 'undefined'}\n` +
-                errResource.toString(),
+        errResource.toString(),
       ));
     }
     next();

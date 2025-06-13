@@ -11,9 +11,9 @@ import { getMetadata } from './reflect';
 
 
 interface ValidationError {
-    className: string;
-    issue: string;
-    suggestion: string | undefined;
+  className: string;
+  issue: string;
+  suggestion: string | undefined;
 }
 
 
@@ -110,7 +110,7 @@ export class DecoratorValidator {
           callerName,
           `Dependency at position ${idx} is undefined (${cycle} -> <?>)`,
           'This usually means there is a circular import between files or a missing or bad import statement'
-                    + '\nCheck your import statements and ensure there is no circular import between files'
+          + '\nCheck your import statements and ensure there is no circular import between files'
         );
 
       } else if (preInjectedDeps[idx]) {
@@ -158,7 +158,7 @@ export class DecoratorValidator {
     // Ensure parameter decorators usage
     paramTypes.forEach((type: Function, index: number) => {
       const hasDecorator = !!(methodsInjections[route.methodName] || {})[index]
-                || route.params.some(param => param.index === index);
+        || route.params.some(param => param.index === index);
       if (!hasDecorator) {
         this.addError(
           className,
