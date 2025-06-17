@@ -1,75 +1,215 @@
 # Getting Started
 
-Welcome to YasuiJS! This guide will help you get up and running with your first YasuiJS API in minutes.
+Welcome to YasuiJS! This guide will walk you through creating your first API from scratch. By the end, you'll have a fully functional REST API with proper structure and best practices.
+
+## What You'll Build
+
+We'll create a simple user management API that demonstrates the core features of YasuiJS:
+- User CRUD operations (Create, Read, Update, Delete)
+- Dependency injection with services
+- Parameter extraction and validation
+- Basic error handling
 
 ## Prerequisites
 
-Before you begin, make sure you have:
+Before we begin, make sure you have:
 
-- **Node.js** (version 16 or higher)
+- **Node.js** (version 16 or higher) - [Download here](https://nodejs.org/)
 - **npm** or **yarn** package manager
 - Basic knowledge of **TypeScript** and **Express.js**
 
-## Installation
-
-Install YasuiJS using npm:
-
+You can check your Node.js version with:
 ```bash
-npm install yasui
+node --version
 ```
 
-Or using yarn:
+## Step 1: Project Setup
 
+Let's start by creating a new project and installing the necessary dependencies.
+
+### Create a New Directory
 ```bash
-yarn add yasui
+mkdir my-yasui-api
+cd my-yasui-api
 ```
 
-## Quick Start
+### Initialize the Project
+```bash
+npm init -y
+```
 
-### 1. Create Your First Controller
+### Install Dependencies
+```bash
+npm install yasui express
+npm install -D typescript @types/node ts-node nodemon
+```
 
-Create a new file `src/controllers/user.controller.ts`:
+### TypeScript Configuration
+Create a `tsconfig.json` file:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "lib": ["ES2020"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+### Package.json Scripts
+Update your `package.json` to include useful scripts:
+
+```json
+{
+  "scripts": {
+    "dev": "nodemon src/app.ts",
+    "build": "tsc",
+    "start": "node dist/app.js"
+  }
+}
+```
+
+## Step 2: Create Your First Controller
+
+Controllers are the heart of your YasuiJS application. They handle incoming HTTP requests and return responses.
+
+Create the file `src/controllers/user.controller.ts`:
 
 ```typescript
-import { Controller, Get, Post, Body, Param } from 'yasui';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query } from 'yasui';
 
+// Define our data types
 interface User {
   id: string;
   name: string;
   email: string;
+  createdAt: Date;
+}
+
+interface CreateUserDto {
+  name: string;
+  email: string;
+}
+
+interface UpdateUserDto {
+  name?: string;
+  email?: string;
 }
 
 @Controller('/api/users')
 export class UserController {
   
+  // In-memory storage for this example
   private users: User[] = [
-    { id: '1', name: 'John Doe', email: 'john@example.com' },
-    { id: '2', name: 'Jane Smith', email: 'jane@example.com' }
+    { 
+      id: '1', 
+      name: 'John Doe', 
+      email: 'john@example.com',
+      createdAt: new Date()
+    },
+    { 
+      id: '2', 
+      name: 'Jane Smith', 
+      email: 'jane@example.com',
+      createdAt: new Date()
+    }
   ];
 
+  // GET /api/users - Get all users with optional pagination
   @Get('/')
-  getAllUsers(): User[] {
-    return this.users;
+  getAllUsers(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10
+  ) {
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedUsers = this.users.slice(startIndex, endIndex);
+    
+    return {
+      users: paginatedUsers,
+      pagination: {
+        page,
+        limit,
+        total: this.users.length,
+        totalPages: Math.ceil(this.users.length / limit)
+      }
+    };
   }
 
+  // GET /api/users/:id - Get a specific user
   @Get('/:id')
-  getUser(@Param('id') id: string): User | null {
-    return this.users.find(user => user.id === id) || null;
+  getUser(@Param('id') id: string) {
+    const user = this.users.find(user => user.id === id);
+    
+    if (!user) {
+      throw new Error('User not found');
+    }
+    
+    return user;
   }
 
+  // POST /api/users - Create a new user
   @Post('/')
-  createUser(@Body() user: Omit<User, 'id'>): User {
+  createUser(@Body() userData: CreateUserDto) {
     const newUser: User = {
       id: Date.now().toString(),
-      ...user
+      ...userData,
+      createdAt: new Date()
     };
+    
     this.users.push(newUser);
     return newUser;
+  }
+
+  // PUT /api/users/:id - Update a user
+  @Put('/:id')
+  updateUser(@Param('id') id: string, @Body() userData: UpdateUserDto) {
+    const userIndex = this.users.findIndex(user => user.id === id);
+    
+    if (userIndex === -1) {
+      throw new Error('User not found');
+    }
+    
+    this.users[userIndex] = {
+      ...this.users[userIndex],
+      ...userData
+    };
+    
+    return this.users[userIndex];
+  }
+
+  // DELETE /api/users/:id - Delete a user
+  @Delete('/:id')
+  deleteUser(@Param('id') id: string) {
+    const userIndex = this.users.findIndex(user => user.id === id);
+    
+    if (userIndex === -1) {
+      throw new Error('User not found');
+    }
+    
+    const deletedUser = this.users[userIndex];
+    this.users.splice(userIndex, 1);
+    
+    return { message: 'User deleted successfully', user: deletedUser };
   }
 }
 ```
 
-### 2. Create Your Application
+## Step 3: Create Your Application
+
+Now let's create the main application file that ties everything together.
 
 Create `src/app.ts`:
 
@@ -77,85 +217,78 @@ Create `src/app.ts`:
 import { YasuiApp } from 'yasui';
 import { UserController } from './controllers/user.controller';
 
+// Create the YasuiJS application
 const app = new YasuiApp({
   port: 3000,
-  debug: true
+  debug: true, // Enable debug mode for development
+  cors: true   // Enable CORS for frontend integration
 });
 
-// Register controllers
+// Register your controllers
 app.registerControllers([UserController]);
 
 // Start the server
-app.start();
+app.start().then(() => {
+  console.log('🚀 YasuiJS API is running on http://localhost:3000');
+  console.log('📚 API Documentation available at http://localhost:3000/api-docs');
+});
 ```
 
-### 3. Run Your Application
+## Step 4: Run Your Application
 
-Add a script to your `package.json`:
-
-```json
-{
-  "scripts": {
-    "dev": "ts-node src/app.ts",
-    "build": "tsc",
-    "start": "node dist/app.js"
-  }
-}
-```
-
-Run your application:
+Now it's time to see your API in action!
 
 ```bash
 npm run dev
 ```
 
-Your API is now running at `http://localhost:3000`!
+You should see output like:
+```
+🚀 YasuiJS API is running on http://localhost:3000
+📚 API Documentation available at http://localhost:3000/api-docs
+```
 
-## Testing Your API
+## Step 5: Test Your API
 
-You can test your endpoints using curl or any API client:
+Let's test all the endpoints we created. You can use curl, Postman, or any API client.
 
+### Get All Users
 ```bash
-# Get all users
 curl http://localhost:3000/api/users
+```
 
-# Get user by ID
+### Get Users with Pagination
+```bash
+curl "http://localhost:3000/api/users?page=1&limit=5"
+```
+
+### Get a Specific User
+```bash
 curl http://localhost:3000/api/users/1
+```
 
-# Create a new user
+### Create a New User
+```bash
 curl -X POST http://localhost:3000/api/users \
   -H "Content-Type: application/json" \
   -d '{"name": "Alice Johnson", "email": "alice@example.com"}'
 ```
 
-## Project Structure
-
-Here's a recommended project structure for a YasuiJS application:
-
-```
-src/
-├── controllers/          # API controllers
-│   ├── user.controller.ts
-│   └── auth.controller.ts
-├── services/            # Business logic
-│   ├── user.service.ts
-│   └── auth.service.ts
-├── middleware/          # Custom middleware
-│   ├── auth.middleware.ts
-│   └── validation.middleware.ts
-├── models/             # Data models and DTOs
-│   ├── user.model.ts
-│   └── auth.model.ts
-├── config/             # Configuration files
-│   └── app.config.ts
-└── app.ts              # Main application file
+### Update a User
+```bash
+curl -X PUT http://localhost:3000/api/users/1 \
+  -H "Content-Type: application/json" \
+  -d '{"name": "John Updated"}'
 ```
 
-## Adding Services with Dependency Injection
+### Delete a User
+```bash
+curl -X DELETE http://localhost:3000/api/users/2
+```
 
-Let's enhance our example with a service layer:
+## Step 6: Add a Service Layer
 
-### 1. Create a Service
+Now let's improve our code by adding a service layer. This separates business logic from the controller.
 
 Create `src/services/user.service.ts`:
 
@@ -166,41 +299,112 @@ interface User {
   id: string;
   name: string;
   email: string;
+  createdAt: Date;
+}
+
+interface CreateUserDto {
+  name: string;
+  email: string;
+}
+
+interface UpdateUserDto {
+  name?: string;
+  email?: string;
 }
 
 @Injectable()
 export class UserService {
   private users: User[] = [
-    { id: '1', name: 'John Doe', email: 'john@example.com' },
-    { id: '2', name: 'Jane Smith', email: 'jane@example.com' }
+    { 
+      id: '1', 
+      name: 'John Doe', 
+      email: 'john@example.com',
+      createdAt: new Date()
+    },
+    { 
+      id: '2', 
+      name: 'Jane Smith', 
+      email: 'jane@example.com',
+      createdAt: new Date()
+    }
   ];
 
-  getAllUsers(): User[] {
-    return this.users;
+  getAllUsers(page: number = 1, limit: number = 10) {
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedUsers = this.users.slice(startIndex, endIndex);
+    
+    return {
+      users: paginatedUsers,
+      pagination: {
+        page,
+        limit,
+        total: this.users.length,
+        totalPages: Math.ceil(this.users.length / limit)
+      }
+    };
   }
 
   getUserById(id: string): User | null {
     return this.users.find(user => user.id === id) || null;
   }
 
-  createUser(userData: Omit<User, 'id'>): User {
+  createUser(userData: CreateUserDto): User {
     const newUser: User = {
       id: Date.now().toString(),
-      ...userData
+      ...userData,
+      createdAt: new Date()
     };
+    
     this.users.push(newUser);
     return newUser;
+  }
+
+  updateUser(id: string, userData: UpdateUserDto): User | null {
+    const userIndex = this.users.findIndex(user => user.id === id);
+    
+    if (userIndex === -1) {
+      return null;
+    }
+    
+    this.users[userIndex] = {
+      ...this.users[userIndex],
+      ...userData
+    };
+    
+    return this.users[userIndex];
+  }
+
+  deleteUser(id: string): User | null {
+    const userIndex = this.users.findIndex(user => user.id === id);
+    
+    if (userIndex === -1) {
+      return null;
+    }
+    
+    const deletedUser = this.users[userIndex];
+    this.users.splice(userIndex, 1);
+    
+    return deletedUser;
   }
 }
 ```
 
-### 2. Update Your Controller
-
-Update `src/controllers/user.controller.ts`:
+Now update your controller to use the service:
 
 ```typescript
-import { Controller, Get, Post, Body, Param } from 'yasui';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query } from 'yasui';
 import { UserService } from '../services/user.service';
+
+interface CreateUserDto {
+  name: string;
+  email: string;
+}
+
+interface UpdateUserDto {
+  name?: string;
+  email?: string;
+}
 
 @Controller('/api/users')
 export class UserController {
@@ -208,140 +412,167 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get('/')
-  getAllUsers() {
-    return this.userService.getAllUsers();
+  getAllUsers(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10
+  ) {
+    return this.userService.getAllUsers(page, limit);
   }
 
   @Get('/:id')
   getUser(@Param('id') id: string) {
-    return this.userService.getUserById(id);
+    const user = this.userService.getUserById(id);
+    
+    if (!user) {
+      throw new Error('User not found');
+    }
+    
+    return user;
   }
 
   @Post('/')
-  createUser(@Body() user: { name: string; email: string }) {
-    return this.userService.createUser(user);
+  createUser(@Body() userData: CreateUserDto) {
+    return this.userService.createUser(userData);
+  }
+
+  @Put('/:id')
+  updateUser(@Param('id') id: string, @Body() userData: UpdateUserDto) {
+    const updatedUser = this.userService.updateUser(id, userData);
+    
+    if (!updatedUser) {
+      throw new Error('User not found');
+    }
+    
+    return updatedUser;
+  }
+
+  @Delete('/:id')
+  deleteUser(@Param('id') id: string) {
+    const deletedUser = this.userService.deleteUser(id);
+    
+    if (!deletedUser) {
+      throw new Error('User not found');
+    }
+    
+    return { message: 'User deleted successfully', user: deletedUser };
   }
 }
 ```
 
-## Adding Middleware
+## Step 7: Add Basic Middleware
 
-### 1. Create Custom Middleware
+Let's add some middleware for logging and basic validation.
 
-Create `src/middleware/auth.middleware.ts`:
+Create `src/middleware/logging.middleware.ts`:
 
 ```typescript
 import { Request, Response, NextFunction } from 'express';
 
-export function authMiddleware(req: Request, res: Response, next: NextFunction) {
-  const token = req.headers.authorization;
+export function loggingMiddleware(req: Request, res: Response, next: NextFunction) {
+  const start = Date.now();
   
-  if (!token) {
-    return res.status(401).json({ error: 'Authorization token required' });
-  }
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
   
-  // Add your token validation logic here
-  if (token !== 'valid-token') {
-    return res.status(403).json({ error: 'Invalid token' });
-  }
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.path} - ${res.statusCode} - ${duration}ms`);
+  });
   
   next();
 }
 ```
 
-### 2. Apply Middleware
-
-Apply middleware to your controller:
-
-```typescript
-import { Controller, Get, Post, Body, Param, Middleware } from 'yasui';
-import { UserService } from '../services/user.service';
-import { authMiddleware } from '../middleware/auth.middleware';
-
-@Controller('/api/users')
-@Middleware([authMiddleware])
-export class UserController {
-  
-  constructor(private userService: UserService) {}
-
-  @Get('/')
-  getAllUsers() {
-    return this.userService.getAllUsers();
-  }
-
-  // This route will require authentication
-  @Post('/')
-  createUser(@Body() user: { name: string; email: string }) {
-    return this.userService.createUser(user);
-  }
-}
-```
-
-## Configuration Options
-
-YasuiJS supports various configuration options:
+Update your `src/app.ts` to include the middleware:
 
 ```typescript
 import { YasuiApp } from 'yasui';
+import { UserController } from './controllers/user.controller';
+import { loggingMiddleware } from './middleware/logging.middleware';
 
 const app = new YasuiApp({
-  port: 3000,                    // Server port
-  debug: true,                   // Enable debug mode
-  cors: true,                    // Enable CORS
-  jsonLimit: '10mb',            // JSON body size limit
-  swagger: {                     // Swagger configuration
-    enabled: true,
-    path: '/api-docs'
-  },
-  middleware: [                  // Global middleware
-    // Add your global middleware here
-  ]
+  port: 3000,
+  debug: true,
+  cors: true,
+  middleware: [loggingMiddleware] // Add global middleware
+});
+
+app.registerControllers([UserController]);
+
+app.start().then(() => {
+  console.log('🚀 YasuiJS API is running on http://localhost:3000');
+  console.log('📚 API Documentation available at http://localhost:3000/api-docs');
 });
 ```
 
+## Project Structure
+
+Your final project structure should look like this:
+
+```
+my-yasui-api/
+├── src/
+│   ├── controllers/
+│   │   └── user.controller.ts
+│   ├── services/
+│   │   └── user.service.ts
+│   ├── middleware/
+│   │   └── logging.middleware.ts
+│   └── app.ts
+├── package.json
+├── tsconfig.json
+└── README.md
+```
+
+## What You've Learned
+
+Congratulations! You've successfully created a complete YasuiJS API with:
+
+- **Controllers**: Handle HTTP requests and responses
+- **Services**: Contain business logic with dependency injection
+- **Middleware**: Process requests globally
+- **Parameter Extraction**: Automatic extraction of query params, body, etc.
+- **Error Handling**: Basic error handling with try-catch
+- **TypeScript**: Full type safety throughout the application
+
 ## Next Steps
 
-Now that you have a basic YasuiJS application running, you can:
+Now that you have a working API, you can explore more advanced features:
 
-1. **Explore Decorators**: Learn about all available decorators in the [Decorators Guide](/en/guide/decorators)
-2. **Add Swagger Documentation**: Generate API documentation with [Swagger Decorators](/en/guide/swagger)
-3. **Implement Authentication**: Add security with [Middleware Guide](/en/guide/middleware)
-4. **Database Integration**: Connect to databases using services
-5. **Error Handling**: Implement proper error handling with [Error Handling Guide](/en/guide/error-handling)
+1. **Add Authentication**: Learn about middleware and authentication in the [Middleware Guide](/middleware)
+2. **Generate Documentation**: Add Swagger decorators for automatic API documentation
+3. **Database Integration**: Connect to a real database using services
+4. **Validation**: Add request validation and error handling
+5. **Testing**: Write unit and integration tests for your API
 
 ## Troubleshooting
 
 ### Common Issues
 
-**TypeScript Configuration**: Make sure your `tsconfig.json` includes:
-
-```json
-{
-  "compilerOptions": {
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "target": "ES2020",
-    "module": "commonjs"
-  }
-}
-```
-
-**Port Already in Use**: If port 3000 is busy, change the port in your configuration:
-
+**Port Already in Use**: If you get an error about port 3000 being busy, change the port in your configuration:
 ```typescript
 const app = new YasuiApp({
   port: 3001  // Use a different port
 });
 ```
 
-**Module Resolution**: If you encounter module resolution issues, make sure your import paths are correct and your TypeScript configuration is properly set up.
+**TypeScript Errors**: Make sure your `tsconfig.json` has the correct decorator settings:
+```json
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  }
+}
+```
+
+**Module Resolution**: If you get import errors, make sure your file paths are correct and TypeScript is properly configured.
 
 ## Need Help?
 
 If you encounter any issues or have questions:
 
-1. Check the [Basic Concepts](/en/guide/basic-concepts) guide
-2. Review the [API Reference](/en/api/) documentation
-3. Look at the [Examples](/en/examples/) for more complex use cases
+1. Check the [Basic Concepts](/basic-concepts) guide for detailed explanations
+2. Review the [Decorators Reference](/decorators) for all available decorators
+3. Look at the [Examples](/examples/) for more complex use cases
 
-Happy coding with YasuiJS! 🚀 
+Happy coding with YasuiJS! 

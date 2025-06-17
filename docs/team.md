@@ -12,7 +12,8 @@ const members = [
   {
     avatar: 'https://www.github.com/thomasbarkats.png',
     name: 'Thomas Barkats',
-    title: 'Creator',
+    title: 'Founder & Lead Architect',
+    desc: 'Initiated YasuiJS and led its development solo. Designed the core architecture and concepts.',
     links: [
       { icon: 'github', link: 'https://github.com/thomasbarkats' },
     ]
@@ -20,7 +21,8 @@ const members = [
   {
     avatar: 'https://www.github.com/alexandre-hallaine.png',
     name: 'Alexandre Hallaine',
-    title: 'Developer',
+    title: 'Core Developer',
+    desc: 'Joined in 2025 to modernize the project with up-to-date tooling.',
     links: [
       { icon: 'github', link: 'https://github.com/alexandre-hallaine' },
     ]

@@ -5,10 +5,9 @@ export default defineConfig({
   title: "YasuiJS",
   description: "An other lightweight REST API framework",
   lastUpdated: true,
+  head: [['link', { rel: 'icon', href: '/favicon.ico' }]],
   
   themeConfig: {
-    logo: '/logo.png',
-    
     search: {
       provider: 'local'
     },
@@ -24,8 +23,7 @@ export default defineConfig({
 
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Guide', link: '/getting-started' },
-      { text: 'API Reference', link: '/decorators' },
+      { text: 'Docs', link: '/what-is-yasuijs' },
       { text: 'Team', link: '/team' },
     ],
 
@@ -43,7 +41,7 @@ export default defineConfig({
         ]
       },
       {
-        text: 'Core Features',
+        text: 'Reference',
         items: [
           { text: 'Decorators', link: '/decorators' },
           { text: 'Dependency Injection', link: '/dependency-injection' },
@@ -51,7 +49,7 @@ export default defineConfig({
           { text: 'Configuration', link: '/configuration' },
           { text: 'Error Handling', link: '/error-handling' }
         ]
-      }
+      },
     ],
   },
 

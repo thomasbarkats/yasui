@@ -1,22 +1,79 @@
 # What is YasuiJS?
 
-YasuiJS is a modern, lightweight REST API framework built for TypeScript developers who want to create powerful APIs with minimal boilerplate code. It combines the simplicity of Express.js with the elegance of decorators and dependency injection.
+YasuiJS is a modern, lightweight REST API framework designed specifically for TypeScript developers. It takes the simplicity of Express.js and enhances it with powerful decorators and dependency injection, making API development more intuitive and maintainable.
+
+## Why YasuiJS?
+
+Building REST APIs can be repetitive and error-prone. Traditional Express.js applications require lots of boilerplate code for route registration, parameter extraction, and dependency management. YasuiJS eliminates this complexity by providing a declarative approach to API development.
+
+### The Problem with Traditional Approaches
+
+When building APIs with plain Express.js, you often end up with code like this:
+
+```typescript
+// Traditional Express.js approach
+app.get('/api/users', (req, res) => {
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const users = userService.getUsers(page, limit);
+  res.json(users);
+});
+
+app.post('/api/users', (req, res) => {
+  const userData = req.body;
+  const newUser = userService.createUser(userData);
+  res.status(201).json(newUser);
+});
+```
+
+This approach has several issues:
+- Manual parameter extraction and validation
+- Repetitive error handling
+- Difficult to test due to tight coupling
+- No automatic documentation generation
+
+### The YasuiJS Solution
+
+With YasuiJS, the same functionality becomes much cleaner:
+
+```typescript
+@Controller('/api/users')
+export class UserController {
+  constructor(private userService: UserService) {}
+
+  @Get('/')
+  getUsers(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
+    return this.userService.getUsers(page, limit);
+  }
+
+  @Post('/')
+  createUser(@Body() userData: CreateUserDto) {
+    return this.userService.createUser(userData);
+  }
+}
+```
 
 ## Core Philosophy
 
-YasuiJS follows these core principles:
+YasuiJS is built around these fundamental principles:
 
-- **Decorator-First**: Use intuitive decorators to define your API structure
-- **TypeScript Native**: Built from the ground up for TypeScript with full type safety
-- **Zero Configuration**: Get started immediately with sensible defaults
-- **Express.js Foundation**: Leverage the power and ecosystem of Express.js
-- **Developer Experience**: Focus on code readability and maintainability
+### Declarative Over Imperative
+Instead of manually registering routes and extracting parameters, you declare what you want using decorators. The framework handles the rest.
+
+### TypeScript First
+Every feature is designed with TypeScript in mind, providing full type safety and excellent IDE support.
+
+### Zero Configuration
+Get started immediately with sensible defaults. Advanced configuration is available when you need it.
+
+### Express.js Foundation
+Built on top of Express.js, so you can use any Express.js middleware or plugin in your YasuiJS application.
 
 ## Key Features
 
-### 🎯 Decorator-Based Routing
+### Decorator-Based Routing
 
-Define your API endpoints using intuitive decorators:
+Define your API endpoints using intuitive decorators that clearly express your intent:
 
 ```typescript
 @Controller('/api/users')
@@ -24,30 +81,41 @@ export class UserController {
   
   @Get('/')
   getAllUsers() {
-    return users;
+    return this.userService.getAllUsers();
   }
 
   @Get('/:id')
   getUser(@Param('id') id: string) {
-    return users.find(u => u.id === id);
+    return this.userService.getUserById(id);
   }
 
   @Post('/')
   createUser(@Body() user: CreateUserDto) {
-    return createUser(user);
+    return this.userService.createUser(user);
+  }
+
+  @Put('/:id')
+  updateUser(@Param('id') id: string, @Body() user: UpdateUserDto) {
+    return this.userService.updateUser(id, user);
+  }
+
+  @Delete('/:id')
+  deleteUser(@Param('id') id: string) {
+    return this.userService.deleteUser(id);
   }
 }
 ```
 
-### 🔧 Dependency Injection
+### Dependency Injection
 
-Built-in dependency injection system for clean, testable code:
+Automatically inject services and dependencies into your controllers:
 
 ```typescript
 @Injectable()
 export class UserService {
   async getUsers() {
     // Database logic here
+    return await this.database.find('users');
   }
 }
 
@@ -57,28 +125,30 @@ export class UserController {
 
   @Get('/')
   async getUsers() {
-    return this.userService.getUsers();
+    return await this.userService.getUsers();
   }
 }
 ```
 
-### 📚 Auto-Generated Swagger Documentation
+The framework automatically creates instances of your services and injects them where needed. This makes your code more testable and maintainable.
 
-Generate beautiful API documentation automatically:
+### Automatic Documentation
+
+Generate beautiful API documentation without writing a single line of documentation code:
 
 ```typescript
 @Get('/:id')
-@ApiOperation('Get user by ID', 'Retrieves detailed user information')
+@ApiOperation('Get user by ID', 'Retrieves detailed user information by their unique identifier')
 @ApiResponse(200, 'Success', UserSchema)
 @ApiResponse(404, 'User not found')
 getUser(@Param('id') id: string) {
-  return getUser(id);
+  return this.userService.getUserById(id);
 }
 ```
 
-### 🛡️ Middleware Support
+### Flexible Middleware
 
-Flexible middleware system for authentication, validation, and more:
+Apply middleware at different levels with ease:
 
 ```typescript
 @Controller('/admin')
@@ -88,14 +158,14 @@ export class AdminController {
   @Get('/users')
   @Middleware([rateLimitMiddleware])
   getUsers() {
-    // Only accessible by authenticated admins
+    // This route requires authentication, admin privileges, and rate limiting
   }
 }
 ```
 
-### 🔍 Parameter Extraction
+### Parameter Extraction
 
-Easy parameter binding with decorators:
+Extract and validate request data automatically:
 
 ```typescript
 @Post('/search')
@@ -105,53 +175,50 @@ searchUsers(
   @Body() filters: SearchFilters,
   @Header('authorization') token: string
 ) {
-  // All parameters automatically extracted and typed
+  // All parameters are automatically extracted, typed, and validated
+  return this.userService.searchUsers(page, limit, filters, token);
 }
 ```
 
 ## Architecture Overview
 
-YasuiJS is built on top of Express.js and provides a higher-level abstraction:
+YasuiJS sits on top of Express.js, providing a higher-level abstraction:
 
 ```
 ┌─────────────────┐
-│   YasuiJS App   │
+│   YasuiJS App   │  ← Your application code
 ├─────────────────┤
-│   Controllers   │
-│   Services      │
-│   Middleware    │
+│   Controllers   │  ← Route handlers with decorators
+│   Services      │  ← Business logic with DI
+│   Middleware    │  ← Request processing
 ├─────────────────┤
-│   Express.js    │
+│   Express.js    │  ← HTTP server and routing
 ├─────────────────┤
-│   HTTP Server   │
+│   HTTP Server   │  ← Network layer
 └─────────────────┘
 ```
 
-### Core Components
+### How It Works
 
-1. **Controllers**: Define API endpoints using decorators
-2. **Services**: Business logic with dependency injection
-3. **Middleware**: Request/response processing
-4. **Decorators**: Route, parameter, and metadata definitions
-5. **Dependency Container**: Automatic service resolution
+1. **Application Startup**: YasuiJS scans your controllers and services
+2. **Route Registration**: Automatically registers routes based on decorators
+3. **Dependency Resolution**: Creates and injects service instances
+4. **Request Processing**: Handles incoming requests through the middleware chain
+5. **Response Generation**: Automatically serializes and sends responses
 
-## Why Choose YasuiJS?
+## When to Use YasuiJS
 
-### vs. Plain Express.js
-- **Less Boilerplate**: No need to manually register routes
-- **Type Safety**: Full TypeScript support with parameter validation
-- **Auto Documentation**: Generate Swagger docs automatically
-- **Dependency Injection**: Built-in DI container
+YasuiJS is perfect for:
 
-### vs. Other Frameworks
-- **Lightweight**: Minimal overhead compared to full-stack frameworks
-- **Express.js Ecosystem**: Use any Express.js middleware or plugin
-- **Simple Learning Curve**: Familiar concepts for Express.js developers
-- **Flexible**: No opinionated structure, adapt to your needs
+- **REST APIs**: Building clean, well-documented REST endpoints
+- **Microservices**: Lightweight services with minimal overhead
+- **TypeScript Projects**: Full type safety and modern ES6+ features
+- **Express.js Migration**: Gradual migration from existing Express.js apps
+- **Rapid Prototyping**: Get APIs running quickly with minimal setup
 
 ## Getting Started
 
-Ready to build your first YasuiJS API? Check out our [Getting Started guide](/en/getting-started) for a step-by-step tutorial.
+Ready to build your first YasuiJS API? The [Getting Started guide](/getting-started) will walk you through creating a complete API in just a few minutes.
 
 ```bash
 npm install yasui
