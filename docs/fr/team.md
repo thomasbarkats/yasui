@@ -12,8 +12,8 @@ const members = [
   {
     avatar: 'https://www.github.com/thomasbarkats.png',
     name: 'Thomas Barkats',
-    title: 'Founder & Lead Architect',
-    desc: 'Initiated YasuiJS and led its development solo. Designed the core architecture and concepts.',
+    title: 'Fondateur & Architecte Principal',
+    desc: 'A initié YasuiJS et dirigé son développement en solo. A conçu l\'architecture et les concepts de base.',
     links: [
       { icon: 'github', link: 'https://github.com/thomasbarkats' },
     ]
@@ -21,8 +21,8 @@ const members = [
   {
     avatar: 'https://www.github.com/alexandre-hallaine.png',
     name: 'Alexandre Hallaine',
-    title: 'Core Developer',
-    desc: 'Joined in 2025 to modernize the project with up-to-date tooling.',
+    title: 'Développeur Principal',
+    desc: 'A rejoint le projet en 2025 pour moderniser avec des outils à jour.',
     links: [
       { icon: 'github', link: 'https://github.com/alexandre-hallaine' },
     ]
@@ -33,11 +33,11 @@ const members = [
 <VPTeamPage>
   <VPTeamPageTitle>
     <template #title>
-      Our Team
+      Notre Équipe
     </template>
     <template #lead>
-      The development of YasuiJS is guided by an international
-      team, some of whom have chosen to be featured below.
+      Le développement de YasuiJS est guidé par une équipe internationale,
+      dont certains ont choisi d'être présentés ci-dessous.
     </template>
   </VPTeamPageTitle>
   <VPTeamMembers :members />

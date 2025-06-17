@@ -11,10 +11,10 @@ hero:
   actions:
     - theme: brand
       text: What is YasuiJS?
-      link: /what-is-yasuijs
+      link: /guide/what-is-yasuijs
     - theme: alt
       text: Quickstart
-      link: /getting-started
+      link: /guide/getting-started
 
 features:
   - icon: 🎯
