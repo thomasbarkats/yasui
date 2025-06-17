@@ -4,10 +4,22 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "YasuiJS",
   description: "An other lightweight REST API framework",
+  lastUpdated: true,
   
   themeConfig: {
+    logo: '/logo.png',
+    
     search: {
       provider: 'local'
+    },
+
+    editLink: {
+      pattern: 'https://github.com/thomasbarkats/yasui/edit/main/docs/:path'
+    },
+
+    footer: {
+      message: 'Released under the AGPL License.',
+      copyright: 'Copyright © 2021-present Thomas Barkats'
     },
 
     nav: [
@@ -15,6 +27,10 @@ export default defineConfig({
       { text: 'Guide', link: '/getting-started' },
       { text: 'API Reference', link: '/decorators' },
       { text: 'Team', link: '/team' },
+    ],
+
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/thomasbarkats/yasui' }
     ],
 
     sidebar: [
@@ -37,10 +53,6 @@ export default defineConfig({
         ]
       }
     ],
-
-    socialLinks: [
-      { icon: 'github', link: 'https://github.com/thomasbarkats/yasui' }
-    ]
   },
 
   locales: {
