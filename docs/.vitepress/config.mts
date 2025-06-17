@@ -14,6 +14,7 @@ export default defineConfig({
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/getting-started' },
       { text: 'API Reference', link: '/decorators' },
+      { text: 'Team', link: '/team' },
     ],
 
     sidebar: [
