@@ -1,11 +1,10 @@
 {
   "name": "yasui",
-  "version": "2.2.0",
-  "description": "Lightweight Express-based framework for REST and web APIs",
+  "version": "3.0.0",
+  "description": "Lightweight framework for REST and web APIs",
   "license": "AGPL-3.0-or-later",
   "author": "Thomas BARKATS",
   "keywords": [
-    "express",
     "framework",
     "lightweight",
     "minimalist",
@@ -47,21 +46,18 @@
     "@types/**/*"
   ],
   "dependencies": {
-    "express": "^5.1.0",
     "kleur": "^4.1.5",
-    "reflect-metadata": "^0.2.2"
+    "reflect-metadata": "^0.2.2",
+    "srvx": "^0.8.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",
-    "@types/express": "^5.0.2",
-    "@types/node": "^22.15.21",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
     "eslint": "^9.27.0",
     "format-commit": "^0.3.1",
     "globals": "^16.2.0",
     "nodemon": "^3.1.10",
-    "swagger-ui-express": "^5.0.1",
     "tsc-alias": "^1.8.16",
     "typescript": "^5.8.3"
   }
