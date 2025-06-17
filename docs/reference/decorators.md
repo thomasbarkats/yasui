@@ -783,7 +783,7 @@ getUser(@Param('id') id: string) {
 
 Now that you understand all the decorators, you can:
 
-- [Learn about Dependency Injection](/dependency-injection) - Advanced DI patterns
-- [Master Middleware usage](/middleware) - Authentication and validation
-- [Configure your application](/configuration) - All configuration options
-- [Handle errors properly](/error-handling) - Error handling best practices 
+- **[Dependency Injection](/reference/dependency-injection)** - Learn how to inject dependencies
+- **[Middleware](/reference/middleware)** - Apply middleware to your routes
+- **[Configuration](/reference/configuration)** - Configure your application
+- **[Error Handling](/reference/error-handling)** - Handle errors properly 

@@ -35,7 +35,7 @@ export default defineConfig({
       {
         text: 'Guide',
         items: [
-          { text: 'Qu\'est-ce que YasuiJS ?', link: '/fr/reference/what-is-yasuijs' },
+          { text: 'Qu\'est-ce que YasuiJS ?', link: '/fr/guide/what-is-yasuijs' },
           { text: 'Démarrage rapide', link: '/fr/guide/getting-started' },
           { text: 'Concepts de base', link: '/fr/guide/basic-concepts' }
         ]

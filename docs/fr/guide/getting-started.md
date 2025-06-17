@@ -528,7 +528,7 @@ Félicitations ! Vous avez créé avec succès une API YasuiJS complète avec :
 
 Maintenant que vous avez une API fonctionnelle, vous pouvez explorer des fonctionnalités plus avancées :
 
-1. **Ajouter l'authentification** : Apprendre les middlewares et l'authentification dans le [Guide des middlewares](/fr/middleware)
+1. **Ajouter l'authentification** : Apprendre les middlewares et l'authentification dans le [Guide des middlewares](/fr/reference/middleware)
 2. **Générer la documentation** : Ajouter des décorateurs Swagger pour la documentation automatique d'API
 3. **Intégration de base de données** : Connecter à une vraie base de données en utilisant des services
 4. **Validation** : Ajouter la validation de requêtes et la gestion d'erreurs
@@ -561,8 +561,8 @@ const app = new YasuiApp({
 
 Si vous rencontrez des problèmes ou avez des questions :
 
-1. Consultez le guide [Concepts de base](/fr/basic-concepts) pour des explications détaillées
-2. Consultez la [Référence des décorateurs](/fr/decorators) pour tous les décorateurs disponibles
-3. Regardez les [Exemples](/fr/examples/) pour des cas d'usage plus complexes
+1. Consultez le guide [Concepts de base](/fr/guide/basic-concepts) pour des explications détaillées
+2. Consultez la [Référence des décorateurs](/fr/reference/decorators) pour tous les décorateurs disponibles
+3. Regardez les [Exemples dans le code source](https://github.com/thomasbarkats/yasui/tree/main/src/examples) pour des cas d'usage plus complexes
 
 Bon codage avec YasuiJS ! 

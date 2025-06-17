@@ -556,8 +556,8 @@ getUser(@Param('id') id: string): User | null {
 
 Now that you understand the basic concepts, you can:
 
-- [Learn about Decorators in detail](/decorators) - Complete reference for all decorators
-- [Explore Dependency Injection patterns](/dependency-injection) - Advanced DI techniques
-- [Master Middleware usage](/middleware) - Authentication, validation, and more
-- [Configure your application](/configuration) - All configuration options
-- [Handle errors properly](/error-handling) - Error handling best practices 
+- **[Decorators](/reference/decorators)** - Learn about all the decorators available in YasuiJS
+- **[Dependency Injection](/reference/dependency-injection)** - Understand how dependency injection works
+- **[Middleware](/reference/middleware)** - Learn about middleware and how to use it
+- **[Configuration](/reference/configuration)** - Configure your YasuiJS application
+- **[Error Handling](/reference/error-handling)** - Handle errors properly in your application 

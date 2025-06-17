@@ -218,7 +218,7 @@ YasuiJS est parfait pour :
 
 ## Commencer
 
-Prêt à construire votre première API YasuiJS ? Le [guide de démarrage](/fr/getting-started) vous guidera à travers la création d'une API complète en quelques minutes.
+Prêt à construire votre première API YasuiJS ? Le [guide de démarrage](/fr/guide/getting-started) vous guidera à travers la création d'une API complète en quelques minutes.
 
 ```bash
 npm install yasui
