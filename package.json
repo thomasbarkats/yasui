@@ -39,7 +39,10 @@
     "prepublishOnly": "npm run build && npm run lint",
     "preversion": "npm run lint",
     "precommit": "npm run lint",
-    "commit": "npm run lint && format-commit"
+    "commit": "npm run lint && format-commit",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "files": [
     "lib/**/*",
@@ -63,6 +66,8 @@
     "nodemon": "^3.1.10",
     "swagger-ui-express": "^5.0.1",
     "tsc-alias": "^1.8.16",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitepress": "^1.6.3",
+    "vue": "^3.5.16"
   }
 }
