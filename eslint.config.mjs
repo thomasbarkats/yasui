@@ -65,6 +65,7 @@ export default [
       '.git/**',
       '.vscode/**',
       'lib/**',
+      'docs/.vitepress/cache/**'
     ]
   }
 ];

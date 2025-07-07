@@ -9,3 +9,5 @@ package-lock.json
 # Docs
 docs/.vitepress/dist
 docs/.vitepress/cache
+
+scripts/.env

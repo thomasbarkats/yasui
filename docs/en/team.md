@@ -1,5 +1,6 @@
 ---
 layout: page
+sidebar: false
 ---
 <script setup>
 import {
@@ -13,7 +14,7 @@ const members = [
     avatar: 'https://www.github.com/thomasbarkats.png',
     name: 'Thomas Barkats',
     title: 'Founder & Lead Architect',
-    desc: 'Initiated YasuiJS and led its development solo. Designed the core architecture and concepts.',
+    desc: 'Initiated YasuiJS and led development. Designed the core architecture and concepts.',
     links: [
       { icon: 'github', link: 'https://github.com/thomasbarkats' },
     ]
@@ -29,6 +30,17 @@ const members = [
   },
 ]
 </script>
+
+<style>
+  .VPTeamPageTitle {
+    padding-top: 0 !important;
+  }
+  @media (min-width: 768px) {
+    .VPTeamPage[data-v-5f7da39d] {
+        margin: 96px 0;
+    }
+  }
+</style>
 
 <VPTeamPage>
   <VPTeamPageTitle>
