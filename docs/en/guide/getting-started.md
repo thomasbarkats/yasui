@@ -95,17 +95,6 @@ Visit `http://localhost:3000` and you'll see:
 
 Congratulations! You have a working YasuiJS API.
 
-## What's Next?
-
-Now that you have a basic API running, learn more about YasuiJS features:
-
-- **[Basic Concepts](/guide/basic-concepts)** - Understand controllers, services, and dependency injection
-- **[Dependency Injection](/guide/dependency-injection)** - Learn about scopes and custom injection tokens
-- **[Middleware](/guide/middleware)** - Create request processing pipelines  
-- **[Error Handling](/guide/error-handling)** - Advanced error management
-- **[API Documentation](/guide/swagger)** - Generate automatic Swagger documentation
-- **[Decorators Reference](/reference/decorators)** - Complete list of available decorators
-
 ## Examples
 
 Check out the [complete examples](https://github.com/thomasbarkats/yasui/tree/main/src/examples) in the YasuiJS repository for more patterns and use cases.

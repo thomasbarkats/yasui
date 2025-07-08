@@ -263,32 +263,6 @@ app.listen(PORT, () => {
 });
 ```
 
-## Environment Variables
-
-YasuiJS respects common environment variables:
-
-```bash
-# Port (only affects createServer)
-PORT=8080
-
-# Environment
-NODE_ENV=production
-
-# Debug mode
-DEBUG=true
-```
-
-Usage in configuration:
-
-```typescript
-yasui.createServer({
-  controllers: [UserController],
-  port: parseInt(process.env.PORT || '3000'),
-  debug: process.env.DEBUG === 'true',
-  environment: process.env.NODE_ENV || 'development'
-});
-```
-
 ## Debug Mode
 
 Enable debug mode to see detailed information:
@@ -305,10 +279,3 @@ Debug mode provides:
 - Dependency injection details
 - Route registration information
 - Error stack traces
-
-## Related
-
-- **[Controllers](/reference/controllers)** - Learn about controller configuration
-- **[Middlewares](/reference/middlewares)** - Understanding middleware setup
-- **[Dependency Injection](/reference/dependency-injection)** - Custom injection tokens
-- **[Error Handling](/reference/error-handling)** - Error configuration options

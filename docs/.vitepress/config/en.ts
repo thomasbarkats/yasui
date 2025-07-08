@@ -8,7 +8,7 @@ export default {
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/guide/what-is-yasuijs' },
-      { text: 'Reference', link: '/reference/decorators' },
+      { text: 'Reference', link: '/reference/config' },
       { text: 'Team', link: '/team' },
     ],
     socialLinks: [
