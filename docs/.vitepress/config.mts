@@ -1,5 +1,8 @@
 import { defineConfig } from 'vitepress'
 import enConfig from './config/en'
+import frConfig from './config/fr';
+import esConfig from './config/es';
+import zhConfig from './config/zh';
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -47,6 +50,21 @@ export default defineConfig({
       label: 'English',
       lang: 'en',
       ...enConfig
+    },
+    fr: {
+      label: 'Français',
+      lang: 'fr',
+      ...frConfig
+    },
+    es: {
+      label: 'Spanish',
+      lang: 'es',
+      ...esConfig
+    },
+    zh: {
+      label: '简体中文',
+      lang: 'zh',
+      ...zhConfig
     }
   }
 });

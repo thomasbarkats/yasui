@@ -45,6 +45,7 @@ const CONFIG = {
   docsDir: './docs',
   supportedLanguages: {
     'fr': 'French',
+    'es': 'Spanish',
     'zh': 'Chinese (Simplified)'
   }
 };
@@ -65,46 +66,61 @@ const anthropic = new Anthropic({
   apiKey: process.env.CLAUDE_API_KEY,
 });
 
-async function callClaudeAPI(content, targetLanguageName, fileType = 'markdown', targetLangCode = '') {
-  const prompts = {
-    markdown: `Translate this VitePress markdown content to ${targetLanguageName}.
+// Function to estimate token count (rough approximation)
+function estimateTokens(text) {
+  // Rough estimation: 1 token ≈ 4 characters for most languages
+  return Math.ceil(text.length / 4);
+}
+
+async function callClaudeAPI(
+  content,
+  targetLanguageName,
+  fileType = 'markdown',
+  targetLangCode = ''
+) {
+  const basePrompts = {
+    markdown: `Translate this VitePress markdown content to ${targetLanguageName}. 
+
+CRITICAL: Your response must contain ONLY the translated content. Do not add any notes, explanations, or offers to continue.
 
 Rules:
-- Keep ALL frontmatter (between ---) exactly as is
-- Preserve markdown syntax, links, code blocks, HTML tags
-- Translate only readable text content
-- Keep technical terms and code unchanged
-- Maintain structure and formatting
-- Return only the translated content
+- Keep frontmatter (---) unchanged
+- Keep markdown syntax unchanged  
+- Keep code blocks unchanged
+- Translate only readable text
+- Output the complete translation
+- Stop when translation is complete
 
 Content:
 ${content}`,
 
-    typescript: `Translate this TypeScript VitePress configuration to ${targetLanguageName}.
+    typescript: `You are a professional technical translator. Translate this TypeScript VitePress configuration to ${targetLanguageName}.
 
-Rules:
-- Keep all TypeScript syntax and structure
-- Translate only text values in strings (titles, labels, nav items, etc.)
-- Keep all property names, imports, and code structure unchanged
-- Translate comments that contain TODO
-- Update link paths to include /${targetLangCode}/ prefix where appropriate
-- Return only the TypeScript code without any markdown formatting or code blocks
+STRICT REQUIREMENTS:
+1. Keep ALL TypeScript syntax and structure exactly as is
+2. Translate ONLY text values in strings (titles, labels, nav items, etc.)
+3. Keep ALL property names, imports, and code structure unchanged
+4. Translate comments that contain TODO
+5. Update link paths to include /${targetLangCode}/ prefix where appropriate
+6. Return ONLY the complete TypeScript code
+7. Do not add any explanatory notes or commentary
 
-Content:
+CONTENT TO TRANSLATE:
 ${content}`
   };
 
   try {
-    console.log('Making API request using Anthropic SDK');
-    console.log(`Using model: ${process.env.CLAUDE_MODEL}`);
+    console.log(`Making API request using Anthropic SDK (${fileType})`);
+    console.log(`Estimated tokens: ${estimateTokens(content)}`);
 
     const message = await anthropic.messages.create({
       model: process.env.CLAUDE_MODEL,
       // eslint-disable-next-line camelcase
-      max_tokens: 4000,
+      max_tokens: 8000,
+      temperature: 0.1,
       messages: [{
         role: 'user',
-        content: prompts[fileType]
+        content: basePrompts[fileType]
       }]
     });
 
@@ -115,7 +131,9 @@ ${content}`
       throw new Error('Invalid response structure from API');
     }
 
-    return message.content[0].text;
+    let translatedContent = message.content[0].text.trim();
+
+    return translatedContent;
   } catch (error) {
     console.error('API request failed:', error.message);
     console.error('Full error object:', JSON.stringify(error, null, 2));
@@ -152,64 +170,108 @@ async function getAllFiles(dir, extensions = ['.md']) {
 
 async function translateFile(sourcePath, targetPath, targetLang) {
   try {
+    let skipTranslation = false;
+    
     if (!forceTranslation) {
       try {
         await fs.access(targetPath);
-        console.log(`Skipping existing file: ${path.relative(process.cwd(), targetPath)}`);
-        return;
+        console.log(`File exists, skipping translation but updating links: ${path.relative(process.cwd(), targetPath)}`);
+        skipTranslation = true;
       } catch {
-        // File doesn't exist, continue translation
+        // File doesn't exist, continue with full translation
       }
     }
-
-    const content = await fs.readFile(sourcePath, 'utf8');
-    const fileType = sourcePath.endsWith('.ts') ? 'typescript' : 'markdown';
-
-    console.log(`Translating: ${path.relative(process.cwd(), sourcePath)}`);
 
     const targetDir = path.dirname(targetPath);
     await fs.mkdir(targetDir, { recursive: true });
 
-    const translatedContent = await callClaudeAPI(content, CONFIG.supportedLanguages[targetLang], fileType, targetLang);
+    let finalContent;
 
-    // For TypeScript config files, update the export name
-    let finalContent = translatedContent;
-    if (fileType === 'typescript') {
-      finalContent = translatedContent.replace(/export const \w+Config/, `export const ${targetLang}Config`);
+    if (skipTranslation) {
+      // File exists, just read it and update links
+      finalContent = await fs.readFile(targetPath, 'utf8');
+      console.log(`Reading existing file: ${path.relative(process.cwd(), targetPath)}`);
+    } else {
+      // File doesn't exist or force translation, do full translation
+      const content = await fs.readFile(sourcePath, 'utf8');
+      const fileType = sourcePath.endsWith('.ts') ? 'typescript' : 'markdown';
+
+      console.log(`Translating: ${path.relative(process.cwd(), sourcePath)}`);
+      console.log(`Content length: ${content.length} characters`);
+      console.log(`Estimated tokens: ${estimateTokens(content)}`);
+
+      const translatedContent = await callClaudeAPI(
+        content,
+        CONFIG.supportedLanguages[targetLang],
+        fileType,
+        targetLang
+      );
+
+      // For TypeScript config files, update the export name
+      finalContent = translatedContent;
+      if (fileType === 'typescript') {
+        finalContent = translatedContent.replace(/export const \w+Config/, `export const ${targetLang}Config`);
+      }
+
+      // Rate limiting between files (only for actual translation)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    // Always update links for markdown files (whether translated or existing)
+    const fileType = sourcePath.endsWith('.ts') ? 'typescript' : 'markdown';
+    if (fileType === 'markdown') {
+      const contentWithUpdatedLinks = replaceLinksWithLanguagePrefix(finalContent, targetLang);
+      
+      // Only write if links were actually updated
+      if (contentWithUpdatedLinks !== finalContent) {
+        finalContent = contentWithUpdatedLinks;
+        console.log(`Updated links in: ${path.relative(process.cwd(), targetPath)}`);
+      }
     }
 
     await fs.writeFile(targetPath, finalContent, 'utf8');
-    console.log(`Completed: ${path.relative(process.cwd(), targetPath)}`);
-
-    // Rate limiting
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    if (!skipTranslation) {
+      console.log(`Completed translation: ${path.relative(process.cwd(), targetPath)}`);
+      console.log(`Output length: ${finalContent.length} characters`);
+    } else {
+      console.log(`Updated links: ${path.relative(process.cwd(), targetPath)}`);
+    }
 
   } catch (error) {
-    console.error(`Failed to translate ${sourcePath}: ${error.message}`);
+    console.error(`Failed to process ${sourcePath}: ${error.message}`);
     throw error;
   }
 }
 
-async function updateGitignore(targetLang) {
-  const gitignorePath = '.gitignore';
-  const ignorePattern = `docs/${targetLang}/`;
+// Function to replace internal links with language prefix
+function replaceLinksWithLanguagePrefix(content, targetLang) {
+  let updatedContent = content;
 
-  try {
-    let content = '';
-    try {
-      content = await fs.readFile(gitignorePath, 'utf8');
-    } catch {
-      // File doesn't exist
-    }
+  // 1. Markdown links: [text](/anything) -> [text](/lang/anything)
+  updatedContent = updatedContent.replace(
+    /\[([^\]]+)\]\(\/([^)]+)\)/g,
+    `[$1](/${targetLang}/$2)`
+  );
 
-    if (!content.includes(ignorePattern)) {
-      content += `\n# Auto-translated files\n${ignorePattern}\n`;
-      await fs.writeFile(gitignorePath, content, 'utf8');
-      console.log(`Updated .gitignore: ${ignorePattern}`);
-    }
-  } catch (error) {
-    console.warn(`Could not update .gitignore: ${error.message}`);
-  }
+  // 2. HTML href links: href="/anything" -> href="/lang/anything"  
+  updatedContent = updatedContent.replace(
+    /href="\/([^"]+)"/g,
+    `href="/${targetLang}/$1"`
+  );
+
+  // 3. YAML frontmatter links: link: /anything -> link: /lang/anything
+  updatedContent = updatedContent.replace(
+    /(link:\s+)\/([^\s\n]+)/g,
+    `$1/${targetLang}/$2`
+  );
+
+  // 4. Clean up: remove language from external URLs and fix double prefixes
+  updatedContent = updatedContent
+    .replace(new RegExp(`(https?://[^"\\)\\s]+)/${targetLang}/`, 'g'), '$1/')
+    .replace(new RegExp(`/${targetLang}/${targetLang}/`, 'g'), `/${targetLang}/`);
+
+  return updatedContent;
 }
 
 async function main() {
@@ -246,9 +308,6 @@ async function main() {
       } catch {
         console.warn(`Config file not found: ${sourceConfigPath}`);
       }
-
-      // Update .gitignore
-      await updateGitignore(targetLang);
 
       console.log(`Completed ${targetLang}`);
     }

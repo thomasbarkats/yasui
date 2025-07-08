@@ -6,7 +6,7 @@ This guide will get you up and running with your first API in just a few minutes
 
 Before we begin, make sure you have:
 
-- **Node.js** (version 16 or higher) - [Download here](https://nodejs.org/)
+- **Node.js** (version 18 or higher) - [Download here](https://nodejs.org/)
 - **npm** or **yarn** package manager
 - Basic knowledge of **TypeScript**
 
