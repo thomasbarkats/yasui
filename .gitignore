@@ -2,3 +2,10 @@
 /node_modules
 /lib
 /.vscode
+.DS_Store
+
+# Docs
+docs/.vitepress/dist
+docs/.vitepress/cache
+
+scripts/.env

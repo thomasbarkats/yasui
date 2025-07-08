@@ -39,7 +39,12 @@
     "prepublishOnly": "npm run build && npm run lint",
     "preversion": "npm run lint",
     "precommit": "npm run lint",
-    "commit": "npm run lint && format-commit"
+    "commit": "npm run lint && format-commit",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "docs:translate": "node scripts/translate-docs.js",
+    "docs:retranslate": "node scripts/translate-docs.js --force"
   },
   "files": [
     "lib/**/*",
@@ -52,6 +57,7 @@
     "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.56.0",
     "@eslint/js": "^9.27.0",
     "@types/express": "^5.0.2",
     "@types/node": "^22.15.21",
@@ -63,6 +69,8 @@
     "nodemon": "^3.1.10",
     "swagger-ui-express": "^5.0.1",
     "tsc-alias": "^1.8.16",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitepress": "^1.6.3",
+    "vue": "^3.5.16"
   }
 }
