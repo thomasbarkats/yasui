@@ -1,26 +1,15 @@
-/**
- * YasuiJS Theme Customization
- */
-
 :root {
   /* Brand colors */
   --vp-c-brand-1: var(--vp-c-indigo-1);
   --vp-c-brand-2: var(--vp-c-indigo-2);
   --vp-c-brand-3: var(--vp-c-indigo-3);
-  --vp-c-brand-shadow-1: rgba(168, 177, 255, 0.8);
-  --vp-c-brand-shadow-2: rgba(168, 177, 255, 0.3);
+  --vp-c-brand-4: #784BA1;
   --vp-c-brand-soft: var(--vp-c-indigo-soft);
 }
 
-/**
- * Hero Section
- */
 :root {
-  /* Title with gradient */
-  --vp-home-hero-name-color: transparent;
-  --vp-home-hero-name-background: -webkit-linear-gradient(120deg,
-      #bd34fe 30%,
-      #41d1ff);
+  --vp-home-hero-name-color: var(--vp-c-brand-1);
+  --vp-button-brand-bg: var(--vp-c-brand-4);
 }
 
 .DocSearch {
@@ -28,7 +17,45 @@
 }
 
 .VPImage {
-  filter:
-    drop-shadow(0 0 20px var(--vp-c-brand-shadow-1))
-    drop-shadow(0 0 44px var(--vp-c-brand-shadow-2));
+  filter: drop-shadow(-8px 8px 64px var(--vp-c-indigo-1));
+}
+
+.VPHero .main {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+@media (min-width: 960px) {
+
+  .VPHero .main {
+    margin-top: -14px;
+    flex: 2 !important;
+  }
+
+  .VPHero .image {
+    order: 0 !important;
+  }
+
+  .VPHero .image img {
+    max-width: 250px !important;
+  }
+
+  .VPHero .main .text {
+    font-size: 52px !important;
+    max-width: 640px !important;
+  }
+
+  .VPHero .tagline {
+    padding-right: 2rem;
+  }
+}
+
+.VPHero .text,
+.VPHero .tagline {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+.VPHero .main .name {
+  margin-bottom: 4px !important;
 }
