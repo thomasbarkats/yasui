@@ -1,6 +1,6 @@
 {
   "name": "yasui",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Lightweight Express-based framework for REST and web APIs",
   "license": "AGPL-3.0-or-later",
   "author": "Thomas BARKATS",
@@ -21,7 +21,7 @@
     "type": "git",
     "url": "git+https://github.com/thomasbarkats/yasui.git"
   },
-  "homepage": "https://github.com/thomasbarkats/yasui#readme",
+  "homepage": "https://yasui.app",
   "bugs": {
     "url": "https://github.com/thomasbarkats/yasui/issues"
   },
