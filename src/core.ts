@@ -94,7 +94,7 @@ export class Core {
   }
 
   public useMiddleware(Middleware: TMiddleware): RequestHandler {
-    if (DecoratorValidator.isConstructible(Middleware)) {
+    if (this.isClassMiddleware(Middleware)) {
       const middleware = this.build(<Constructible>Middleware) as IDMiddleware;
       return middleware.run(middleware);
     }
@@ -164,5 +164,15 @@ export class Core {
         this.logger.error(`swagger setup error: ${err}`);
       }
     }
+  }
+
+
+  private isClassMiddleware(Md: TMiddleware): Md is Constructible<IDMiddleware> {
+    if (typeof Md !== 'function') {
+      return false;
+    }
+    return Md.prototype &&
+      typeof Md.prototype.run === 'function' &&
+      Md.prototype.constructor === Md;
   }
 }

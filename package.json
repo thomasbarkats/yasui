@@ -57,20 +57,20 @@
     "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
-    "@anthropic-ai/sdk": "^0.56.0",
-    "@eslint/js": "^9.27.0",
-    "@types/express": "^5.0.2",
-    "@types/node": "^22.15.21",
-    "@typescript-eslint/eslint-plugin": "^8.32.1",
-    "@typescript-eslint/parser": "^8.32.1",
-    "eslint": "^9.27.0",
-    "format-commit": "^0.3.1",
-    "globals": "^16.2.0",
+    "@anthropic-ai/sdk": "^0.57.0",
+    "@eslint/js": "^9.31.0",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.15",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "eslint": "^9.31.0",
+    "format-commit": "^0.4.0",
+    "globals": "^16.3.0",
     "nodemon": "^3.1.10",
     "swagger-ui-express": "^5.0.1",
     "tsc-alias": "^1.8.16",
     "typescript": "^5.8.3",
     "vitepress": "^1.6.3",
-    "vue": "^3.5.16"
+    "vue": "^3.5.17"
   }
 }

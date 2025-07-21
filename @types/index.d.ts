@@ -1,4 +1,10 @@
-import { Application } from 'express';
+import {
+  Application as ExprApplication,
+  NextFunction as ExprNextFunction,
+  Response as ExprResponse,
+  Request as ExprRequest,
+  RequestHandler as ExprRequestHandler,
+} from 'express';
 import { Server } from 'http';
 import { YasuiConfig } from './interfaces';
 
@@ -17,16 +23,14 @@ export * from './enums';
 export * from './openapi';
 export * from './utils';
 
+export type Application = ExprApplication;
+export type Request = ExprRequest;
+export type Response = ExprResponse;
+export type NextFunction = ExprNextFunction;
+export type RequestHandler = ExprRequestHandler;
+
 export function createServer(conf: YasuiConfig): Server;
 export function createApp(conf: YasuiConfig): Application;
-
-export {
-  Application,
-  NextFunction,
-  Response,
-  Request,
-  RequestHandler,
-} from 'express';
 
 
 declare const yasui: {
