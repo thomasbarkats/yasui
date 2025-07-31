@@ -1,11 +1,12 @@
-import { IControllerRoute, Instance, IRouteParam } from '../interfaces';
+import { IControllerRoute, Instance, IRouteParam, TApiProperty } from '../interfaces';
 import { HttpCode } from './http-code.enum';
 import { Scopes } from './scopes.enum';
 import { OpenAPIOperation } from '../openapi';
 
 
 export enum ReflectMetadata {
-  DESIGN_TYPE = 'design:paramtypes',
+  DESIGN_TYPE = 'design:type',
+  DESIGN_PARAM_TYPES = 'design:paramtypes',
   PRE_INJECTED_DEPS = 'PRE_INJECTED_DEPS',
   DEP_SCOPES = 'DEP_SCOPES',
   METHOD_INJECTED_DEPS = 'METHOD_INJECTED_DEPS',
@@ -14,12 +15,15 @@ export enum ReflectMetadata {
   HTTP_STATUS = 'HTTP_STATUS',
   PARAMS = 'PARAMS',
   SELF = 'SELF',
-  SWAGGER = 'SWAGGER',
   INJECTABLE = 'INJECTABLE',
+  SWAGGER_OPERATION = 'SWG_OPS',
+  SWAGGER_SCHEMA_DEFINITION = 'SWG_SCHEMA_DEF',
+  SWAGGER_SCHEMA_NAME = 'SWG_SCHEMA_NAME',
 }
 
 export interface ReflectTypes {
-  [ReflectMetadata.DESIGN_TYPE]: Function[];
+  [ReflectMetadata.DESIGN_TYPE]: Function;
+  [ReflectMetadata.DESIGN_PARAM_TYPES]: Function[];
   [ReflectMetadata.PRE_INJECTED_DEPS]: Record<number, string>;
   [ReflectMetadata.DEP_SCOPES]: Record<number, Scopes>;
   [ReflectMetadata.METHOD_INJECTED_DEPS]: Record<string, Record<number, Function | string>>;
@@ -29,6 +33,8 @@ export interface ReflectTypes {
   [ReflectMetadata.HTTP_STATUS]: HttpCode;
   [ReflectMetadata.PARAMS]: IRouteParam[];
   [ReflectMetadata.SELF]: Instance;
-  [ReflectMetadata.SWAGGER]: OpenAPIOperation;
   [ReflectMetadata.INJECTABLE]: boolean;
+  [ReflectMetadata.SWAGGER_OPERATION]: OpenAPIOperation;
+  [ReflectMetadata.SWAGGER_SCHEMA_DEFINITION]: Record<string, TApiProperty>;
+  [ReflectMetadata.SWAGGER_SCHEMA_NAME]: string;
 }

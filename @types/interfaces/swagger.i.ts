@@ -1,11 +1,25 @@
 import { IControllerRoute, TController } from './controller.i';
+import { Constructible } from './utils.i';
 import {
+  ObjectSchema,
   OpenAPIComponents,
   OpenAPIInfo,
   OpenAPIOperation,
   OpenAPIPathItem,
+  OpenAPISchema,
   OpenAPIServer,
+  RefSchema,
 } from '../openapi';
+
+
+export type ApiPropertySchema =
+  | ObjectSchema
+  | RefSchema
+  | (Exclude<OpenAPISchema, ObjectSchema | RefSchema> & {
+    required?: boolean;
+  });
+
+export type TApiProperty = ApiPropertySchema | Constructible;
 
 
 export interface ISwaggerRoute extends IControllerRoute {

@@ -75,7 +75,7 @@ export class Injector {
     scope: Scopes
   ): Instance[] {
     /** inject via constructor param types or pre-registered token injections */
-    const deps = getMetadata(ReflectMetadata.DESIGN_TYPE, Provided) || [];
+    const deps = getMetadata(ReflectMetadata.DESIGN_PARAM_TYPES, Provided) || [];
     const preInjectedDeps = getMetadata(ReflectMetadata.PRE_INJECTED_DEPS, Provided) || {};
 
     const depScopes = getMetadata(ReflectMetadata.DEP_SCOPES, Provided) || {};

@@ -2,7 +2,7 @@ import { italic } from 'kleur';
 import { Request } from 'express';
 
 import { HttpCode, HttpCodeMap } from '~types/enums';
-import { OpenAPISchema } from '~types/openapi';
+import { ObjectSchema, OpenAPISchema } from '~types/openapi';
 
 
 export class HttpError extends Error {
@@ -66,14 +66,14 @@ export class ErrorResource {
 export function ErrorResourceSchema<T extends Record<string, any> = Record<string, any>>(
   additionalProperties: Record<string, OpenAPISchema> = {},
   additionalPropertiesExample?: T,
-): OpenAPISchema {
+): ObjectSchema {
   return {
     type: 'object',
     properties: {
       url: {
         type: 'string',
         format: 'uri',
-        description: 'Full URL of the request that caused the error',
+        description: 'Request URL',
         example: 'http://localhost:3000/api/tests'
       },
       path: {
@@ -84,7 +84,7 @@ export function ErrorResourceSchema<T extends Record<string, any> = Record<strin
       method: {
         type: 'string',
         enum: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
-        description: 'HTTP method used',
+        description: 'HTTP method',
         example: 'PUT'
       },
       name: {

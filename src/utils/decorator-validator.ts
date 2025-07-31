@@ -8,6 +8,7 @@ import {
 import { ReflectMetadata, Scopes } from '~types/enums';
 import { LoggerService } from '../services';
 import { getMetadata } from './reflect';
+import { SwaggerService } from './swagger.service';
 
 
 interface ValidationError {
@@ -97,7 +98,7 @@ export class DecoratorValidator {
       }
     }
 
-    const deps = getMetadata(ReflectMetadata.DESIGN_TYPE, target) || [];
+    const deps = getMetadata(ReflectMetadata.DESIGN_PARAM_TYPES, target) || [];
     const preInjectedDeps = getMetadata(ReflectMetadata.PRE_INJECTED_DEPS, target) || {};
 
     deps.forEach((Dep, idx) => {
@@ -137,6 +138,20 @@ export class DecoratorValidator {
     }
   }
 
+  public validateSwaggerSchemaName(
+    callerName: string,
+    name: string
+  ): void {
+    const existingSchemaClass = SwaggerService.schemas.get(name)?.className;
+    if (existingSchemaClass !== callerName) {
+      this.addError(
+        callerName,
+        `Schema '${name}' already exists (Class ${existingSchemaClass})`,
+        'Use a different name for your schema'
+      );
+    }
+  }
+
 
   private validateRouteMethod(
     className: string,
@@ -146,7 +161,7 @@ export class DecoratorValidator {
     if (!prototype[route.methodName]) {
       return;
     }
-    const paramTypes = getMetadata(ReflectMetadata.DESIGN_TYPE, prototype, route.methodName) || [];
+    const paramTypes = getMetadata(ReflectMetadata.DESIGN_PARAM_TYPES, prototype, route.methodName) || [];
     const paramNames = this.getParameterNames(prototype[route.methodName]);
 
     const methodsInjections = getMetadata(ReflectMetadata.METHOD_INJECTED_DEPS, prototype) || {};

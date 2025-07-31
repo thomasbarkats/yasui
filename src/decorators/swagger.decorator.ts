@@ -1,10 +1,13 @@
 import { ReflectMetadata } from '~types/enums';
+import { TApiProperty } from '~types/interfaces';
 import {
   OpenAPIParamater,
   OpenAPIResponses,
   OpenAPISchema,
 } from '~types/openapi';
 import { getMetadata, defineMetadata } from '../utils/reflect';
+import { SwaggerService } from '../utils/swagger.service';
+import { mapTypeToSchema } from '../utils/swagger';
 
 
 /** swagger operation decorator */
@@ -26,9 +29,9 @@ function addSwaggerOperation(
     target: object,
     propertyKey: string | symbol
   ): void {
-    const swaggerMetadata = getMetadata(ReflectMetadata.SWAGGER, target, propertyKey) || {};
+    const swaggerMetadata = getMetadata(ReflectMetadata.SWAGGER_OPERATION, target, propertyKey) || {};
 
-    defineMetadata(ReflectMetadata.SWAGGER, {
+    defineMetadata(ReflectMetadata.SWAGGER_OPERATION, {
       ...swaggerMetadata,
       summary,
       description,
@@ -38,11 +41,47 @@ function addSwaggerOperation(
 }
 
 
+/** swagger schema name decorator */
+export function ApiSchema(name: string): ClassDecorator {
+  return function (target: Function): void {
+    defineMetadata(ReflectMetadata.SWAGGER_SCHEMA_NAME, name, target.prototype);
+  };
+}
+
+/** swagger schema required property definition decorator */
+export function ApiProperty(schema?: TApiProperty, isRequired: boolean = true): PropertyDecorator {
+  return function (target: object, propertyKey: string | symbol): void {
+
+    // Infer type if not specified
+    if (!schema || (!('type' in schema) && typeof schema === 'object' && !('$ref' in schema))) {
+      const designType = getMetadata(ReflectMetadata.DESIGN_TYPE, target, propertyKey);
+      if (designType) {
+        schema = mapTypeToSchema(designType);
+      } else {
+        schema = { type: 'object' };
+      }
+    }
+
+    if (typeof schema === 'object' && !('required' in schema) && !('$ref' in schema) && schema.type !== 'object') {
+      schema.required = isRequired;
+    }
+    const existingProps = getMetadata(ReflectMetadata.SWAGGER_SCHEMA_DEFINITION, target) || {};
+    existingProps[propertyKey as string] = schema;
+    defineMetadata(ReflectMetadata.SWAGGER_SCHEMA_DEFINITION, existingProps, target);
+  };
+}
+
+/** swagger schema optional property definition decorator */
+export function ApiPropertyOptional(schema?: TApiProperty): PropertyDecorator {
+  return ApiProperty(schema, false);
+}
+
+
 /** swagger response decorator */
 export function ApiResponse(
   statusCode: number,
   description: string,
-  schema?: OpenAPISchema
+  schema?: TApiProperty
 ): MethodDecorator {
   return addSwaggerResponse(statusCode, description, schema);
 }
@@ -51,20 +90,22 @@ export function ApiResponse(
 function addSwaggerResponse(
   statusCode: number,
   description: string,
-  schema?: OpenAPISchema,
+  schema?: TApiProperty
 ): MethodDecorator {
   return function (
     target: object,
     propertyKey: string | symbol
   ): void {
-    const swaggerMetadata = getMetadata(ReflectMetadata.SWAGGER, target, propertyKey) || {};
+    const resolvedSchema = schema ? SwaggerService.resolveSchema(schema) : undefined;
+
+    const swaggerMetadata = getMetadata(ReflectMetadata.SWAGGER_OPERATION, target, propertyKey) || {};
     const responses: OpenAPIResponses = swaggerMetadata.responses || {};
-    responses[statusCode] = { description, schema };
-    if (schema) {
-      responses[statusCode].content = { 'application/json': { schema: schema } };
+    responses[statusCode] = { description, schema: resolvedSchema };
+    if (resolvedSchema) {
+      responses[statusCode].content = { 'application/json': { schema: resolvedSchema } };
     }
 
-    defineMetadata(ReflectMetadata.SWAGGER, {
+    defineMetadata(ReflectMetadata.SWAGGER_OPERATION, {
       ...swaggerMetadata,
       responses,
     }, target, propertyKey);
@@ -75,8 +116,8 @@ function addSwaggerResponse(
 /** swagger body decorator */
 export function ApiBody(
   description?: string,
-  schema?: OpenAPISchema,
-  contentType: string = 'application/json',
+  schema?: TApiProperty,
+  contentType: string = 'application/json'
 ): MethodDecorator {
   return addSwaggerRequestBody(description, schema, contentType);
 }
@@ -84,22 +125,23 @@ export function ApiBody(
 /** add swagger request body metadata */
 function addSwaggerRequestBody(
   description?: string,
-  schema?: OpenAPISchema,
-  contentType: string = 'application/json',
+  schema?: TApiProperty,
+  contentType: string = 'application/json'
 ): MethodDecorator {
   return function (
     target: object,
     propertyKey: string | symbol
   ): void {
-    const swaggerMetadata = getMetadata(ReflectMetadata.SWAGGER, target, propertyKey) || {};
+    const resolvedSchema = schema ? SwaggerService.resolveSchema(schema) : undefined;
+    const swaggerMetadata = getMetadata(ReflectMetadata.SWAGGER_OPERATION, target, propertyKey) || {};
 
-    defineMetadata(ReflectMetadata.SWAGGER, {
+    defineMetadata(ReflectMetadata.SWAGGER_OPERATION, {
       ...swaggerMetadata,
       requestBody: {
         description: description || 'Request body',
         content: {
           [contentType]: {
-            schema: schema || { type: 'object' }
+            schema: resolvedSchema || { type: 'object' }
           }
         }
       }
@@ -132,7 +174,7 @@ function addSwaggerParam(
     target: object,
     propertyKey: string | symbol
   ): void {
-    const swaggerMetadata = getMetadata(ReflectMetadata.SWAGGER, target, propertyKey) || {};
+    const swaggerMetadata = getMetadata(ReflectMetadata.SWAGGER_OPERATION, target, propertyKey) || {};
     const parameters: OpenAPIParamater[] = swaggerMetadata.parameters || [];
 
     parameters.push({
@@ -143,7 +185,7 @@ function addSwaggerParam(
       schema: schema || { type: 'string' },
     });
 
-    defineMetadata(ReflectMetadata.SWAGGER, {
+    defineMetadata(ReflectMetadata.SWAGGER_OPERATION, {
       ...swaggerMetadata,
       parameters
     }, target, propertyKey);
@@ -154,3 +196,7 @@ function addSwaggerParam(
 export const ApiParam = swaggerParamDecorator('path');
 export const ApiQuery = swaggerParamDecorator('query');
 export const ApiHeader = swaggerParamDecorator('header');
+
+// Aliases
+export const AP = ApiProperty();
+export const APO = ApiPropertyOptional();
