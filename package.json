@@ -40,6 +40,7 @@
     "preversion": "npm run lint",
     "precommit": "npm run lint",
     "commit": "npm run lint && format-commit",
+    "branch": "format-commit --branch",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
@@ -58,19 +59,19 @@
   },
   "devDependencies": {
     "@anthropic-ai/sdk": "^0.57.0",
-    "@eslint/js": "^9.31.0",
+    "@eslint/js": "^9.32.0",
     "@types/express": "^5.0.3",
-    "@types/node": "^24.0.15",
+    "@types/node": "^24.1.0",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
-    "eslint": "^9.31.0",
+    "eslint": "^9.32.0",
     "format-commit": "^0.4.0",
     "globals": "^16.3.0",
     "nodemon": "^3.1.10",
     "swagger-ui-express": "^5.0.1",
     "tsc-alias": "^1.8.16",
-    "typescript": "^5.8.3",
+    "typescript": "^5.9.2",
     "vitepress": "^1.6.3",
-    "vue": "^3.5.17"
+    "vue": "^3.5.18"
   }
 }

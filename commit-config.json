@@ -1,5 +1,6 @@
 {
   "format": 1,
+  "branchFormat": 1,
   "types": [
     {
       "value": "fix",
