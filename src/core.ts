@@ -40,7 +40,6 @@ export class Core {
     }
     this.logger = new LoggerService();
     this.appService = new AppService(this.config);
-    this.swagger = new SwaggerService();
     this.decoratorValidator = this.config.enableDecoratorValidation
       ? new DecoratorValidator(this.config)
       : null;
@@ -48,6 +47,9 @@ export class Core {
       this.logger,
       this.decoratorValidator,
       conf.debug,
+    );
+    this.swagger = new SwaggerService(
+      this.decoratorValidator,
     );
     this.app = express();
   }

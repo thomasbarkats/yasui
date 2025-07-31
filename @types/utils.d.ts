@@ -1,5 +1,5 @@
 import { HttpCode } from './enums';
-import { OpenAPISchema } from './openapi';
+import { ObjectSchema, OpenAPISchema } from './openapi';
 
 
 /** Error class for custom error handling */
@@ -20,4 +20,4 @@ export function ErrorResourceSchema<T extends Record<string, any> = Record<strin
   additionalProperties: Record<string, OpenAPISchema>,
   /** Example object for the combined error schema */
   additionalPropertiesExample?: T,
-): OpenAPISchema;
+): ObjectSchema;

@@ -25,6 +25,7 @@ export function createServer(conf: YasuiConfig): Server {
       core.logger.warn('server started with errors');
       core.logger.log(`server listens on port ${port}`);
       core.decoratorValidator.outputErrors();
+      core.decoratorValidator = null;
     } else {
       core.logger.success('server successfully started');
       core.logger.log(`server listens on port ${port}`);
@@ -37,5 +38,6 @@ export function createApp(conf: YasuiConfig): Application {
   const core: Core = new Core(conf);
   const app: Application = core.createApp();
   core.decoratorValidator?.outputErrors();
+  core.decoratorValidator = null;
   return app;
 }

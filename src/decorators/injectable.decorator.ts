@@ -24,7 +24,7 @@ export function Inject(token?: string): ParameterDecorator {
       if (token) {
         methodsDeps[methodName][index] = token;
       } else {
-        const paramTypes = getMetadata(ReflectMetadata.DESIGN_TYPE, target, methodName) || [];
+        const paramTypes = getMetadata(ReflectMetadata.DESIGN_PARAM_TYPES, target, methodName) || [];
         methodsDeps[methodName][index] = <Constructible>paramTypes[index];
       }
       defineMetadata(ReflectMetadata.METHOD_INJECTED_DEPS, methodsDeps, target);

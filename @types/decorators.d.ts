@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 
-import { TMiddleware } from './interfaces';
+import { TApiProperty, TMiddleware } from './interfaces';
 import { HttpCode, Scopes } from './enums';
 import { OpenAPISchema } from './openapi';
 
@@ -67,15 +67,33 @@ export function routeRequestParamDecorator(type: string): (varName?: string) => 
 
 // --- Swagger decorators ---
 
-/** Documents API endpoint with summary, description and tags */
+/**
+ * Documents API endpoint with summary, description and tags
+ */
 export function ApiOperation(summary: string, description?: string, tags?: string[]): MethodDecorator;
-/** Documents API response with status code, description and schema */
-export function ApiResponse(statusCode: number, description: string, schema?: OpenAPISchema): MethodDecorator;
+/**
+ * Documents API response with status code, description and schema
+ */
+export function ApiResponse(statusCode: number, description: string, schema?: TApiProperty): MethodDecorator;
+/**
+ * Defines property for a class API schema
+ * @default schema.required true
+ */
+export function ApiProperty(schema?: TApiProperty): PropertyDecorator;
+/**
+ * Defines non-required property for a class API schema
+ */
+export function ApiPropertyOptional(schema?: TApiProperty): PropertyDecorator;
+/**
+ * Defines custom name for a class API schema
+ * @default name Class.name // if non-decorated
+ */
+export function ApiSchema(name: string): ClassDecorator;
 /**
  * Documents request body schema and content type
  * @default contentType "application/json"
  */
-export function ApiBody(description?: string, schema?: OpenAPISchema, contentType?: string): MethodDecorator;
+export function ApiBody(description?: string, schema?: TApiProperty, contentType?: string): MethodDecorator;
 /**
  * Documents path parameter with validation schema
  * @default required false
@@ -91,3 +109,8 @@ export function ApiQuery(name: string, description?: string, required?: boolean,
  * @default required false
  */
 export function ApiHeader(name: string, description?: string, required?: boolean, schema?: OpenAPISchema): MethodDecorator;
+
+/** Alias for '@ApiProperty()` */
+export const AP: PropertyDecorator;
+/** Alias for `@ApiPropertyOptional()` */
+export const APO: PropertyDecorator;

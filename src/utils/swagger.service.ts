@@ -1,20 +1,92 @@
 import { HttpCode, HttpCodeMap, ReflectMetadata } from '~types/enums';
 import {
+  TApiProperty,
+  Constructible,
   IRouteParam,
   ISwaggerConfig,
   ISwaggerRoute,
   TController,
 } from '~types/interfaces';
 import {
+  ObjectSchema,
   OpenAPIOperation,
   OpenAPIParamater,
   OpenAPIResponses,
+  OpenAPISchema,
 } from '~types/openapi';
 import { getMetadata } from './reflect';
+import { mapTypeToSchema } from './swagger';
+import { DecoratorValidator } from './decorator-validator';
+import { ErrorResourceSchema } from './error.resource';
 
 
 export class SwaggerService {
-  private routesRegistry: ISwaggerRoute[] = [];
+  public static schemas: Map<string, OpenAPISchema & { className: string }> = new Map();
+  /** <Class name, name> */
+  private static declaredSchemas: Record<string, string> = {};
+  private routesRegistry: ISwaggerRoute[];
+
+  constructor(
+    private readonly decoratorValidator: DecoratorValidator | null,
+  ) {
+    this.routesRegistry = [];
+  }
+
+
+  public static resolveSchema(schema: TApiProperty): OpenAPISchema {
+    if (typeof schema === 'object' && schema !== null) {
+      return schema as OpenAPISchema;
+
+    } else if (typeof schema === 'function') {
+      const openApiSchema = mapTypeToSchema(schema);
+      if ('$ref' in openApiSchema) {
+        const schemaName = SwaggerService.autoRegisterSchema(schema);
+        return { $ref: `#/components/schemas/${schemaName}` };
+      }
+    }
+    return { type: 'object' };
+  }
+
+
+  private static generateSchemaFromClass(Class: Constructible): OpenAPISchema {
+    const props: Record<string, OpenAPISchema> = {};
+    const required: string[] = [];
+
+    const swaggerProps = getMetadata(ReflectMetadata.SWAGGER_SCHEMA_DEFINITION, Class.prototype) || {};
+
+    Object.entries(swaggerProps).forEach(([propName, propSchema]) => {
+      if (typeof propSchema === 'object' && 'required' in propSchema) {
+        if (propSchema.required) {
+          required.push(propName);
+        }
+        delete propSchema.required;
+      }
+      props[propName] = SwaggerService.resolveSchema(propSchema);
+    });
+
+    const schema: ObjectSchema = {
+      type: 'object',
+      properties: props,
+    };
+    if (required.length > 0) {
+      schema.required = required;
+    }
+    return schema;
+  }
+
+  private static autoRegisterSchema(Class: Constructible): string {
+    let name = getMetadata(ReflectMetadata.SWAGGER_SCHEMA_NAME, Class.prototype) || Class.name;
+
+    if (this.schemas.get(name)?.className !== Class.name) {
+      SwaggerService.declaredSchemas[Class.name] = name;
+      const schema = SwaggerService.generateSchemaFromClass(Class);
+      if (this.schemas.has(name)) {
+        name = Class.name; // duplicated custom name
+      }
+      SwaggerService.schemas.set(name, { ...schema, className: Class.name });
+    }
+    return name;
+  }
 
 
   public registerControllerRoutes(
@@ -24,7 +96,11 @@ export class SwaggerService {
     const routes = getMetadata(ReflectMetadata.ROUTES, ControllerClass.prototype) || [];
 
     for (const route of routes) {
-      const swaggerMetadata = getMetadata(ReflectMetadata.SWAGGER, ControllerClass.prototype, route.methodName) || {};
+      const swaggerMetadata = getMetadata(
+        ReflectMetadata.SWAGGER_OPERATION,
+        ControllerClass.prototype,
+        route.methodName
+      ) || {};
       const swaggerRoute: ISwaggerRoute = {
         ...route,
         controllerName: ControllerClass.name,
@@ -52,8 +128,16 @@ export class SwaggerService {
       },
     };
 
-    if (hasApiKey) {
-      config.components = {
+    Object.entries(SwaggerService.declaredSchemas).forEach(([className, declaredName]) => {
+      this.decoratorValidator?.validateSwaggerSchemaName(className, declaredName);
+    });
+
+    config.components = {
+      schemas: {
+        ...Object.fromEntries(SwaggerService.schemas),
+        'Default Error Response': ErrorResourceSchema()
+      },
+      ...(hasApiKey && {
         securitySchemes: {
           ApiKeyAuth: {
             type: 'apiKey',
@@ -61,8 +145,8 @@ export class SwaggerService {
             name: 'x-api-key'
           }
         }
-      };
-    }
+      })
+    };
 
     for (const route of this.routesRegistry) {
       if (!config.paths[route.fullPath]) {
