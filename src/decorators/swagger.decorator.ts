@@ -1,5 +1,5 @@
 import { ReflectMetadata } from '~types/enums';
-import { TApiProperty } from '~types/interfaces';
+import { Constructible, ApiPropertyDefinition, ApiPropertyPrimitiveSchema } from '~types/interfaces';
 import {
   OpenAPIParamater,
   OpenAPIResponses,
@@ -7,7 +7,7 @@ import {
 } from '~types/openapi';
 import { getMetadata, defineMetadata } from '../utils/reflect';
 import { SwaggerService } from '../utils/swagger.service';
-import { mapTypeToSchema } from '../utils/swagger';
+import { extractDecoratorUsage, mapTypeToSchema } from '../utils/swagger';
 
 
 /** swagger operation decorator */
@@ -49,48 +49,49 @@ export function ApiSchema(name: string): ClassDecorator {
 }
 
 /** swagger schema required property definition decorator */
-export function ApiProperty(schema?: TApiProperty, isRequired: boolean = true): PropertyDecorator {
+export function ApiProperty(def?: ApiPropertyDefinition, isRequired: boolean = true): PropertyDecorator {
   return function (target: object, propertyKey: string | symbol): void {
 
-    // Infer type if not specified
-    if (!schema || (!('type' in schema) && typeof schema === 'object' && !('$ref' in schema))) {
+    // Infer schema type for empty decorator usage
+    if (!def) {
       const designType = getMetadata(ReflectMetadata.DESIGN_TYPE, target, propertyKey);
       if (designType) {
-        schema = mapTypeToSchema(designType);
+        const schema = mapTypeToSchema(designType);
+        def = ('$ref' in schema) ? <Constructible>designType : schema;
       } else {
-        schema = { type: 'object' };
+        def = { type: 'object' };
       }
     }
-
-    if (typeof schema === 'object' && !('required' in schema) && !('$ref' in schema) && schema.type !== 'object') {
-      schema.required = isRequired;
+    if (extractDecoratorUsage(def) === 'PrimitiveSchema' && !('required' in def)) {
+      (<ApiPropertyPrimitiveSchema>def).required = isRequired;
     }
     const existingProps = getMetadata(ReflectMetadata.SWAGGER_SCHEMA_DEFINITION, target) || {};
-    existingProps[propertyKey as string] = schema;
+    existingProps[propertyKey as string] = def;
     defineMetadata(ReflectMetadata.SWAGGER_SCHEMA_DEFINITION, existingProps, target);
   };
 }
 
 /** swagger schema optional property definition decorator */
-export function ApiPropertyOptional(schema?: TApiProperty): PropertyDecorator {
-  return ApiProperty(schema, false);
+export function ApiPropertyOptional(def?: ApiPropertyDefinition): PropertyDecorator {
+  return ApiProperty(def, false);
 }
 
 
 /** swagger response decorator */
 export function ApiResponse(
   statusCode: number,
-  description: string,
-  schema?: TApiProperty
+  descArg: string | Constructible,
+  defArg?: ApiPropertyDefinition
 ): MethodDecorator {
-  return addSwaggerResponse(statusCode, description, schema);
+  const { description, definition } = extractDescArgUsage(descArg, defArg);
+  return addSwaggerResponse(statusCode, description, definition);
 }
 
 /** add swagger response metadata */
 function addSwaggerResponse(
   statusCode: number,
   description: string,
-  schema?: TApiProperty
+  schema?: ApiPropertyDefinition
 ): MethodDecorator {
   return function (
     target: object,
@@ -115,24 +116,25 @@ function addSwaggerResponse(
 
 /** swagger body decorator */
 export function ApiBody(
-  description?: string,
-  schema?: TApiProperty,
+  descArg?: string | Constructible,
+  defArg?: ApiPropertyDefinition,
   contentType: string = 'application/json'
 ): MethodDecorator {
-  return addSwaggerRequestBody(description, schema, contentType);
+  const { description, definition } = extractDescArgUsage(descArg || '', defArg);
+  return addSwaggerRequestBody(description, definition, contentType);
 }
 
 /** add swagger request body metadata */
 function addSwaggerRequestBody(
   description?: string,
-  schema?: TApiProperty,
+  definition?: ApiPropertyDefinition,
   contentType: string = 'application/json'
 ): MethodDecorator {
   return function (
     target: object,
     propertyKey: string | symbol
   ): void {
-    const resolvedSchema = schema ? SwaggerService.resolveSchema(schema) : undefined;
+    const resolvedSchema = definition ? SwaggerService.resolveSchema(definition) : undefined;
     const swaggerMetadata = getMetadata(ReflectMetadata.SWAGGER_OPERATION, target, propertyKey) || {};
 
     defineMetadata(ReflectMetadata.SWAGGER_OPERATION, {
@@ -147,6 +149,19 @@ function addSwaggerRequestBody(
       }
     }, target, propertyKey);
   };
+}
+
+
+function extractDescArgUsage(
+  description: string | Constructible,
+  definition?: ApiPropertyDefinition,
+): { description: string; definition?: ApiPropertyDefinition } {
+  if (typeof description !== 'string') {
+    definition = description;
+    description = getMetadata(ReflectMetadata.SWAGGER_SCHEMA_NAME, description.prototype)
+      || description.name;
+  }
+  return { description, definition };
 }
 
 
@@ -198,5 +213,5 @@ export const ApiQuery = swaggerParamDecorator('query');
 export const ApiHeader = swaggerParamDecorator('header');
 
 // Aliases
-export const AP = ApiProperty();
-export const APO = ApiPropertyOptional();
+export const AP = ApiProperty;
+export const APO = ApiPropertyOptional;

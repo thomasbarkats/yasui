@@ -1,5 +1,30 @@
+import { ApiPropertyDefinition } from '~types/interfaces';
 import { OpenAPISchema } from '~types/openapi';
 
+
+export type DecoratorUsage =
+  | 'PrimitiveSchema'
+  | 'RefSchema'
+  | 'ObjectSchema'
+  | 'Array'
+  | 'Enum'
+  | 'Constructible'
+  | 'Record';
+
+export function extractDecoratorUsage(def: ApiPropertyDefinition): DecoratorUsage {
+  if (typeof def === 'function') {
+    return 'Constructible';
+  } else if (Array.isArray(def)) {
+    return 'Array';
+  } else if ('$ref' in def) {
+    return 'RefSchema';
+  } else if ('type' in def) {
+    return def.type === 'object' ? 'ObjectSchema' : 'PrimitiveSchema';
+  } else if ('enum' in def) {
+    return 'Enum';
+  }
+  return 'Record';
+}
 
 export function mapTypeToSchema(type: Function): OpenAPISchema {
   switch (type) {

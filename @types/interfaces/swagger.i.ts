@@ -12,14 +12,31 @@ import {
 } from '../openapi';
 
 
-export type ApiPropertySchema =
+export type ApiPropertyPrimitiveSchema = Exclude<OpenAPISchema, ObjectSchema | RefSchema> & {
+  required?: boolean;
+};
+
+export type SafeApiPropertyRecord = {
+  type?: never;
+  $ref?: never;
+  enum?: never;
+} & {
+  [K in string]: (Constructible | [Constructible]) | SafeApiPropertyRecord;
+};
+
+export type ApiPropertyEnumSchema = {
+  enum: (string | number)[] | Record<string, string | number>;
+};
+
+/** Swagger decorators (ApiProperty, ApiResponse, ApiBody) usage */
+export type ApiPropertyDefinition =
+  | ApiPropertyPrimitiveSchema
   | ObjectSchema
   | RefSchema
-  | (Exclude<OpenAPISchema, ObjectSchema | RefSchema> & {
-    required?: boolean;
-  });
-
-export type TApiProperty = ApiPropertySchema | Constructible;
+  | ApiPropertyEnumSchema
+  | Constructible
+  | [Constructible]
+  | SafeApiPropertyRecord;
 
 
 export interface ISwaggerRoute extends IControllerRoute {
