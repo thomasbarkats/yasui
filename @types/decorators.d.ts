@@ -1,6 +1,7 @@
+/* eslint-disable no-redeclare */
 /* eslint-disable max-len */
 
-import { TApiProperty, TMiddleware } from './interfaces';
+import { Constructible, ApiPropertyDefinition, TMiddleware } from './interfaces';
 import { HttpCode, Scopes } from './enums';
 import { OpenAPISchema } from './openapi';
 
@@ -74,16 +75,24 @@ export function ApiOperation(summary: string, description?: string, tags?: strin
 /**
  * Documents API response with status code, description and schema
  */
-export function ApiResponse(statusCode: number, description: string, schema?: TApiProperty): MethodDecorator;
+export function ApiResponse(statusCode: number, description: string, schema?: ApiPropertyDefinition): MethodDecorator;
+/**
+ * Documents API response with schema reference only (description will be the schema name)
+ */
+export function ApiResponse(statusCode: number, schemaRef: Constructible): MethodDecorator;
 /**
  * Defines property for a class API schema
  * @default schema.required true
  */
-export function ApiProperty(schema?: TApiProperty): PropertyDecorator;
+export function ApiProperty(schema?: ApiPropertyDefinition): PropertyDecorator;
+/** Alias for '@ApiProperty()` */
+export function AP(schema?: ApiPropertyDefinition): PropertyDecorator;
 /**
  * Defines non-required property for a class API schema
  */
-export function ApiPropertyOptional(schema?: TApiProperty): PropertyDecorator;
+export function ApiPropertyOptional(schema?: ApiPropertyDefinition): PropertyDecorator;
+/** Alias for `@ApiPropertyOptional()` */
+export function APO(schema?: ApiPropertyDefinition): PropertyDecorator;
 /**
  * Defines custom name for a class API schema
  * @default name Class.name // if non-decorated
@@ -93,7 +102,11 @@ export function ApiSchema(name: string): ClassDecorator;
  * Documents request body schema and content type
  * @default contentType "application/json"
  */
-export function ApiBody(description?: string, schema?: TApiProperty, contentType?: string): MethodDecorator;
+export function ApiBody(description?: string, schema?: ApiPropertyDefinition, contentType?: string): MethodDecorator;
+/**
+ * Documents request body with schema reference only (description will be the schema name, contentType "application/json")
+ */
+export function ApiBody(schemaRef: Constructible): MethodDecorator;
 /**
  * Documents path parameter with validation schema
  * @default required false
@@ -109,8 +122,3 @@ export function ApiQuery(name: string, description?: string, required?: boolean,
  * @default required false
  */
 export function ApiHeader(name: string, description?: string, required?: boolean, schema?: OpenAPISchema): MethodDecorator;
-
-/** Alias for '@ApiProperty()` */
-export const AP: PropertyDecorator;
-/** Alias for `@ApiPropertyOptional()` */
-export const APO: PropertyDecorator;

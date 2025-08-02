@@ -1,10 +1,12 @@
 import { HttpCode, HttpCodeMap, ReflectMetadata } from '~types/enums';
 import {
-  TApiProperty,
+  ApiPropertyDefinition,
+  ApiPropertyEnumSchema,
   Constructible,
   IRouteParam,
   ISwaggerConfig,
   ISwaggerRoute,
+  SafeApiPropertyRecord,
   TController,
 } from '~types/interfaces';
 import {
@@ -14,8 +16,8 @@ import {
   OpenAPIResponses,
   OpenAPISchema,
 } from '~types/openapi';
-import { getMetadata } from './reflect';
-import { mapTypeToSchema } from './swagger';
+import { defineMetadata, getMetadata } from './reflect';
+import { extractDecoratorUsage, mapTypeToSchema } from './swagger';
 import { DecoratorValidator } from './decorator-validator';
 import { ErrorResourceSchema } from './error.resource';
 
@@ -33,20 +35,58 @@ export class SwaggerService {
   }
 
 
-  public static resolveSchema(schema: TApiProperty): OpenAPISchema {
-    if (typeof schema === 'object' && schema !== null) {
-      return schema as OpenAPISchema;
-
-    } else if (typeof schema === 'function') {
-      const openApiSchema = mapTypeToSchema(schema);
-      if ('$ref' in openApiSchema) {
-        const schemaName = SwaggerService.autoRegisterSchema(schema);
-        return { $ref: `#/components/schemas/${schemaName}` };
+  public static resolveSchema(def: ApiPropertyDefinition): OpenAPISchema {
+    switch (extractDecoratorUsage(def)) {
+      case 'PrimitiveSchema':
+      case 'RefSchema':
+      case 'ObjectSchema':
+        return def as OpenAPISchema;
+      case 'Array':
+        return {
+          type: 'array',
+          items: SwaggerService.resolveSchema((<Array<Constructible>>def)[0]),
+        };
+      case 'Enum': {
+        const enumDef = (<ApiPropertyEnumSchema>def).enum;
+        const enumValues = Array.isArray(enumDef) ? enumDef : Object.values(enumDef);
+        return typeof enumValues[0] === 'string'
+          ? { type: 'string', enum: enumValues as string[] }
+          : { type: 'number', enum: enumValues as number[] };
+      }
+      case 'Constructible': {
+        const schema = mapTypeToSchema(<Constructible>def);
+        if ('$ref' in schema) {
+          const schemaName = SwaggerService.autoRegisterSchema(<Constructible>def);
+          schema.$ref = `#/components/schemas/${schemaName}`;
+        }
+        return schema;
+      }
+      case 'Record': {
+        const schema: ObjectSchema = { type: 'object' };
+        schema.properties = {};
+        for (const property in def) {
+          schema.properties[property] = SwaggerService.resolveSchema((<SafeApiPropertyRecord>def)[property]);
+        }
+        return schema;
       }
     }
-    return { type: 'object' };
   }
 
+  private static autoRegisterSchema(Class: Constructible): string {
+    let name = getMetadata(ReflectMetadata.SWAGGER_SCHEMA_NAME, Class.prototype) || Class.name;
+
+    if (this.schemas.get(name)?.className !== Class.name) {
+      SwaggerService.declaredSchemas[Class.name] = name;
+
+      const schema = SwaggerService.generateSchemaFromClass(Class);
+      if (this.schemas.has(name)) {
+        name = Class.name; // duplicated custom name
+        defineMetadata(ReflectMetadata.SWAGGER_SCHEMA_NAME, name, Class.prototype);
+      }
+      SwaggerService.schemas.set(name, { ...schema, className: Class.name });
+    }
+    return name;
+  }
 
   private static generateSchemaFromClass(Class: Constructible): OpenAPISchema {
     const props: Record<string, OpenAPISchema> = {};
@@ -72,20 +112,6 @@ export class SwaggerService {
       schema.required = required;
     }
     return schema;
-  }
-
-  private static autoRegisterSchema(Class: Constructible): string {
-    let name = getMetadata(ReflectMetadata.SWAGGER_SCHEMA_NAME, Class.prototype) || Class.name;
-
-    if (this.schemas.get(name)?.className !== Class.name) {
-      SwaggerService.declaredSchemas[Class.name] = name;
-      const schema = SwaggerService.generateSchemaFromClass(Class);
-      if (this.schemas.has(name)) {
-        name = Class.name; // duplicated custom name
-      }
-      SwaggerService.schemas.set(name, { ...schema, className: Class.name });
-    }
-    return name;
   }
 
 

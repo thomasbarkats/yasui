@@ -1,4 +1,5 @@
 import { HttpCode } from './enums';
+import { ApiPropertyDefinition } from './interfaces';
 import { ObjectSchema, OpenAPISchema } from './openapi';
 
 
@@ -21,3 +22,7 @@ export function ErrorResourceSchema<T extends Record<string, any> = Record<strin
   /** Example object for the combined error schema */
   additionalPropertiesExample?: T,
 ): ObjectSchema;
+
+
+/** Returns a reference OpenAPI schema for a given resource */
+export function resolveSchema(schema: ApiPropertyDefinition): OpenAPISchema;

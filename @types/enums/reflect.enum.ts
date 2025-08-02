@@ -1,4 +1,4 @@
-import { IControllerRoute, Instance, IRouteParam, TApiProperty } from '../interfaces';
+import { IControllerRoute, Instance, IRouteParam, ApiPropertyDefinition } from '../interfaces';
 import { HttpCode } from './http-code.enum';
 import { Scopes } from './scopes.enum';
 import { OpenAPIOperation } from '../openapi';
@@ -35,6 +35,6 @@ export interface ReflectTypes {
   [ReflectMetadata.SELF]: Instance;
   [ReflectMetadata.INJECTABLE]: boolean;
   [ReflectMetadata.SWAGGER_OPERATION]: OpenAPIOperation;
-  [ReflectMetadata.SWAGGER_SCHEMA_DEFINITION]: Record<string, TApiProperty>;
+  [ReflectMetadata.SWAGGER_SCHEMA_DEFINITION]: Record<string, ApiPropertyDefinition>;
   [ReflectMetadata.SWAGGER_SCHEMA_NAME]: string;
 }
