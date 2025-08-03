@@ -28,7 +28,7 @@ export type ApiPropertyEnumSchema = {
   enum: (string | number)[] | Record<string, string | number>;
 };
 
-/** Swagger decorators (ApiProperty, ApiResponse, ApiBody) usage */
+/** Swagger decorators usage */
 export type ApiPropertyDefinition =
   | ApiPropertyPrimitiveSchema
   | ObjectSchema

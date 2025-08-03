@@ -1,13 +1,24 @@
 import { ReflectMetadata } from '~types/enums';
-import { Constructible, ApiPropertyDefinition, ApiPropertyPrimitiveSchema } from '~types/interfaces';
+import { HttpError, resolveSchema } from '../utils';
+import {
+  Constructible,
+  ApiPropertyDefinition,
+  ApiPropertyPrimitiveSchema,
+} from '~types/interfaces';
 import {
   OpenAPIParamater,
   OpenAPIResponses,
-  OpenAPISchema,
 } from '~types/openapi';
-import { getMetadata, defineMetadata } from '../utils/reflect';
-import { SwaggerService } from '../utils/swagger.service';
-import { extractDecoratorUsage, mapTypeToSchema } from '../utils/swagger';
+import {
+  getMetadata,
+  defineMetadata
+} from '../utils/reflect';
+import {
+  ERROR_RESOURCE_SCHEMA_NAME,
+  extractDecoratorUsage,
+  mapTypeToSchema,
+  overloadCustomErrorDefinition,
+} from '../utils/swagger';
 
 
 /** swagger operation decorator */
@@ -87,17 +98,31 @@ export function ApiResponse(
   return addSwaggerResponse(statusCode, description, definition);
 }
 
+/** swagger error response decorator */
+export function ApiErrorResponse<T extends HttpError>(
+  statusCode: number,
+  descArg: string | Constructible<T>,
+  ErrorDataClass?: Constructible<T>
+): MethodDecorator {
+  const { description, definition } = extractDescArgUsage(descArg, ErrorDataClass);
+  const errorSchema = definition
+    ? overloadCustomErrorDefinition(statusCode, definition as Constructible<T>)
+    : { $ref: `#/components/schemas/${encodeURIComponent(ERROR_RESOURCE_SCHEMA_NAME)}` };
+
+  return addSwaggerResponse(statusCode, description, errorSchema);
+}
+
 /** add swagger response metadata */
 function addSwaggerResponse(
   statusCode: number,
   description: string,
-  schema?: ApiPropertyDefinition
+  definition?: ApiPropertyDefinition
 ): MethodDecorator {
   return function (
     target: object,
     propertyKey: string | symbol
   ): void {
-    const resolvedSchema = schema ? SwaggerService.resolveSchema(schema) : undefined;
+    const resolvedSchema = definition ? resolveSchema(definition) : undefined;
 
     const swaggerMetadata = getMetadata(ReflectMetadata.SWAGGER_OPERATION, target, propertyKey) || {};
     const responses: OpenAPIResponses = swaggerMetadata.responses || {};
@@ -134,7 +159,7 @@ function addSwaggerRequestBody(
     target: object,
     propertyKey: string | symbol
   ): void {
-    const resolvedSchema = definition ? SwaggerService.resolveSchema(definition) : undefined;
+    const resolvedSchema = definition ? resolveSchema(definition) : undefined;
     const swaggerMetadata = getMetadata(ReflectMetadata.SWAGGER_OPERATION, target, propertyKey) || {};
 
     defineMetadata(ReflectMetadata.SWAGGER_OPERATION, {
@@ -171,9 +196,9 @@ function swaggerParamDecorator(paramIn: 'path' | 'query' | 'header'): Function {
     name: string,
     description?: string,
     required?: boolean,
-    schema?: OpenAPISchema
+    definition?: ApiPropertyDefinition
   ): MethodDecorator {
-    return addSwaggerParam(paramIn, name, description, required, schema);
+    return addSwaggerParam(paramIn, name, description, required, definition);
   };
 }
 
@@ -183,7 +208,7 @@ function addSwaggerParam(
   name: string,
   description?: string,
   required?: boolean,
-  schema?: OpenAPISchema
+  definition?: ApiPropertyDefinition
 ): MethodDecorator {
   return function (
     target: object,
@@ -191,13 +216,14 @@ function addSwaggerParam(
   ): void {
     const swaggerMetadata = getMetadata(ReflectMetadata.SWAGGER_OPERATION, target, propertyKey) || {};
     const parameters: OpenAPIParamater[] = swaggerMetadata.parameters || [];
+    const resolvedSchema = definition ? resolveSchema(definition) : undefined;
 
     parameters.push({
       name,
       in: paramIn,
       required: required ?? (paramIn === 'path'), // 'path' always required
       description,
-      schema: schema || { type: 'string' },
+      schema: resolvedSchema || { type: 'string' },
     });
 
     defineMetadata(ReflectMetadata.SWAGGER_OPERATION, {

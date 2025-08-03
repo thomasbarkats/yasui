@@ -17,13 +17,13 @@ import {
   OpenAPISchema,
 } from '~types/openapi';
 import { defineMetadata, getMetadata } from './reflect';
-import { extractDecoratorUsage, mapTypeToSchema } from './swagger';
+import { ERROR_RESOURCE_SCHEMA_NAME, extractDecoratorUsage, mapTypeToSchema } from './swagger';
 import { DecoratorValidator } from './decorator-validator';
 import { ErrorResourceSchema } from './error.resource';
 
 
 export class SwaggerService {
-  public static schemas: Map<string, OpenAPISchema & { className: string }> = new Map();
+  public static schemas: Map<string, OpenAPISchema & { className?: string }> = new Map();
   /** <Class name, name> */
   private static declaredSchemas: Record<string, string> = {};
   private routesRegistry: ISwaggerRoute[];
@@ -57,7 +57,7 @@ export class SwaggerService {
         const schema = mapTypeToSchema(<Constructible>def);
         if ('$ref' in schema) {
           const schemaName = SwaggerService.autoRegisterSchema(<Constructible>def);
-          schema.$ref = `#/components/schemas/${schemaName}`;
+          schema.$ref = `#/components/schemas/${encodeURIComponent(schemaName)}`;
         }
         return schema;
       }
@@ -154,15 +154,14 @@ export class SwaggerService {
       },
     };
 
+    SwaggerService.schemas.set(ERROR_RESOURCE_SCHEMA_NAME, ErrorResourceSchema());
+
     Object.entries(SwaggerService.declaredSchemas).forEach(([className, declaredName]) => {
       this.decoratorValidator?.validateSwaggerSchemaName(className, declaredName);
     });
 
     config.components = {
-      schemas: {
-        ...Object.fromEntries(SwaggerService.schemas),
-        'Default Error Response': ErrorResourceSchema()
-      },
+      schemas: Object.fromEntries(SwaggerService.schemas),
       ...(hasApiKey && {
         securitySchemes: {
           ApiKeyAuth: {

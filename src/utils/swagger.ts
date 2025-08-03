@@ -1,6 +1,12 @@
-import { ApiPropertyDefinition } from '~types/interfaces';
+import { HttpCode, ReflectMetadata } from '~types/enums';
+import { ApiPropertyDefinition, Constructible } from '~types/interfaces';
 import { OpenAPISchema } from '~types/openapi';
+import { HttpError, ErrorResourceSchema } from './error.resource';
+import { getMetadata, defineMetadata } from './reflect';
+import { resolveSchema } from '.';
 
+
+export const ERROR_RESOURCE_SCHEMA_NAME = 'Error Response';
 
 export type DecoratorUsage =
   | 'PrimitiveSchema'
@@ -10,6 +16,7 @@ export type DecoratorUsage =
   | 'Enum'
   | 'Constructible'
   | 'Record';
+
 
 export function extractDecoratorUsage(def: ApiPropertyDefinition): DecoratorUsage {
   if (typeof def === 'function') {
@@ -40,4 +47,26 @@ export function mapTypeToSchema(type: Function): OpenAPISchema {
       }
       return { type: 'object' };
   }
+}
+
+export function overloadCustomErrorDefinition<T extends HttpError>(
+  statusCode: HttpCode = 500,
+  ErrorDataClass: Constructible<T>,
+): Constructible<T> {
+  const errorDataClassDefinition = getMetadata(ReflectMetadata.SWAGGER_SCHEMA_DEFINITION, ErrorDataClass.prototype);
+  const errorDataClassSchema: Record<string, OpenAPISchema> = {};
+
+  for (const property in errorDataClassDefinition) {
+    errorDataClassSchema[property] = resolveSchema(errorDataClassDefinition[property]);
+  }
+
+  defineMetadata(ReflectMetadata.SWAGGER_SCHEMA_DEFINITION, {
+    ...ErrorResourceSchema(statusCode).properties,
+    data: {
+      type: 'object',
+      properties: errorDataClassSchema,
+    }
+  }, ErrorDataClass.prototype);
+
+  return ErrorDataClass;
 }

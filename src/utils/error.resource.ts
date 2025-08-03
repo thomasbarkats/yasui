@@ -2,7 +2,7 @@ import { italic } from 'kleur';
 import { Request } from 'express';
 
 import { HttpCode, HttpCodeMap } from '~types/enums';
-import { ObjectSchema, OpenAPISchema } from '~types/openapi';
+import { ObjectSchema } from '~types/openapi';
 
 
 export class HttpError extends Error {
@@ -60,13 +60,7 @@ export class ErrorResource {
   }
 }
 
-
-/** error schema for Swagger/OpenAPI response decorators */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function ErrorResourceSchema<T extends Record<string, any> = Record<string, any>>(
-  additionalProperties: Record<string, OpenAPISchema> = {},
-  additionalPropertiesExample?: T,
-): ObjectSchema {
+export function ErrorResourceSchema(statusCode: number = 500): ObjectSchema {
   return {
     type: 'object',
     properties: {
@@ -100,31 +94,20 @@ export function ErrorResourceSchema<T extends Record<string, any> = Record<strin
       statusMessage: {
         type: 'string',
         description: 'HTTP status message',
-        example: 'Internal Server Error'
+        example: HttpCodeMap[statusCode]
       },
       status: {
         type: 'integer',
         minimum: 100,
         maximum: 599,
         description: 'HTTP status code',
-        example: 500
+        example: statusCode
       },
       data: {
         type: 'object',
-        properties: additionalProperties,
         description: 'Additional error data and extended properties',
         example: {}
       }
-    },
-    example: {
-      url: 'http://localhost:3000/api/tests',
-      path: '/api/tests',
-      method: 'PUT',
-      name: 'Error',
-      message: 'I just simulate an error.',
-      statusMessage: 'Internal Server Error',
-      status: 500,
-      data: additionalPropertiesExample || {},
     }
   };
 };
