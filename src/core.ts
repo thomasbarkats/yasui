@@ -150,7 +150,11 @@ export class Core {
       const swaggerConfig = this.swagger.getSwaggerConfig(this.config.swagger?.info, !!this.config.apiKey);
 
       this.app.use(swaggerPath, swaggerUi.serve);
-      this.app.get(swaggerPath, swaggerUi.setup(swaggerConfig));
+      this.app.get(swaggerPath, swaggerUi.setup(swaggerConfig, {
+        swaggerOptions: {
+          defaultModelsExpandDepth: 0,
+        }
+      }));
       this.app.get(`${swaggerPath}/swagger.json`, (req, res) => {
         res.json(swaggerConfig);
       });

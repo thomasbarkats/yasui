@@ -3,7 +3,7 @@
 
 import { Constructible, ApiPropertyDefinition, TMiddleware } from './interfaces';
 import { HttpCode, Scopes } from './enums';
-import { OpenAPISchema } from './openapi';
+import { HttpError } from './utils';
 
 
 export function Controller(path: string, ...middlewares: TMiddleware[]): ClassDecorator;
@@ -68,57 +68,39 @@ export function routeRequestParamDecorator(type: string): (varName?: string) => 
 
 // --- Swagger decorators ---
 
-/**
- * Documents API endpoint with summary, description and tags
- */
+/** Documents API endpoint */
 export function ApiOperation(summary: string, description?: string, tags?: string[]): MethodDecorator;
-/**
- * Documents API response with status code, description and schema
- */
-export function ApiResponse(statusCode: number, description: string, schema?: ApiPropertyDefinition): MethodDecorator;
-/**
- * Documents API response with schema reference only (description will be the schema name)
- */
-export function ApiResponse(statusCode: number, schemaRef: Constructible): MethodDecorator;
-/**
- * Defines property for a class API schema
- * @default schema.required true
- */
-export function ApiProperty(schema?: ApiPropertyDefinition): PropertyDecorator;
+/** Documents API response */
+export function ApiResponse(statusCode: number, description: string, definition?: ApiPropertyDefinition): MethodDecorator;
+/** Documents API response with class reference only (description will be the schema name) */
+export function ApiResponse(statusCode: number, ClassRef: Constructible): MethodDecorator;
+/** Documents API error response with base error schema and custom properties schema (record or class reference) */
+export function ApiErrorResponse<T extends HttpError>(statusCode: number, description: string, ErrorDataClass?: Constructible<T>): MethodDecorator;
+/** Documents API error response with class reference only for custom properties (description will be the schema name) */
+export function ApiErrorResponse<T extends HttpError>(statusCode: number, ErrorDataClass?: Constructible<T>): MethodDecorator;
+/** Defines property for a class API schema
+ *  @default schema.required true */
+export function ApiProperty(definition?: ApiPropertyDefinition): PropertyDecorator;
 /** Alias for '@ApiProperty()` */
-export function AP(schema?: ApiPropertyDefinition): PropertyDecorator;
-/**
- * Defines non-required property for a class API schema
- */
-export function ApiPropertyOptional(schema?: ApiPropertyDefinition): PropertyDecorator;
+export function AP(definition?: ApiPropertyDefinition): PropertyDecorator;
+/** Defines non-required property for a class API schema */
+export function ApiPropertyOptional(definition?: ApiPropertyDefinition): PropertyDecorator;
 /** Alias for `@ApiPropertyOptional()` */
-export function APO(schema?: ApiPropertyDefinition): PropertyDecorator;
-/**
- * Defines custom name for a class API schema
- * @default name Class.name // if non-decorated
- */
+export function APO(definition?: ApiPropertyDefinition): PropertyDecorator;
+/** Defines custom name for a class API schema
+ *  @default name Class.name // if non-decorated */
 export function ApiSchema(name: string): ClassDecorator;
-/**
- * Documents request body schema and content type
- * @default contentType "application/json"
- */
-export function ApiBody(description?: string, schema?: ApiPropertyDefinition, contentType?: string): MethodDecorator;
-/**
- * Documents request body with schema reference only (description will be the schema name, contentType "application/json")
- */
-export function ApiBody(schemaRef: Constructible): MethodDecorator;
-/**
- * Documents path parameter with validation schema
- * @default required false
- */
-export function ApiParam(name: string, description?: string, required?: boolean, schema?: OpenAPISchema): MethodDecorator;
-/**
- * Documents query parameter with validation schema
- * @default required false
- */
-export function ApiQuery(name: string, description?: string, required?: boolean, schema?: OpenAPISchema): MethodDecorator;
-/**
- * Documents header parameter with validation schema
- * @default required false
- */
-export function ApiHeader(name: string, description?: string, required?: boolean, schema?: OpenAPISchema): MethodDecorator;
+/** Documents request body schema and content type
+ *  @default contentType "application/json" */
+export function ApiBody(description?: string, definition?: ApiPropertyDefinition, contentType?: string): MethodDecorator;
+/** Documents request body with class reference only (description will be the schema name, contentType "application/json") */
+export function ApiBody(ClassRef: Constructible): MethodDecorator;
+/** Documents path parameter with validation schema
+ *  @default required false */
+export function ApiParam(name: string, description?: string, required?: boolean, definition?: ApiPropertyDefinition): MethodDecorator;
+/** Documents query parameter with validation schema
+ *  @default required false */
+export function ApiQuery(name: string, description?: string, required?: boolean, definition?: ApiPropertyDefinition): MethodDecorator;
+/** Documents header parameter with validation schema
+ *  @default required false */
+export function ApiHeader(name: string, description?: string, required?: boolean, definition?: ApiPropertyDefinition): MethodDecorator;

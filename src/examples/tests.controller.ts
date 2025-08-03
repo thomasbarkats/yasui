@@ -1,10 +1,10 @@
 import {
+  ApiErrorResponse,
   ApiOperation,
   ApiParam,
   ApiResponse,
   Body,
   Controller,
-  ErrorResourceSchema,
   Get,
   Header,
   HttpStatus,
@@ -51,12 +51,12 @@ export class TestsController {
 
   @Put('/')
   @ApiOperation('Simulate error 500', 'Deliberately throws an error for testing purposes')
-  @ApiResponse(500, 'Internal server error', ErrorResourceSchema())
+  @ApiErrorResponse(500, 'Internal server error simulation')
   private error(): void {
     /**
-       * custom error must inherit from Error and have a status property
-       * 500 (Internal server error) is returned by default
-       */
+     * custom error must inherit from Error and have a status property
+     * 500 (Internal server error) is returned by default
+     */
     throw new Error('I just simulate an error.');
   }
 }
