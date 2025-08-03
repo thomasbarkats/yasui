@@ -43,9 +43,8 @@ export class AppService {
     req: Request,
     res: Response,
   ): void {
-    const message = `Cannot resolve ${req.method} ${req.path}`;
+    this.logger.error(`Cannot resolve ${req.method} ${req.path}`);
     res.sendStatus(HttpCode.NOT_FOUND);
-    this.logger.error(message);
   }
 
   /** pretty logs and client responses for errors */

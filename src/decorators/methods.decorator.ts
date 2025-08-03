@@ -47,6 +47,7 @@ function addRoute(
         target,
         descriptor,
         params,
+        false,
         defaultStatus
       ),
       methodName,
@@ -65,6 +66,7 @@ export function routeHandler(
   target: object,
   descriptor: PropertyDescriptor,
   params: IRouteParam[],
+  isMiddleware?: boolean,
   defaultStatus: HttpCode = HttpCode.OK,
 ): RequestHandler {
   const routeFunction: Function = descriptor.value;
@@ -89,10 +91,16 @@ export function routeHandler(
     const maxIndex = allIndexes.length > 0 ? Math.max(...allIndexes) : -1;
     const args: unknown[] = new Array(maxIndex + 1);
 
-    // Bind Express parameters (@Param, @Body, etc.)
+    // Bind Express parameters (@Param, @Body, etc.) with type transformation
     for (const param of params) {
-      args[param.index] = param.path.reduce((prev, curr) => prev && prev[curr] || null, routeHandlerArgs);
+      let value = param.path.reduce((prev, curr) => prev && prev[curr] || null, routeHandlerArgs);
+
+      if (value !== null && param.type && shouldTransformParam(param.path)) {
+        value = transformParamValue(value, param.type);
+      }
+      args[param.index] = value;
     }
+
     // Bind injected dependencies (@Inject)
     for (const indexStr in methodDeps) {
       const index = parseInt(indexStr);
@@ -101,11 +109,48 @@ export function routeHandler(
 
     try {
       const result: unknown = await routeFunction.apply(self, args);
-      res.status(defaultStatus).json(result);
+      if (!isMiddleware) {
+        res.status(defaultStatus).json(result);
+      }
     } catch (err) {
       next(err);
     }
   };
+}
+
+function shouldTransformParam(path: string[]): boolean {
+  if (path.length < 2) {
+    return false;
+  }
+  return (
+    path[1] === 'params' ||
+    path[1] === 'query' ||
+    path[1] === 'headers'
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function transformParamValue(value: string, paramType: Function): any {
+  switch (paramType) {
+    case Number:
+      return Number(value);
+    case Boolean:
+      return value === 'true' || value === '1';
+    case Date:
+      return new Date(<string>value);
+    case Array:
+      return Array.isArray(value)
+        ? value
+        : new Array(value);
+    case String:
+      return value;
+    default:
+      try {
+        return JSON.parse(value);
+      } catch {
+        return {};
+      }
+  }
 }
 
 
