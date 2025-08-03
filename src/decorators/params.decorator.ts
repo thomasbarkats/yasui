@@ -35,6 +35,7 @@ function extractParam(
     if (!propertyKey) {
       return;
     }
+
     /** construct param access path */
     const path: string[] = [source];
     for (const node of [reqProperty, varName]) {
@@ -43,11 +44,17 @@ function extractParam(
       }
     }
 
+    const paramTypes = getMetadata(ReflectMetadata.DESIGN_PARAM_TYPES, target, propertyKey) || [];
+    const paramType = paramTypes[parameterIndex];
     const methodName = String(propertyKey);
-    const routeParam: IRouteParam = { index: parameterIndex, path };
-    const routeParams = getMetadata(ReflectMetadata.PARAMS, target, methodName) || [];
-
+    const routeParam: IRouteParam = { 
+      index: parameterIndex, 
+      type: paramType,
+      path,
+    };
+  
     /** add mapped param to route metadata */
+    const routeParams = getMetadata(ReflectMetadata.PARAMS, target, methodName) || [];
     defineMetadata(
       ReflectMetadata.PARAMS,
       [...routeParams, routeParam],

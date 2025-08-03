@@ -24,5 +24,6 @@ export interface IControllerRoute {
 
 export interface IRouteParam {
   index: number;
+  type: Function;
   path: string[];
 }

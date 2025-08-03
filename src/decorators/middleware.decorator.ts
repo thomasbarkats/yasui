@@ -25,6 +25,7 @@ export const Middleware = (): ClassDecorator => {
         target.prototype,
         descriptor,
         params,
+        true
       );
     };
   };
