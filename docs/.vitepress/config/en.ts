@@ -12,7 +12,8 @@ export default {
       { text: 'Team', link: '/team' },
     ],
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/thomasbarkats/yasui' }
+      { icon: 'github', link: 'https://github.com/thomasbarkats/yasui' },
+      { icon: 'npm', link: 'http://npmjs.com/package/yasui' }
     ],
     sidebar: [
       {
@@ -32,7 +33,7 @@ export default {
           { text: 'Dependency Injection', link: '/reference/dependency-injection' },
           { text: 'Logging', link: '/reference/logging' },
           { text: 'Error Handling', link: '/reference/error-handling' },
-          { text: 'Swagger', link: '/reference/swagger' }
+          { text: 'Swagger Doc.', link: '/reference/swagger' }
         ]
       }
     ]

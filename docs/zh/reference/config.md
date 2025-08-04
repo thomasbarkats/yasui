@@ -1,13 +1,13 @@
 # 配置
 
-YasuiJS 应用程序使用 `yasui.createServer()` 和 `yasui.createApp()` 的完整配置参考。
+使用 `yasui.createServer()` 和 `yasui.createApp()` 的 YasuiJS 应用程序完整配置参考。
 
 ## 概述
 
-YasuiJS 提供了两种主要方式来创建应用程序：
+YasuiJS 提供两种主要方式来创建应用程序：
 
 - **`yasui.createServer(config)`** - 自动创建并启动 HTTP 服务器
-- **`yasui.createApp(config)`** - 返回一个 Express 应用程序，用于手动配置
+- **`yasui.createApp(config)`** - 返回一个可手动配置的 Express 应用程序
 
 这两种方法都接受相同的配置对象，具有以下选项。
 
@@ -20,7 +20,7 @@ YasuiJS 提供了两种主要方式来创建应用程序：
 **描述:** 要在应用程序中注册的控制器类数组。
 
 ```typescript
-import { UserController, ProductController } from './controllers';
+import yasui from 'yasui';
 
 yasui.createServer({
   controllers: [UserController, ProductController]
@@ -35,9 +35,6 @@ yasui.createServer({
 **描述:** 应用于所有请求的全局中间件数组。可以是 YasuiJS 中间件类或 Express RequestHandler 函数。
 
 ```typescript
-import { LoggingMiddleware } from './middleware';
-import cors from 'cors';
-
 yasui.createServer({
   controllers: [UserController],
   middlewares: [LoggingMiddleware, cors()]
@@ -59,7 +56,7 @@ yasui.createServer({
 #### `port`
 **类型:** `number`  
 **默认值:** `3000`  
-**描述:** HTTP 服务器的端口号。仅与 `createServer()` 一起使用。
+**描述:** HTTP 服务器的端口号。仅用于 `createServer()`。
 
 ```typescript
 yasui.createServer({
@@ -83,7 +80,7 @@ yasui.createServer({
 #### `injections`
 **类型:** `Array<{ token: string, provide: any }>`  
 **默认值:** `[]`  
-**描述:** 用于依赖注入的自定义注入令牌。详情请参阅[依赖注入](/zh/reference/dependency-injection)。
+**描述:** 依赖注入的自定义注入令牌。详见 [依赖注入](/zh/reference/dependency-injection)。
 
 ```typescript
 yasui.createServer({
@@ -98,7 +95,7 @@ yasui.createServer({
 #### `swagger`
 **类型:** `SwaggerConfig | undefined`  
 **默认值:** `undefined`  
-**描述:** Swagger 文档配置。详情请参阅 [Swagger](/zh/reference/swagger)。
+**描述:** Swagger 文档配置。详见 [Swagger](/zh/reference/swagger)。
 
 ```typescript
 yasui.createServer({
@@ -118,7 +115,7 @@ yasui.createServer({
 #### `enableDecoratorValidation`
 **类型:** `boolean`  
 **默认值:** `true`  
-**描述:** 在启动时启用装饰器验证，以捕获配置错误。
+**描述:** 在启动时启用装饰器验证以捕获配置错误。
 
 ```typescript
 yasui.createServer({
@@ -127,7 +124,7 @@ yasui.createServer({
 });
 ```
 
-## createServer() 与 createApp()
+## createServer() 与 createApp() 的比较
 
 ### createServer()
 
@@ -142,17 +139,17 @@ yasui.createServer({
   debug: true
 });
 
-// 服务器自动启动并监听 3000 端口
+// 服务器自动启动并在端口 3000 上监听
 ```
 
 **适用场景：**
-- 你想立即启动服务器
-- 你不需要额外的 Express 配置
-- 你正在构建一个简单的 API
+- 想要立即启动服务器
+- 不需要额外的 Express 配置
+- 构建简单的 API
 
 ### createApp()
 
-返回一个 Express 应用程序，用于手动配置：
+返回一个可手动配置的 Express 应用程序：
 
 ```typescript
 import yasui from 'yasui';
@@ -178,19 +175,16 @@ app.listen(3000, () => {
 ```
 
 **适用场景：**
-- 你需要自定义 Express 配置
-- 你想添加自定义路由或中间件
-- 你需要更多地控制服务器启动
-- 你正在与现有的 Express 应用程序集成
+- 需要自定义 Express 配置
+- 想要添加自定义路由或中间件
+- 需要更多服务器启动控制
+- 与现有 Express 应用程序集成
 
 ## 配置示例
 
 ### 基本 API 设置
 
 ```typescript
-import yasui from 'yasui';
-import { UserController, AuthController } from './controllers';
-
 yasui.createServer({
   controllers: [UserController, AuthController],
   port: 3000,
@@ -201,10 +195,6 @@ yasui.createServer({
 ### 完整配置
 
 ```typescript
-import yasui from 'yasui';
-import { UserController, AuthController } from './controllers';
-import { AuthMiddleware, LoggingMiddleware } from './middleware';
-
 yasui.createServer({
   controllers: [UserController, AuthController],
   middlewares: [LoggingMiddleware, AuthMiddleware],

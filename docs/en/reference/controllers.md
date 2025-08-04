@@ -17,11 +17,6 @@ export class UserController {
   getAllUsers() {
     return { users: [] }; // Automatically returns JSON
   }
-
-  @Post('/')
-  createUser() {
-    return { message: 'User created' }; // Automatically returns JSON
-  }
 }
 ```
 
@@ -43,8 +38,6 @@ export class UserController {
 You can apply middleware to all routes in a controller. Learn more in [Middlewares](/reference/middlewares).
 
 ```typescript
-import { AuthMiddleware } from './middleware/auth.middleware';
-
 @Controller('/api/users', AuthMiddleware)
 export class UserController {
   // All routes will have AuthMiddleware applied
@@ -71,14 +64,16 @@ export class UserController {
     return { users: [] };
   }
 
-  @Get('/:id')
-  getUser() {
-    return { user: {} };
-  }
-
   @Post('/')
   createUser() {
     return { message: 'User created' };
+  }
+
+  @Get('/:id')
+  getUser() {
+    // Use Express-style route parameters in your paths:
+    // Route: GET /api/users/123
+    return { user: {} };
   }
 
   @Put('/:id')
@@ -93,138 +88,25 @@ export class UserController {
 }
 ```
 
-### Route Parameters
-
-Use Express-style route parameters in your paths:
-
-```typescript
-@Controller('/api/users')
-export class UserController {
-  @Get('/:id')
-  getUser() {
-    // Route: GET /api/users/123
-  }
-
-  @Get('/:id/posts/:postId')
-  getUserPost() {
-    // Route: GET /api/users/123/posts/456
-  }
-
-  @Get('/search/:category?')
-  searchUsers() {
-    // Route: GET /api/users/search or /api/users/search/admin
-  }
-}
-```
-
 ### Route-Level Middleware
 
 Apply middleware to specific routes. Learn more in [Middlewares](/reference/middlewares).
 
 ```typescript
-import { ValidationMiddleware, AuthMiddleware } from './middleware';
-
 @Controller('/api/users')
 export class UserController {
   @Get('/', ValidationMiddleware)
-  getAllUsers() {
-    // Only this route has ValidationMiddleware
-  }
-
-  @Post('/', AuthMiddleware, ValidationMiddleware)
-  createUser() {
-    // This route has both middlewares
-  }
+  getAllUsers() {}
 }
 ```
 
 ## Parameter Decorators
 
-Extract data from HTTP requests using parameter decorators. All parameter decorators can be used with or without a parameter name to extract specific values or entire objects.
-
-### Request Object Access
-
-- `@Req()` - Access Express Request object (no parameters)
-- `@Res()` - Access Express Response object (no parameters)
-- `@Next()` - Access Express NextFunction (no parameters)
-
-Access Express request, response, and next objects:
-
-```typescript
-import { Request, Response, NextFunction } from 'express';
-
-@Controller('/api/users')
-export class UserController {
-  @Get('/')
-  getAllUsers(
-    @Req() request: Request,
-    @Res() response: Response,
-    @Next() next: NextFunction
-  ) {
-    // Direct access to Express objects
-    console.log(request.url);
-    return { users: [] };
-  }
-}
-```
-
-### Extract Route Parameters
-
-- `@Param(name?)` - Extract route parameters (optional parameter name)
-
-```typescript
-@Controller('/api/users')
-export class UserController {
-  @Get('/:id')
-  getUser(@Param('id') id: string) {
-    // Extract specific parameter
-    return { userId: id };
-  }
-
-  @Get('/:id/posts/:postId')
-  getUserPost(
-    @Param('id') userId: string,
-    @Param('postId') postId: string
-  ) {
-    // Extract multiple parameters
-    return { userId, postId };
-  }
-
-  @Get('/all')
-  getAllWithParams(@Param() params: any) {
-    // Get all route parameters as object
-    return { params };
-  }
-}
-```
-
-### Extract Query Parameters
-
-- `@Query(name?)` - Extract query parameters (optional parameter name)
-
-```typescript
-@Controller('/api/users')
-export class UserController {
-  @Get('/')
-  getUsers(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10
-  ) {
-    // Extract specific query parameters with defaults
-    return { page, limit };
-  }
-
-  @Get('/search')
-  searchUsers(@Query() query: any) {
-    // Get all query parameters as object
-    return { searchParams: query };
-  }
-}
-```
+Extract data from HTTP requests using parameter decorators. YasuiJS automatically transforms parameters based on their TypeScript types for better type safety.
 
 ### Extract Request Body
 
-- `@Body(name?)` - Extract request body data (optional parameter name)
+- `@Body(name?)` - Extract request body data
 
 ```typescript
 @Controller('/api/users')
@@ -243,23 +125,76 @@ export class UserController {
 }
 ```
 
-### Extract Headers
+### Extract Parameters & Headers
 
-- `@Header(name?)` - Extract request headers (optional parameter name)
+- `@Param(name)` - Extract route parameters
+- `@Query(name)` - Extract query parameters
+- `@Header(name?)` - Extract request headers
+
+Parameters are automatically transformed based on their TypeScript types:
 
 ```typescript
 @Controller('/api/users')
 export class UserController {
-  @Get('/')
-  getUsers(@Header('authorization') auth: string) {
-    // Extract specific header
-    return { authHeader: auth };
+  @Get('/:id')
+  getUser(@Param('id') id: number) { 
+    // Automatically converted to number
   }
 
-  @Get('/all-headers')
-  getUsersWithHeaders(@Header() headers: any) {
-    // Get all headers as object
-    return { headers };
+  @Get('/search')
+  searchUsers(
+    @Query('page') page: number,
+    @Query('active') active: boolean,
+    @Query('tags') tags: string[]
+  ) {
+    // page: number (converted from "123" to 123)
+    // active: boolean (converted from "true"/"1" to true)
+    // tags: string[] (from ?tags=red&tags=blue)
+    return { page, active, tags };
+  }
+
+  @Get('/profile')
+  getProfile(
+    @Query('settings') settings: { theme: string },
+    @Header('x-api-version') version: number
+  ) {
+    // settings: object (from ?settings={"theme":"dark"} - JSON parsed)
+    // version: number (header converted to number)
+    return { settings, version };
+  }
+}
+```
+
+### Supported Type Transformations
+
+YasuiJS automatically converts parameters based on TypeScript types:
+
+- **string** - No conversion (default)
+- **number** - Converts to number, returns NaN if invalid
+- **boolean** - Converts "true"/"1" to true, everything else to false
+- **Date** - Converts to Date object, returns Invalid Date if invalid
+- **string[]** - For query arrays like `?tags=red&tags=blue`
+- **object** - Parses JSON strings for queries like `?data={"key":"value"}`
+
+### Request Object Access
+
+- `@Req()` - Access Express Request object
+- `@Res()` - Access Express Response object
+- `@Next()` - Access Express NextFunction
+
+```typescript
+import { Request, Response, NextFunction } from 'yasui';
+
+@Controller('/api/users')
+export class UserController {
+  @Get('/')
+  getAllUsers(
+    @Req() request: Request,
+    @Res() response: Response,
+    @Next() next: NextFunction
+  ) {
+    console.log(request.url);
+    return { users: [] };
   }
 }
 ```
@@ -297,7 +232,7 @@ export class UserController {
 
 ### Custom Status Codes
 
-- `@HttpStatus(code)` - Set custom HTTP status code (required status code parameter, accepts number or HttpCode enum)
+- `@HttpStatus(code)` - Set custom HTTP status code
 
 Use the `@HttpStatus()` decorator to set custom status codes:
 
@@ -306,15 +241,8 @@ import { HttpStatus, HttpCode } from 'yasui';
 
 @Controller('/api/users')
 export class UserController {
-  @Post('/')
-  @HttpStatus(201) // Using number
-  createUser(@Body() userData: any) {
-    // Returns with status 201 Created
-    return { created: userData };
-  }
-
   @Post('/alt')
-  @HttpStatus(HttpCode.CREATED) // Using HttpCode enum
+  @HttpStatus(201) // Using number
   createUserAlt(@Body() userData: any) {
     // Returns with status 201 Created
     return { created: userData };
@@ -334,7 +262,7 @@ export class UserController {
 For complete control, use the Express response object:
 
 ```typescript
-import { Response } from 'express';
+import { Response } from 'yasui';
 
 @Controller('/api/users')
 export class UserController {
@@ -346,33 +274,9 @@ export class UserController {
     });
     // Don't return anything when using res directly
   }
-
-  @Get('/file')
-  downloadFile(@Res() res: Response) {
-    res.download('/path/to/file.pdf');
-  }
 }
 ```
 
 ## Error Handling
 
 Let the framework handle errors automatically or throw custom errors. For complete error handling details, see [Error Handling](/reference/error-handling).
-
-```typescript
-import { HttpError, HttpCode } from 'yasui';
-
-@Controller('/api/users')
-export class UserController {
-  @Get('/:id')
-  getUser(@Param('id') id: string) {
-    const user = this.userService.findById(id);
-    
-    if (!user) {
-      // Throw custom HTTP error
-      throw new HttpError(HttpCode.NOT_FOUND, 'User not found');
-    }
-    
-    return user;
-  }
-}
-```

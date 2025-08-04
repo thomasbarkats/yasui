@@ -20,7 +20,7 @@ Both methods accept the same configuration object with the following options.
 **Description:** Array of controller classes to register in your application.
 
 ```typescript
-import { UserController, ProductController } from './controllers';
+import yasui from 'yasui';
 
 yasui.createServer({
   controllers: [UserController, ProductController]
@@ -35,9 +35,6 @@ yasui.createServer({
 **Description:** Array of global middlewares to apply to all requests. Can be YasuiJS middleware classes or Express RequestHandler functions.
 
 ```typescript
-import { LoggingMiddleware } from './middleware';
-import cors from 'cors';
-
 yasui.createServer({
   controllers: [UserController],
   middlewares: [LoggingMiddleware, cors()]
@@ -188,9 +185,6 @@ app.listen(3000, () => {
 ### Basic API Setup
 
 ```typescript
-import yasui from 'yasui';
-import { UserController, AuthController } from './controllers';
-
 yasui.createServer({
   controllers: [UserController, AuthController],
   port: 3000,
@@ -201,10 +195,6 @@ yasui.createServer({
 ### Complete Configuration
 
 ```typescript
-import yasui from 'yasui';
-import { UserController, AuthController } from './controllers';
-import { AuthMiddleware, LoggingMiddleware } from './middleware';
-
 yasui.createServer({
   controllers: [UserController, AuthController],
   middlewares: [LoggingMiddleware, AuthMiddleware],

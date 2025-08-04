@@ -1,49 +1,46 @@
 # Gestion des Erreurs
 
-YasuiJS fournit une gestion et un formatage automatiques des erreurs pour la journalisation et les réponses client. Toutes les méthodes de contrôleur sont automatiquement enveloppées avec une gestion d'erreurs pour capturer et traiter toutes les erreurs levées.
+YasuiJS fournit une gestion et un formatage automatiques des erreurs pour la journalisation et les réponses client. Toutes les méthodes du contrôleur sont automatiquement encapsulées avec une gestion des erreurs pour capturer et traiter toutes les erreurs levées.
 
 ## Aperçu
 
 Lorsqu'une erreur se produit dans votre application, YasuiJS automatiquement :
 - Enregistre l'erreur avec des informations détaillées (URL, méthode, statut, message)
-- Formate et l'envoie au client sous forme de réponse JSON
-- Inclut le code de statut HTTP, les détails de l'erreur, les informations de la requête et toutes données d'erreur supplémentaires
+- La formate et l'envoie au client sous forme de réponse JSON
+- Inclut le code de statut HTTP, les détails de l'erreur, les informations de la requête et toutes les données d'erreur supplémentaires
 
 ```typescript
-@Controller('/users')
-export class UserController {
-  @Get('/:id')
-  getUser(@Param('id') id: string) {
-    const user = this.userService.findById(id);
-    
-    if (!user) {
-      // Cette erreur sera automatiquement capturée et formatée
-      throw new HttpError(HttpCode.NOT_FOUND, 'User not found');
-    }
-    return user;
+@Get('/:id')
+getUser(@Param('id') id: string) {
+  const user = this.userService.findById(id);
+
+  if (!user) {
+    // Cette erreur sera automatiquement capturée et formatée
+    throw new Error('Utilisateur non trouvé');
   }
+  return user;
 }
 ```
 
-## Gestion d'Erreurs Personnalisée
+## Gestion Personnalisée des Erreurs
 
 ### Classe HttpError
 
-Créez des erreurs personnalisées avec des codes de statut spécifiques et des données supplémentaires en étendant ou en utilisant la classe `HttpError`. Votre erreur personnalisée doit définir les propriétés `status` et `message` et peut inclure toutes propriétés supplémentaires.
+Créez des erreurs personnalisées avec des codes de statut spécifiques et des données supplémentaires en étendant ou en utilisant la classe `HttpError`. Votre erreur personnalisée doit définir les propriétés `status` et `message` et peut inclure des propriétés supplémentaires.
 
 ```typescript
 import { HttpError, HttpCode } from 'yasui';
 
 @Controller('/users')
 export class UserController {
+
  @Get('/:id')
  getUser(@Param('id') id: string) {
    const user = this.userService.findById(id);
-   
+
    if (!user) {
-     throw new HttpError(HttpCode.NOT_FOUND, 'User not found');
+     throw new HttpError(HttpCode.NOT_FOUND, 'Utilisateur non trouvé');
    }
-   
    return user;
  }
 }
@@ -57,46 +54,30 @@ Créez des classes d'erreur personnalisées pour des erreurs de logique métier 
 class ValidationError extends HttpError {
   fields: string[];
 
-  constructor(message: string, fields: string[]) {
-    super(HttpCode.BAD_REQUEST, message);
+  constructor(fields: string[]) {
+    super(HttpCode.BAD_REQUEST, 'Champs requis manquants');
     this.fields = fields;
   }
 }
 
 @Controller('/users')
 export class UserController {
+
   @Post('/')
   createUser(@Body() userData: any) {
     const missingFields = this.validateUserData(userData);
-    
+
     if (missingFields.length > 0) {
-      throw new ValidationError('Missing required fields', missingFields);
+      throw new ValidationError(missingFields);
     }
-    
     return this.userService.createUser(userData);
   }
 }
 ```
 
-## Enum HttpCode
+## Énumération HttpCode
 
 YasuiJS fournit une énumération `HttpCode` avec les codes de statut HTTP courants. Pour une liste complète des codes de statut HTTP et leurs significations, consultez la [documentation des codes de statut de réponse HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status).
-
-```typescript
-import { HttpCode } from 'yasui';
-
-@Controller('/api')
-export class ApiController {
-  @Delete('/:id')
-  deleteItem(@Param('id') id: string) {
-    if (!this.service.exists(id)) {
-      throw new HttpError(HttpCode.NOT_FOUND, 'Item not found');
-    }
-    
-    this.service.delete(id);
-  }
-}
-```
 
 ## Format de Réponse d'Erreur
 
@@ -104,55 +85,36 @@ Lorsqu'une erreur est levée, YasuiJS la formate automatiquement en une réponse
 
 ```json
 {
-  "error": {
-    "status": 404,
-    "message": "User not found",
-    "timestamp": "2024-01-15T10:30:00.000Z",
-    "path": "/api/users/123",
-    "method": "GET",
-    "data": {
-      "resourceType": "User",
-      "resourceId": "123"
-    }
+  "url": "http://localhost:3000/api/users/123",
+  "path": "/api/users/123",
+  "method": "POST",
+  "name": "ValidationError", // Nom de la classe d'erreur
+  "message": "Champs requis manquants",
+  "statusMessage": "Bad Request", // Message de statut HTTP
+  "status": 404, // Code de statut HTTP
+  "data": {
+    "fields": ["name", "age"]
   }
 }
 ```
 
-La réponse inclut :
-- **status** : Code de statut HTTP
-- **message** : Message d'erreur
-- **timestamp** : Quand l'erreur s'est produite
-- **path** : Chemin de la requête où l'erreur s'est produite
-- **method** : Méthode HTTP
-- **data** : Toutes propriétés supplémentaires de votre erreur personnalisée
+Les propriétés des erreurs personnalisées héritant de HttpError seront incluses dans `data`.
 
 ## Gestion des Erreurs dans les Services
 
-Les services peuvent lever des erreurs qui seront automatiquement capturées lorsqu'ils sont appelés depuis les contrôleurs :
+Les services ou tout Injectable peuvent lever des erreurs qui seront automatiquement capturées lorsqu'elles sont appelées depuis les contrôleurs :
 
 ```typescript
 @Injectable()
 export class UserService {
+
   findById(id: string) {
     const user = this.database.findUser(id);
-    
     if (!user) {
       // Ceci sera capturé par le gestionnaire d'erreurs du contrôleur
-      throw new HttpError(HttpCode.NOT_FOUND, 'User not found');
+      throw new HttpError(HttpCode.NOT_FOUND, 'Utilisateur non trouvé');
     }
-    
     return user;
-  }
-
-  createUser(userData: any) {
-    if (this.emailExists(userData.email)) {
-      throw new HttpError(HttpCode.CONFLICT, 'Email already exists', {
-        email: userData.email,
-        suggestion: 'Try logging in instead'
-      });
-    }
-    
-    return this.database.createUser(userData);
   }
 }
 ```
@@ -173,7 +135,7 @@ export class ServiceB {
   constructor(private serviceA: ServiceA) {} // Dépendance circulaire détectée !
 }
 
-// Un décorateur de paramètre manquant sera détecté
+// Le décorateur de paramètre manquant sera détecté
 @Controller('/users')
 export class UserController {
   @Get('/:id')
@@ -188,6 +150,6 @@ Vous pouvez désactiver la validation des décorateurs dans la configuration (no
 ```typescript
 yasui.createServer({
   controllers: [UserController],
-  enableDecoratorValidation: false // Dangereux - désactive la validation
+  enableDecoratorValidation: false // Non sécurisé - désactive la validation
 });
 ```

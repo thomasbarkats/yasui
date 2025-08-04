@@ -34,8 +34,11 @@ export class LoggingMiddleware {
 The `@Middleware()` decorator defines a class as middleware. The class must implement a `use()` method. You can optionally implement the `IMiddleware` interface provided by YasuiJS to enforce the method signature.
 
 ```typescript
-import { Middleware, IMiddleware, Req, Res, Next } from 'yasui';
-import { Request, Response, NextFunction } from 'express';
+import {
+  Middleware, IMiddleware,
+  Request, Response, NextFunction,
+  Req, Res, Next,
+} from 'yasui';
 
 @Middleware()
 export class AuthMiddleware implements IMiddleware {
@@ -49,9 +52,9 @@ export class AuthMiddleware implements IMiddleware {
     if (!token) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    
     // Validate token logic here
-    next(); // Continue to next middleware or controller
+
+    next(); // Continue to next middleware or controller logic
   }
 }
 ```
@@ -109,28 +112,11 @@ You can use standard Express middleware functions directly:
 ```typescript
 import cors from 'cors';
 import helmet from 'helmet';
-import { Request, Response, NextFunction } from 'express';
-
-// Function middleware
-function customMiddleware(req: Request, res: Response, next: NextFunction) {
-  console.log(`${req.method} ${req.path}`);
-  next();
-}
-
-// Function that returns middleware
-function rateLimiter(maxRequests: number) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    // Rate limiting logic
-    next();
-  };
-}
 
 yasui.createServer({
   middlewares: [
     cors(),
     helmet(),
-    customMiddleware,
-    rateLimiter(100)
   ]
 });
 ```
@@ -142,9 +128,6 @@ yasui.createServer({
 Applied to all requests across your entire application:
 
 ```typescript
-import yasui from 'yasui';
-import { LoggingMiddleware, SecurityMiddleware } from './middleware';
-
 yasui.createServer({
   controllers: [UserController],
   middlewares: [LoggingMiddleware, SecurityMiddleware]
@@ -156,8 +139,6 @@ yasui.createServer({
 Applied to all routes within a specific controller:
 
 ```typescript
-import { AuthMiddleware, ValidationMiddleware } from './middleware';
-
 // Single middleware
 @Controller('/api/users', AuthMiddleware)
 export class UserController {
@@ -176,8 +157,6 @@ export class AdminController {
 Applied to specific routes only:
 
 ```typescript
-import { AuthMiddleware, ValidationMiddleware } from './middleware';
-
 @Controller('/api/users')
 export class UserController {
   @Get('/')

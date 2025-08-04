@@ -2,11 +2,11 @@
 
 Les middlewares traitent les requêtes dans un pipeline avant qu'elles n'atteignent vos contrôleurs. Ils gèrent les préoccupations transversales comme l'authentification, la journalisation, la validation et la transformation des requêtes.
 
-## Aperçu
+## Vue d'ensemble
 
 YasuiJS prend en charge deux types de middlewares :
 - **Middlewares basés sur des classes** utilisant le décorateur `@Middleware()`
-- **Fonctions RequestHandler d'Express** pour la compatibilité avec les middlewares Express existants
+- **Fonctions RequestHandler Express** pour la compatibilité avec les middlewares Express existants
 
 Les middlewares peuvent être appliqués à trois niveaux avec différentes priorités d'exécution :
 1. **Niveau application** - Appliqué à toutes les requêtes
@@ -19,7 +19,7 @@ import { Middleware, NextFunction } from 'yasui';
 @Middleware()
 export class LoggingMiddleware {
   use(@Next() next: NextFunction) {
-    console.log('Request received');
+    console.log('Requête reçue');
     next();
   }
 }
@@ -31,11 +31,14 @@ export class LoggingMiddleware {
 
 - `@Middleware()` - Marque une classe comme middleware (pas de paramètres)
 
-Le décorateur `@Middleware()` définit une classe comme middleware. La classe doit implémenter une méthode `use()`. Vous pouvez éventuellement implémenter l'interface `IMiddleware` fournie par YasuiJS pour imposer la signature de la méthode.
+Le décorateur `@Middleware()` définit une classe comme middleware. La classe doit implémenter une méthode `use()`. Vous pouvez optionnellement implémenter l'interface `IMiddleware` fournie par YasuiJS pour imposer la signature de la méthode.
 
 ```typescript
-import { Middleware, IMiddleware, Req, Res, Next } from 'yasui';
-import { Request, Response, NextFunction } from 'express';
+import {
+  Middleware, IMiddleware,
+  Request, Response, NextFunction,
+  Req, Res, Next,
+} from 'yasui';
 
 @Middleware()
 export class AuthMiddleware implements IMiddleware {
@@ -47,16 +50,16 @@ export class AuthMiddleware implements IMiddleware {
     const token = req.headers.authorization;
     
     if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      return res.status(401).json({ error: 'Non autorisé' });
     }
-    
-    // Validate token logic here
-    next(); // Continue to next middleware or controller
+    // Logique de validation du token ici
+
+    next(); // Continue vers le prochain middleware ou la logique du contrôleur
   }
 }
 ```
 
-### Décorateurs de paramètres dans les middlewares
+### Décorateurs de paramètres dans les Middlewares
 
 Les middlewares peuvent utiliser les mêmes décorateurs de paramètres que les contrôleurs :
 
@@ -70,23 +73,23 @@ export class ValidationMiddleware {
     @Next() next: NextFunction
   ) {
     if (shouldValidate && !this.isValid(body)) {
-      throw new Error('Invalid request data');
+      throw new Error('Données de requête invalides');
     }
     
     next();
   }
   
   private isValid(data: any): boolean {
-    // Validation logic
+    // Logique de validation
     return true;
   }
 }
 ```
 
-### Exécution des middlewares
+### Exécution des Middlewares
 
-Vous devez explicitement appeler `next()` pour continuer vers le middleware ou le contrôleur suivant. Pour arrêter le pipeline de requêtes, vous pouvez soit :
-- Renvoyer une réponse en utilisant `@Res()`
+Vous devez explicitement appeler `next()` pour continuer vers le prochain middleware ou contrôleur. Pour arrêter le pipeline de requête, vous pouvez soit :
+- Retourner une réponse en utilisant `@Res()`
 - Lancer une erreur
 - Ne pas appeler `next()`
 
@@ -95,104 +98,80 @@ Vous devez explicitement appeler `next()` pour continuer vers le middleware ou l
 export class ConditionalMiddleware {
   use(@Req() req: Request, @Next() next: NextFunction) {
     if (req.path === '/public') {
-      next(); // Continue pipeline
+      next(); // Continue le pipeline
     }
-    // Don't call next() to stop here
+    // Ne pas appeler next() pour arrêter ici
   }
 }
 ```
 
-## Middlewares RequestHandler d'Express
+## Middlewares RequestHandler Express
 
-Vous pouvez utiliser directement les fonctions middleware standard d'Express :
+Vous pouvez utiliser directement les fonctions middleware Express standard :
 
 ```typescript
 import cors from 'cors';
 import helmet from 'helmet';
-import { Request, Response, NextFunction } from 'express';
-
-// Function middleware
-function customMiddleware(req: Request, res: Response, next: NextFunction) {
-  console.log(`${req.method} ${req.path}`);
-  next();
-}
-
-// Function that returns middleware
-function rateLimiter(maxRequests: number) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    // Rate limiting logic
-    next();
-  };
-}
 
 yasui.createServer({
   middlewares: [
     cors(),
     helmet(),
-    customMiddleware,
-    rateLimiter(100)
   ]
 });
 ```
 
-## Niveaux d'utilisation des middlewares
+## Niveaux d'utilisation des Middlewares
 
-### Niveau application
+### Niveau Application
 
-Appliqué à toutes les requêtes dans l'ensemble de votre application :
+Appliqué à toutes les requêtes dans votre application :
 
 ```typescript
-import yasui from 'yasui';
-import { LoggingMiddleware, SecurityMiddleware } from './middleware';
-
 yasui.createServer({
   controllers: [UserController],
   middlewares: [LoggingMiddleware, SecurityMiddleware]
 });
 ```
 
-### Niveau contrôleur
+### Niveau Contrôleur
 
-Appliqué à toutes les routes au sein d'un contrôleur spécifique :
+Appliqué à toutes les routes dans un contrôleur spécifique :
 
 ```typescript
-import { AuthMiddleware, ValidationMiddleware } from './middleware';
-
-// Single middleware
+// Middleware unique
 @Controller('/api/users', AuthMiddleware)
 export class UserController {
-  // All routes require authentication
+  // Toutes les routes nécessitent une authentification
 }
 
-// Multiple middlewares
+// Plusieurs middlewares
 @Controller('/api/admin', AuthMiddleware, ValidationMiddleware)
 export class AdminController {
-  // All routes have auth + validation
+  // Toutes les routes ont auth + validation
 }
 ```
 
-### Niveau point de terminaison
+### Niveau Point de Terminaison
 
 Appliqué uniquement à des routes spécifiques :
 
 ```typescript
-import { AuthMiddleware, ValidationMiddleware } from './middleware';
-
 @Controller('/api/users')
 export class UserController {
   @Get('/')
   getUsers() {
-    // No middleware
+    // Pas de middleware
   }
   
   @Post('/', ValidationMiddleware)
   createUser() {
-    // Only validation middleware
+    // Uniquement middleware de validation
   }
   
   @Delete('/:id', AuthMiddleware, ValidationMiddleware)
   deleteUser() {
-    // Both auth and validation middlewares
+    // Les deux middlewares auth et validation
   }
 }
 ```
@@ -207,16 +186,16 @@ Les middlewares s'exécutent dans cet ordre :
 4. **Méthode du contrôleur**
 
 ```typescript
-// Execution order example:
+// Exemple d'ordre d'exécution :
 yasui.createServer({
-  middlewares: [GlobalMiddleware] // 1. First
+  middlewares: [GlobalMiddleware] // 1. Premier
 });
 
-@Controller('/users', ControllerMiddleware) // 2. Second
+@Controller('/users', ControllerMiddleware) // 2. Deuxième
 export class UserController {
-  @Post('/', EndpointMiddleware) // 3. Third
+  @Post('/', EndpointMiddleware) // 3. Troisième
   createUser() {
-    // 4. Finally the controller method
+    // 4. Finalement la méthode du contrôleur
   }
 }
 ```

@@ -1,14 +1,14 @@
 # Documentation API (Swagger)
 
-YasuiJS fournit une génération de documentation OpenAPI avec une intégration optionnelle de Swagger UI. Il génère automatiquement la documentation à partir de vos décorateurs existants et vous permet de l'améliorer avec des métadonnées supplémentaires.
+YasuiJS fournit la génération de documentation OpenAPI avec une intégration optionnelle de Swagger UI. Il génère automatiquement la documentation à partir de vos décorateurs existants et vous permet de l'enrichir avec des métadonnées supplémentaires.
 
 ## Configuration
 
 ### Configuration de base
 
-Activez Swagger en ajoutant la configuration à votre application. YasuiJS génère automatiquement la documentation à partir de vos contrôleurs, routes et décorateurs.
+Activez Swagger en ajoutant la configuration à votre application. YasuiJS génère la documentation à partir de vos contrôleurs, routes et décorateurs.
 
-**Remarque**: Vous devez installer `swagger-ui-express` séparément:
+**Note**: Vous devez installer `swagger-ui-express` séparément :
 ```bash
 npm install swagger-ui-express
 ```
@@ -16,17 +16,18 @@ npm install swagger-ui-express
 ```typescript
 yasui.createServer({
   controllers: [UserController],
-  swagger: {
-    enabled: true,
-    info: {
-      title: 'My API',
-      version: '1.0.0'
-    }
-  }
+  swagger: { enabled: true }
 });
 ```
 
-La documentation sera accessible à `/api-docs` (chemin par défaut) et la spécification JSON à `/api-docs.json`.
+La documentation sera accessible à `/api-docs` (chemin par défaut) et la spécification JSON à `/api-docs/swagger.json`.
+
+YasuiJS génère automatiquement une documentation de base à partir de vos contrôleurs et décorateurs de route existants, même sans décorateurs spécifiques à Swagger. Le framework détecte :
+- **Paramètres**: Les paramètres de chemin, les paramètres de requête et les en-têtes sont automatiquement détectés avec le type `string` par défaut
+- **Corps de la requête**: Automatiquement détecté lorsque présent avec un schéma `{}` par défaut
+- **Réponses**: Seul le code de statut 200 (ou le statut par défaut si `@HttpStatus` est présent) est détecté sans information de schéma
+
+Les sections suivantes décrivent comment enrichir cette documentation avec des métadonnées supplémentaires et un typage précis.
 
 ### Configuration complète
 
@@ -35,176 +36,187 @@ yasui.createServer({
   controllers: [UserController],
   swagger: {
     enabled: true,
-    path: '/docs', // Chemin personnalisé
+    path: '/docs', // Chemin personnalisé, spécification JSON à `/docs/swagger.json`
     info: {
-      title: 'User Management API',
+      title: 'API de Gestion des Utilisateurs',
       version: '2.1.0',
-      description: 'Complete API for user management operations',
-      contact: {
-        name: 'API Support',
-        email: 'support@example.com'
-      },
-      license: {
-        name: 'MIT',
-        url: 'https://opensource.org/licenses/MIT'
-      }
+      description: 'API complète pour les opérations de gestion des utilisateurs',
     },
-    servers: [
-      {
-        url: 'https://api.example.com/v1',
-        description: 'Production server'
-      },
-      {
-        url: 'http://localhost:3000',
-        description: 'Development server'
-      }
-    ]
   }
 });
 ```
 
-## Documentation améliorée
+## Définition du Schéma
 
-Enrichissez la documentation API par défaut avec des décorateurs optionnels. Tous les décorateurs sont attachés à la méthode du point de terminaison:
+YasuiJS utilise des classes TypeScript avec des décorateurs de propriétés pour définir les schémas API. Les propriétés sont automatiquement déduites des métadonnées TypeScript lorsque les décorateurs sont utilisés sans paramètres.
 
-### Opération API
+Les schémas sont automatiquement enregistrés s'ils sont utilisés dans des décorateurs.
 
-- `@ApiOperation(summary, description?, tags?)` - Décrit le point de terminaison
+### `@ApiProperty(definition?)`
+Définit une propriété, requise par défaut. Prend en charge plusieurs formats de définition :
 
 ```typescript
-import { ApiOperation } from 'yasui';
+export class CreateUserDto {
+  @ApiProperty() // Type déduit de TypeScript
+  name: string;
 
-@Controller('/users')
-export class UserController {
-  @Get('/')
-  @ApiOperation('Get all users', 'Retrieve a list of all users in the system', ['users'])
-  getUsers() {
-    return this.userService.getAllUsers();
-  }
+  @ApiProperty({ type: 'string', format: 'email' }) // Schéma OpenAPI, personnalisation complète
+  username: string;
 
-  @Post('/')
-  @ApiOperation('Create user', 'Create a new user account')
-  createUser(@Body() userData: any) {
-    return this.userService.createUser(userData);
-  }
+  @ApiProperty({ enum: ['admin', 'user', 'moderator'] }) // Valeurs d'énumération
+  role: string;
+
+  @ApiProperty({ enum: UserStatus }) // Énumération TypeScript
+  status: UserStatus;
+
+  @ApiProperty([String]) // Tableau de types primitifs
+  tags: string[];
+
+  @ApiProperty(AddressDto) // Référence à une autre classe
+  address: AddressDto;
+
+  @ApiProperty([AddressDto]) // Tableau de références de classe
+  previousAddresses: AddressDto[];
+
+  @ApiProperty({
+    theme: String,
+    preferences: PreferencesDto,
+    categories: [String],
+    addresses: [AddressDto]
+  }) // Enregistrement des utilisations précédemment listées
+  settings: any;
 }
 ```
 
-### Documentation des paramètres
+Seuls les types primitifs peuvent être déduits des métadonnées TypeScript. Les types complexes (y compris les tableaux) seront par défaut `{ type: 'object' }`. Pour un typage spécifique, utilisez les formats de définition explicites montrés ci-dessus.
 
-- `@ApiParam(name, description?, required?, schema?)` - Documente les paramètres de chemin
-- `@ApiQuery(name, description?, required?, schema?)` - Documente les paramètres de requête  
-- `@ApiHeader(name, description?, required?, schema?)` - Documente les en-têtes
+### `@ApiPropertyOptional(definition?)`
+Équivalent à `@ApiProperty({ required: false })`
 
 ```typescript
-import { ApiParam, ApiQuery, ApiHeader } from 'yasui';
+@ApiPropertyOptional()
+description?: string;
 
-@Controller('/users')
-export class UserController {
-  @Get('/:id')
-  @ApiParam('id', 'User unique identifier', true, { type: 'string' })
-  @ApiHeader('Authorization', 'Bearer token for authentication', true)
-  getUser(@Param('id') id: string) {
-    return this.userService.findById(id);
-  }
+@ApiPropertyOptional({ enum: ['small', 'medium', 'large'] })
+size?: string;
+```
 
-  @Get('/')
-  @ApiQuery('page', 'Page number for pagination', false, { type: 'number', default: 1 })
-  @ApiQuery('limit', 'Number of items per page', false, { type: 'number', default: 10 })
-  getUsers(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10
-  ) {
-    return this.userService.getUsers({ page, limit });
-  }
+### `@ApiSchema(name)`
+Définit un nom de schéma personnalisé. Le nom par défaut est le nom de la classe. Les noms de schéma doivent être uniques.
+
+```typescript
+@ApiSchema('Requête de Création d\'Utilisateur')
+export class CreateUserDto {
+  @ApiProperty()
+  name: string;
 }
 ```
 
-### Documentation du corps de la requête
+### Alias
+- `@AP()` - Alias pour `@ApiProperty()`
+- `@APO()` - Alias pour `@ApiPropertyOptional()`
 
-- `@ApiBody(description?, schema?)` - Documente le corps de la requête
+## Documentation des Points de Terminaison
+
+### `@ApiBody(description?, definition?, contentType?)`
+Documente le schéma du corps de la requête. Le type de contenu par défaut est `application/json`.
 
 ```typescript
-import { ApiBody } from 'yasui';
+@Post('/users')
+@ApiBody('Données utilisateur', CreateUserDto)
+createUser(@Body() data: CreateUserDto) {}
+```
+Tous les formats de définition décrits pour @ApiProperty (schéma OpenAPI, Tableau de primitifs, Tableau de références de classe, Enregistrement, Énumération...) sont valides pour @ApiBody. Les schémas de toute classe seront automatiquement résolus.
 
-@Controller('/users')
-export class UserController {
-  @Post('/')
-  @ApiBody('User creation data', {
-    type: 'object',
-    properties: {
-      name: { type: 'string', description: 'User full name' },
-      email: { type: 'string', format: 'email', description: 'User email address' },
-      age: { type: 'number', minimum: 18, description: 'User age (must be 18+)' }
-    },
-    required: ['name', 'email']
-  })
-  createUser(@Body() userData: any) {
-    return this.userService.createUser(userData);
-  }
-}
+Il est également possible d'utiliser @ApiBody avec une référence de classe uniquement sans description (ce sera le nom du schéma dans ce cas).
+```ts
+@Post('/users')
+@ApiBody(CreateUserDto)
+createUser(@Body() data: CreateUserDto) {}
 ```
 
-### Documentation des réponses
-
-- `@ApiResponse(statusCode, description, schema?)` - Documente les réponses
+### `@ApiResponse(statusCode, description?, definition?)`
+Documente les réponses des points de terminaison.
 
 ```typescript
-import { ApiResponse } from 'yasui';
+@Get('/users')
+@ApiResponse(200, 'Utilisateurs', [UserDto])
+getUsers() {}
+```
+Tous les formats de définition décrits pour @ApiProperty (schéma OpenAPI, Tableau de primitifs, Tableau de références de classe, Enregistrement, Énumération...) sont valides pour @ApiResponse. Les schémas de toute classe seront automatiquement résolus.
 
-@Controller('/users')
-export class UserController {
-  @Get('/:id')
-  @ApiResponse(200, 'User found successfully', {
-    type: 'object',
-    properties: {
-      id: { type: 'string' },
-      name: { type: 'string' },
-      email: { type: 'string' },
-      createdAt: { type: 'string', format: 'date-time' }
-    }
-  })
-  @ApiResponse(404, 'User not found')
-  getUser(@Param('id') id: string) {
-    return this.userService.findById(id);
-  }
-
-  @Post('/')
-  @ApiResponse(201, 'User created successfully')
-  @ApiResponse(400, 'Invalid user data')
-  createUser(@Body() userData: any) {
-    return this.userService.createUser(userData);
-  }
-}
+Il est également possible d'utiliser @ApiResponse avec une référence de classe uniquement sans description (ce sera le nom du schéma dans ce cas).
+```typescript
+@Get('/users/:id')
+@ApiResponse(200, UserDto)
+getUser(@Param('id') id: string) {}
 ```
 
-## Réponses d'erreur
-
-`ErrorResourceSchema` génère un schéma pour le format d'encapsulation d'erreur de YasuiJS. Vous pouvez éventuellement définir des champs supplémentaires qui seront inclus dans la propriété `data` pour vos erreurs personnalisées:
+### `@ApiOperation(summary, description?, tags?)`
+Décrit l'opération du point de terminaison.
 
 ```typescript
-import { ApiResponse, ErrorResourceSchema } from 'yasui';
+@Get('/users')
+@ApiOperation('Obtenir tous les utilisateurs')
+getUsers() {}
 
-@Controller('/users')
-export class UserController {
-  @Get('/:id')
-  @ApiResponse(404, 'User not found', ErrorResourceSchema())
-  getUser(@Param('id') id: string) {
-    return this.userService.findById(id);
-  }
+@Post('/users')
+@ApiOperation('Créer un utilisateur', 'Crée un nouveau compte utilisateur', ['utilisateurs'])
+createUser() {}
+```
 
-  @Post('/')
-  @ApiResponse(400, 'Validation failed', ErrorResourceSchema({
-    fields: { 
-      type: 'array', 
-      items: { type: 'string' },
-      description: 'List of invalid fields' 
-    }
-  }, {
-    fields: ['email', 'password']
-  }))
-  createUser(@Body() userData: any) {
-    return this.userService.createUser(userData);
-  }
-}
+### Documentation des Paramètres
+- `@ApiParam(name, description?, required?, definition?)` - Paramètres de chemin
+- `@ApiQuery(name, description?, required?, definition?)` - Paramètres de requête
+- `@ApiHeader(name, description?, required?, definition?)` - En-têtes
+
+Tous les formats de définition décrits pour `@ApiProperty` et les décorateurs précédents sont pris en charge, mais gardez à l'esprit que les utilisations complexes (objets, tableaux, références de classe, etc.) peuvent ne pas avoir de sens selon la nature du décorateur, même si le schéma OpenAPI sera correctement généré.
+
+```typescript
+@Get('/users/:id')
+@ApiParam('id', 'ID de l\'utilisateur', true, Number)
+@ApiQuery('include', 'Inclure les données associées', false, Boolean)
+@ApiHeader('Authorization', 'Jeton Bearer', true) // String par défaut
+getUser(
+  @Param('id') id: number,
+  @Query('include') include?: boolean
+) {}
+```
+
+## Réponses d'Erreur
+
+### `@ApiErrorResponse(statusCode, description?, ErrorDataClass?)`
+Documente les réponses d'erreur avec le format d'enveloppe d'erreur YasuiJS. Ce décorateur inclut automatiquement la structure de schéma d'erreur complète du framework qui enveloppe toutes les erreurs dans votre application.
+
+```typescript
+@Get('/users/:id')
+@ApiErrorResponse(404, 'Utilisateur non trouvé')
+@ApiErrorResponse(500, 'Erreur interne du serveur')
+getUser(@Param('id') id: string) {}
+```
+
+Lorsque vous avez des classes d'erreur personnalisées qui étendent `HttpError`, vous pouvez les enrichir avec les décorateurs `@ApiProperty` et `@ApiPropertyOptional` pour documenter leurs propriétés spécifiques. Le schéma résultant fusionnera vos données d'erreur personnalisées avec l'enveloppe d'erreur standard de YasuiJS :
+
+```typescript
+@Post('/users')
+@ApiErrorResponse(400, 'Échec de la validation', ValidationErrorData)
+createUser(@Body() data: CreateUserDto) {}
+
+// Également possible avec une référence de classe uniquement (la description sera le nom du schéma)
+@Post('/users')
+@ApiErrorResponse(400, ValidationErrorData)
+createUser(@Body() data: CreateUserDto) {}
+```
+
+### Approche alternative
+Si vous préférez une documentation d'erreur plus simple sans le format d'enveloppe complet, vous pouvez continuer à utiliser le décorateur standard `@ApiResponse` décrit précédemment. Avec `@ApiResponse`, si vous passez une classe d'erreur personnalisée étendant HttpError, vous n'obtiendrez que le schéma de cette classe spécifique sans hériter des définitions API.
+
+## Fonctions Utilitaires
+
+### `resolveSchema(schema: ApiPropertyDefinition): OpenAPISchema`
+Résout manuellement toute définition de schéma (voir les formats décrits dans la section @ApiProperty) au format OpenAPI. Utile pour des cas d'utilisation spécifiques.
+
+```typescript
+import { resolveSchema } from 'yasui';
+const schema = resolveSchema(CreateUserDto);
 ```

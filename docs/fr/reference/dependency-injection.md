@@ -32,7 +32,7 @@ export class UserController {
 
 ### Décorateur Injectable
 
-- `@Injectable()` - Marque une classe comme injectable (pas de paramètres, requis pour tous les services)
+- `@Injectable()` - Marquer une classe comme injectable (pas de paramètres, requis pour tous les services)
 
 Utilisez le décorateur `@Injectable()` pour marquer une classe comme injectable. Ce décorateur est **requis** pour tous les services qui seront injectés.
 
@@ -83,7 +83,7 @@ export class OrderService {
 
 ### Décorateur Scope
 
-- `@Scope(scope)` - Spécifie la portée de la dépendance (paramètre de portée requis)
+- `@Scope(scope)` - Spécifier la portée de la dépendance (paramètre de portée requis)
 
 YasuiJS prend en charge trois portées différentes qui contrôlent comment les instances sont créées et partagées :
 
@@ -93,7 +93,7 @@ YasuiJS prend en charge trois portées différentes qui contrôlent comment les 
 
 Le décorateur `@Scope()` est appliqué au point d'injection, pas sur la classe de service elle-même.
 
-### Portées au niveau du constructeur
+### Portées au niveau du Constructeur
 
 Vous pouvez spécifier des portées pour des dépendances individuelles dans les constructeurs :
 
@@ -108,41 +108,38 @@ export class MyService {
 }
 ```
 
-### Directives de sélection de portée
+### Directives de Sélection de Portée
 
-- **SHARED** : Utilisez pour les services sans état, les caches, les connexions de base de données
-- **LOCAL** : Utilisez pour les services spécifiques aux requêtes, les processeurs temporaires
-- **DEEP_LOCAL** : Utilisez pour les opérations complètement isolées, les scénarios de test
+- **SHARED** : Utiliser pour les services sans état, les caches, les connexions de base de données
+- **LOCAL** : Utiliser pour les services spécifiques aux requêtes, les processeurs temporaires
+- **DEEP_LOCAL** : Utiliser pour les opérations complètement isolées, les scénarios de test
 
-## Injection au niveau des méthodes
+## Injection au niveau des Méthodes
 
 ### Décorateur Inject
 
-- `@Inject(token?)` - Injecte des dépendances dans les paramètres de méthode (token personnalisé optionnel)
+- `@Inject(token?)` - Injecter des dépendances dans les paramètres de méthode (token personnalisé optionnel)
 
-Vous pouvez injecter des dépendances directement dans les paramètres de méthode de contrôleur ou middleware. Cela limite l'injection à des points de terminaison spécifiques au lieu du contrôleur entier, permettant une gestion fine de la portée. Par exemple, vous pouvez avoir un service partagé injecté dans le constructeur, mais une route spécifique qui nécessite une instance dédiée du même service.
+Vous pouvez injecter des dépendances directement dans les paramètres de méthode des contrôleurs ou middlewares. Cela restreint l'injection à des points d'entrée spécifiques au lieu du contrôleur entier, permettant une gestion fine de la portée. Par exemple, vous pouvez avoir un service partagé injecté dans le constructeur, mais une route spécifique qui nécessite une instance dédiée du même service.
 
 ```typescript
 @Controller('/users')
 export class UserController {
-  constructor(private userService: UserService) {} // Instance partagée pour le contrôleur
+
+  // Instance partagée pour le contrôleur
+  constructor(private userService: UserService) {}
 
   @Get('/:id')
   getUser(
     @Param('id') id: string,
-    @Inject() userService: UserService // Instance spécifique à ce point de terminaison
+    @Inject() userService: UserService // Instance spécifique à ce point d'entrée
   ) {
     return userService.getUser(id);
-  }
-
-  @Get('/')
-  getUsers(@Inject() userService: UserService) {
-    return userService.getAllUsers();
   }
 }
 ```
 
-### Portées au niveau des méthodes
+### Portées au niveau des Méthodes
 
 Les portées fonctionnent également avec l'injection au niveau des méthodes :
 
@@ -159,11 +156,11 @@ export class ApiController {
 }
 ```
 
-## Tokens d'injection personnalisés
+## Tokens d'Injection Personnalisés
 
-### Utilisation de tokens personnalisés
+### Utilisation des Tokens Personnalisés
 
-Pour des scénarios complexes, utilisez des tokens d'injection personnalisés avec `@Inject()`. C'est utile pour injecter des valeurs primitives, des configurations, ou lorsque vous avez besoin de plusieurs instances de la même classe :
+Pour les scénarios complexes, utilisez des tokens d'injection personnalisés avec `@Inject()`. C'est utile pour injecter des valeurs primitives, des configurations, ou lorsque vous avez besoin de plusieurs instances de la même classe :
 
 ```typescript
 @Injectable()
@@ -191,9 +188,9 @@ export class UserController {
 }
 ```
 
-### Enregistrement des tokens personnalisés
+### Enregistrement des Tokens Personnalisés
 
-Enregistrez des tokens personnalisés dans la configuration de votre application :
+Enregistrez les tokens personnalisés dans votre configuration d'application :
 
 ```typescript
 interface AppConfig {
@@ -217,9 +214,9 @@ yasui.createServer({
 });
 ```
 
-### Dépendances circulaires
+### Dépendances Circulaires
 
-YasuiJS détecte automatiquement et empêche les dépendances circulaires au démarrage :
+YasuiJS détecte et empêche automatiquement les dépendances circulaires au démarrage :
 
 ```typescript
 // Ceci sera détecté et signalé comme une erreur

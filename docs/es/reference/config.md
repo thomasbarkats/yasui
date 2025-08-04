@@ -2,7 +2,7 @@
 
 Referencia completa de configuración para aplicaciones YasuiJS usando `yasui.createServer()` y `yasui.createApp()`.
 
-## Visión General
+## Descripción General
 
 YasuiJS proporciona dos formas principales de crear tu aplicación:
 
@@ -20,7 +20,7 @@ Ambos métodos aceptan el mismo objeto de configuración con las siguientes opci
 **Descripción:** Array de clases controladoras para registrar en tu aplicación.
 
 ```typescript
-import { UserController, ProductController } from './controllers';
+import yasui from 'yasui';
 
 yasui.createServer({
   controllers: [UserController, ProductController]
@@ -31,13 +31,10 @@ yasui.createServer({
 
 #### `middlewares`
 **Tipo:** `Array<Constructor | RequestHandler>`  
-**Por defecto:** `[]`  
+**Valor Predeterminado:** `[]`  
 **Descripción:** Array de middlewares globales para aplicar a todas las peticiones. Pueden ser clases middleware de YasuiJS o funciones RequestHandler de Express.
 
 ```typescript
-import { LoggingMiddleware } from './middleware';
-import cors from 'cors';
-
 yasui.createServer({
   controllers: [UserController],
   middlewares: [LoggingMiddleware, cors()]
@@ -46,7 +43,7 @@ yasui.createServer({
 
 #### `environment`
 **Tipo:** `string`  
-**Por defecto:** `process.env.NODE_ENV || 'development'`  
+**Valor Predeterminado:** `process.env.NODE_ENV || 'development'`  
 **Descripción:** Nombre del entorno para tu aplicación.
 
 ```typescript
@@ -58,7 +55,7 @@ yasui.createServer({
 
 #### `port`
 **Tipo:** `number`  
-**Por defecto:** `3000`  
+**Valor Predeterminado:** `3000`  
 **Descripción:** Número de puerto para el servidor HTTP. Solo se usa con `createServer()`.
 
 ```typescript
@@ -70,8 +67,8 @@ yasui.createServer({
 
 #### `debug`
 **Tipo:** `boolean`  
-**Por defecto:** `false`  
-**Descripción:** Habilita el modo debug con registro adicional y seguimiento de peticiones.
+**Valor Predeterminado:** `false`  
+**Descripción:** Habilita el modo de depuración con registro adicional y seguimiento de peticiones.
 
 ```typescript
 yasui.createServer({
@@ -82,7 +79,7 @@ yasui.createServer({
 
 #### `injections`
 **Tipo:** `Array<{ token: string, provide: any }>`  
-**Por defecto:** `[]`  
+**Valor Predeterminado:** `[]`  
 **Descripción:** Tokens de inyección personalizados para inyección de dependencias. Ver [Inyección de Dependencias](/es/reference/dependency-injection) para más detalles.
 
 ```typescript
@@ -97,7 +94,7 @@ yasui.createServer({
 
 #### `swagger`
 **Tipo:** `SwaggerConfig | undefined`  
-**Por defecto:** `undefined`  
+**Valor Predeterminado:** `undefined`  
 **Descripción:** Configuración de documentación Swagger. Ver [Swagger](/es/reference/swagger) para más detalles.
 
 ```typescript
@@ -109,7 +106,7 @@ yasui.createServer({
     info: {
       title: 'Mi API',
       version: '1.0.0',
-      description: 'Documentación API'
+      description: 'Documentación de API'
     }
   }
 });
@@ -117,7 +114,7 @@ yasui.createServer({
 
 #### `enableDecoratorValidation`
 **Tipo:** `boolean`  
-**Por defecto:** `true`  
+**Valor Predeterminado:** `true`  
 **Descripción:** Habilita la validación de decoradores al inicio para detectar errores de configuración.
 
 ```typescript
@@ -188,9 +185,6 @@ app.listen(3000, () => {
 ### Configuración Básica de API
 
 ```typescript
-import yasui from 'yasui';
-import { UserController, AuthController } from './controllers';
-
 yasui.createServer({
   controllers: [UserController, AuthController],
   port: 3000,
@@ -201,10 +195,6 @@ yasui.createServer({
 ### Configuración Completa
 
 ```typescript
-import yasui from 'yasui';
-import { UserController, AuthController } from './controllers';
-import { AuthMiddleware, LoggingMiddleware } from './middleware';
-
 yasui.createServer({
   controllers: [UserController, AuthController],
   middlewares: [LoggingMiddleware, AuthMiddleware],
@@ -263,9 +253,9 @@ app.listen(PORT, () => {
 });
 ```
 
-## Modo Debug
+## Modo de Depuración
 
-Habilita el modo debug para ver información detallada:
+Habilita el modo de depuración para ver información detallada:
 
 ```typescript
 yasui.createServer({
@@ -274,7 +264,7 @@ yasui.createServer({
 });
 ```
 
-El modo debug proporciona:
+El modo de depuración proporciona:
 - Registro de peticiones/respuestas
 - Detalles de inyección de dependencias
 - Información de registro de rutas

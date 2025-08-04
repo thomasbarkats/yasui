@@ -12,7 +12,8 @@ export default {
       { text: '团队', link: '/zh/team' },
     ],
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/thomasbarkats/yasui' }
+      { icon: 'github', link: 'https://github.com/thomasbarkats/yasui' },
+      { icon: 'npm', link: 'http://npmjs.com/package/yasui' }
     ],
     sidebar: [
       {
@@ -32,7 +33,7 @@ export default {
           { text: '依赖注入', link: '/zh/reference/dependency-injection' },
           { text: '日志', link: '/zh/reference/logging' },
           { text: '错误处理', link: '/zh/reference/error-handling' },
-          { text: 'Swagger', link: '/zh/reference/swagger' }
+          { text: 'Swagger 文档', link: '/zh/reference/swagger' }
         ]
       }
     ]

@@ -6,22 +6,19 @@ YasuiJS proporciona manejo y formateo automático de errores tanto para el regis
 
 Cuando ocurre un error en tu aplicación, YasuiJS automáticamente:
 - Registra el error con información detallada (URL, método, estado, mensaje)
-- Lo formatea y envía al cliente como una respuesta JSON
+- Lo formatea y lo envía al cliente como una respuesta JSON
 - Incluye código de estado HTTP, detalles del error, información de la solicitud y cualquier dato adicional del error
 
 ```typescript
-@Controller('/users')
-export class UserController {
-  @Get('/:id')
-  getUser(@Param('id') id: string) {
-    const user = this.userService.findById(id);
-    
-    if (!user) {
-      // Este error será capturado y formateado automáticamente
-      throw new HttpError(HttpCode.NOT_FOUND, 'Usuario no encontrado');
-    }
-    return user;
+@Get('/:id')
+getUser(@Param('id') id: string) {
+  const user = this.userService.findById(id);
+
+  if (!user) {
+    // Este error será capturado y formateado automáticamente
+    throw new Error('Usuario no encontrado');
   }
+  return user;
 }
 ```
 
@@ -36,14 +33,14 @@ import { HttpError, HttpCode } from 'yasui';
 
 @Controller('/users')
 export class UserController {
+
  @Get('/:id')
  getUser(@Param('id') id: string) {
    const user = this.userService.findById(id);
-   
+
    if (!user) {
      throw new HttpError(HttpCode.NOT_FOUND, 'Usuario no encontrado');
    }
-   
    return user;
  }
 }
@@ -57,22 +54,22 @@ Crea clases de error personalizadas para errores específicos de lógica de nego
 class ValidationError extends HttpError {
   fields: string[];
 
-  constructor(message: string, fields: string[]) {
-    super(HttpCode.BAD_REQUEST, message);
+  constructor(fields: string[]) {
+    super(HttpCode.BAD_REQUEST, 'Faltan campos requeridos');
     this.fields = fields;
   }
 }
 
 @Controller('/users')
 export class UserController {
+
   @Post('/')
   createUser(@Body() userData: any) {
     const missingFields = this.validateUserData(userData);
-    
+
     if (missingFields.length > 0) {
-      throw new ValidationError('Faltan campos requeridos', missingFields);
+      throw new ValidationError(missingFields);
     }
-    
     return this.userService.createUser(userData);
   }
 }
@@ -82,77 +79,42 @@ export class UserController {
 
 YasuiJS proporciona un enum `HttpCode` con códigos de estado HTTP comunes. Para una lista completa de códigos de estado HTTP y sus significados, consulta la [documentación de códigos de estado de respuesta HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status).
 
-```typescript
-import { HttpCode } from 'yasui';
-
-@Controller('/api')
-export class ApiController {
-  @Delete('/:id')
-  deleteItem(@Param('id') id: string) {
-    if (!this.service.exists(id)) {
-      throw new HttpError(HttpCode.NOT_FOUND, 'Elemento no encontrado');
-    }
-    
-    this.service.delete(id);
-  }
-}
-```
-
 ## Formato de Respuesta de Error
 
 Cuando se lanza un error, YasuiJS automáticamente lo formatea en una respuesta JSON consistente:
 
 ```json
 {
-  "error": {
-    "status": 404,
-    "message": "Usuario no encontrado",
-    "timestamp": "2024-01-15T10:30:00.000Z",
-    "path": "/api/users/123",
-    "method": "GET",
-    "data": {
-      "resourceType": "User",
-      "resourceId": "123"
-    }
+  "url": "http://localhost:3000/api/users/123",
+  "path": "/api/users/123",
+  "method": "POST",
+  "name": "ValidationError", // Nombre de la clase de error
+  "message": "Faltan campos requeridos",
+  "statusMessage": "Bad Request", // Mensaje de estado HTTP
+  "status": 404, // Código de estado HTTP
+  "data": {
+    "fields": ["name", "age"]
   }
 }
 ```
 
-La respuesta incluye:
-- **status**: Código de estado HTTP
-- **message**: Mensaje de error
-- **timestamp**: Cuándo ocurrió el error
-- **path**: Ruta de la solicitud donde ocurrió el error
-- **method**: Método HTTP
-- **data**: Cualquier propiedad adicional de tu error personalizado
+Las propiedades de errores personalizados que heredan de HttpError se incluirán en `data`.
 
 ## Manejo de Errores en Servicios
 
-Los servicios pueden lanzar errores que serán automáticamente capturados cuando se llamen desde los controladores:
+Los servicios o cualquier Injectable pueden lanzar errores que serán capturados automáticamente cuando se llamen desde los controladores:
 
 ```typescript
 @Injectable()
 export class UserService {
+
   findById(id: string) {
     const user = this.database.findUser(id);
-    
     if (!user) {
       // Esto será capturado por el manejador de errores del controlador
       throw new HttpError(HttpCode.NOT_FOUND, 'Usuario no encontrado');
     }
-    
     return user;
-  }
-
-  createUser(userData: any) {
-    if (this.emailExists(userData.email)) {
-      throw new HttpError(HttpCode.CONFLICT, 'El email ya existe', {
-        email: userData.email,
-        suggestion: 'Intenta iniciar sesión en su lugar'
-      });
-    }
-    
-    return this.database.createUser(userData);
   }
 }
 ```

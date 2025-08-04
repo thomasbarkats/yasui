@@ -6,7 +6,7 @@ Los middlewares procesan las solicitudes en un pipeline antes de que lleguen a s
 
 YasuiJS admite dos tipos de middlewares:
 - **Middlewares basados en clases** usando el decorador `@Middleware()`
-- **Funciones RequestHandler de Express** para compatibilidad con middlewares Express existentes
+- **Funciones Express RequestHandler** para compatibilidad con middlewares Express existentes
 
 Los middlewares se pueden aplicar en tres niveles con diferentes prioridades de ejecución:
 1. **Nivel de aplicación** - Aplicado a todas las solicitudes
@@ -34,8 +34,11 @@ export class LoggingMiddleware {
 El decorador `@Middleware()` define una clase como middleware. La clase debe implementar un método `use()`. Opcionalmente puede implementar la interfaz `IMiddleware` proporcionada por YasuiJS para forzar la firma del método.
 
 ```typescript
-import { Middleware, IMiddleware, Req, Res, Next } from 'yasui';
-import { Request, Response, NextFunction } from 'express';
+import {
+  Middleware, IMiddleware,
+  Request, Response, NextFunction,
+  Req, Res, Next,
+} from 'yasui';
 
 @Middleware()
 export class AuthMiddleware implements IMiddleware {
@@ -47,11 +50,11 @@ export class AuthMiddleware implements IMiddleware {
     const token = req.headers.authorization;
     
     if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      return res.status(401).json({ error: 'No autorizado' });
     }
-    
     // Lógica de validación del token aquí
-    next(); // Continuar al siguiente middleware o controlador
+
+    next(); // Continuar al siguiente middleware o lógica del controlador
   }
 }
 ```
@@ -70,7 +73,7 @@ export class ValidationMiddleware {
     @Next() next: NextFunction
   ) {
     if (shouldValidate && !this.isValid(body)) {
-      throw new Error('Invalid request data');
+      throw new Error('Datos de solicitud inválidos');
     }
     
     next();
@@ -102,35 +105,18 @@ export class ConditionalMiddleware {
 }
 ```
 
-## Middlewares RequestHandler de Express
+## Middlewares Express RequestHandler
 
 Puede usar funciones middleware estándar de Express directamente:
 
 ```typescript
 import cors from 'cors';
 import helmet from 'helmet';
-import { Request, Response, NextFunction } from 'express';
-
-// Middleware de función
-function customMiddleware(req: Request, res: Response, next: NextFunction) {
-  console.log(`${req.method} ${req.path}`);
-  next();
-}
-
-// Función que retorna middleware
-function rateLimiter(maxRequests: number) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    // Lógica de límite de velocidad
-    next();
-  };
-}
 
 yasui.createServer({
   middlewares: [
     cors(),
     helmet(),
-    customMiddleware,
-    rateLimiter(100)
   ]
 });
 ```
@@ -142,9 +128,6 @@ yasui.createServer({
 Aplicado a todas las solicitudes en toda su aplicación:
 
 ```typescript
-import yasui from 'yasui';
-import { LoggingMiddleware, SecurityMiddleware } from './middleware';
-
 yasui.createServer({
   controllers: [UserController],
   middlewares: [LoggingMiddleware, SecurityMiddleware]
@@ -156,8 +139,6 @@ yasui.createServer({
 Aplicado a todas las rutas dentro de un controlador específico:
 
 ```typescript
-import { AuthMiddleware, ValidationMiddleware } from './middleware';
-
 // Middleware único
 @Controller('/api/users', AuthMiddleware)
 export class UserController {
@@ -176,8 +157,6 @@ export class AdminController {
 Aplicado solo a rutas específicas:
 
 ```typescript
-import { AuthMiddleware, ValidationMiddleware } from './middleware';
-
 @Controller('/api/users')
 export class UserController {
   @Get('/')
