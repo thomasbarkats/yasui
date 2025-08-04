@@ -1,10 +1,10 @@
 # 依赖注入
 
-YasuiJS提供了一个完整的依赖注入系统，具有自动解析依赖关系和作用域管理功能。它实现了松耦合、更好的可测试性和更清晰的关注点分离。
+YasuiJS 提供了一个完整的依赖注入系统，具有自动解析依赖关系和作用域管理功能。它实现了松耦合、更好的可测试性和更清晰的关注点分离。
 
 ## 概述
 
-依赖注入自动管理组件之间的关系。无需手动创建和连接对象，YasuiJS通过分析类构造函数和方法参数为您完成这项工作。
+依赖注入自动管理组件之间的关系。YasuiJS 通过分析类构造函数和方法参数来自动创建和连接对象，而不是手动创建和连接对象。
 
 ```typescript
 import { Injectable, Controller } from 'yasui';
@@ -30,11 +30,11 @@ export class UserController {
 
 ## 可注入服务
 
-### Injectable装饰器
+### Injectable 装饰器
 
 - `@Injectable()` - 将类标记为可注入（无参数，所有服务都需要）
 
-使用`@Injectable()`装饰器将类标记为可注入。这个装饰器对所有将被注入的服务来说是**必需的**。
+使用 `@Injectable()` 装饰器将类标记为可注入。此装饰器对所有将被注入的服务来说都是**必需的**。
 
 ```typescript
 import { Injectable } from 'yasui';
@@ -42,7 +42,7 @@ import { Injectable } from 'yasui';
 @Injectable()
 export class UserService {
   getUser(id: string) {
-    // 业务逻辑在这里
+    // 业务逻辑
     return { id, name: 'John Doe' };
   }
 }
@@ -50,7 +50,7 @@ export class UserService {
 @Injectable()
 export class EmailService {
   sendEmail(to: string, subject: string) {
-    // 邮件逻辑在这里
+    // 邮件逻辑
     console.log(`Sending email to ${to}: ${subject}`);
   }
 }
@@ -58,7 +58,7 @@ export class EmailService {
 
 ## 构造函数注入
 
-只需在控制器、中间件或服务构造函数中声明您的依赖项。您可以在同一个构造函数中注入多个服务。它们将被自动解析和注入：
+只需在控制器、中间件或服务构造函数中声明依赖项。您可以在同一个构造函数中注入多个服务。它们将被自动解析和注入：
 
 ```typescript
 @Injectable()
@@ -81,21 +81,21 @@ export class OrderService {
 
 ## 依赖作用域
 
-### Scope装饰器
+### Scope 装饰器
 
 - `@Scope(scope)` - 指定依赖作用域（需要作用域参数）
 
-YasuiJS支持三种不同的依赖作用域，控制实例如何创建和共享：
+YasuiJS 支持三种不同的依赖作用域，用于控制实例的创建和共享方式：
 
-- **`Scopes.SHARED`**（默认）：整个应用程序共享的单例实例
-- **`Scopes.LOCAL`**：每个注入上下文创建新实例
+- **`Scopes.SHARED`**（默认）：在整个应用程序中共享的单例实例
+- **`Scopes.LOCAL`**：为每个注入上下文创建新实例
 - **`Scopes.DEEP_LOCAL`**：创建新实例，并将局部性传播到其自身的依赖项
 
-`@Scope()`装饰器应用于注入点，而不是服务类本身。
+`@Scope()` 装饰器应用于注入点，而不是服务类本身。
 
-### 构造函数级别的作用域
+### 构造函数级作用域
 
-您可以在构造函数中为各个依赖项指定作用域：
+您可以在构造函数中为单个依赖项指定作用域：
 
 ```typescript
 @Injectable()
@@ -103,7 +103,7 @@ export class MyService {
   constructor(
     @Scope(Scopes.LOCAL) private tempService: TempService,
     @Scope(Scopes.DEEP_LOCAL) private isolatedService: IsolatedService,
-    private sharedService: SharedService // 默认为SHARED
+    private sharedService: SharedService // 默认为 SHARED
   ) {}
 }
 ```
@@ -111,33 +111,30 @@ export class MyService {
 ### 作用域选择指南
 
 - **SHARED**：用于无状态服务、缓存、数据库连接
-- **LOCAL**：用于特定请求的服务、临时处理器
+- **LOCAL**：用于请求特定的服务、临时处理器
 - **DEEP_LOCAL**：用于完全隔离的操作、测试场景
 
 ## 方法级注入
 
-### Inject装饰器
+### Inject 装饰器
 
-- `@Inject(token?)` - 将依赖项注入到方法参数中（可选自定义令牌）
+- `@Inject(token?)` - 将依赖项注入到方法参数中（可选的自定义令牌）
 
-您可以直接将依赖项注入到控制器或中间件方法参数中。这将注入限制在特定端点而不是整个控制器，允许精细的作用域管理。例如，您可以在构造函数中注入共享服务，但特定路由需要该服务的专用实例。
+您可以直接将依赖项注入到控制器或中间件方法参数中。这将注入限制在特定端点而不是整个控制器，允许细粒度的作用域管理。例如，您可以在构造函数中注入共享服务，但特定路由需要同一服务的专用实例。
 
 ```typescript
 @Controller('/users')
 export class UserController {
-  constructor(private userService: UserService) {} // 控制器的共享实例
+
+  // 控制器的共享实例
+  constructor(private userService: UserService) {}
 
   @Get('/:id')
   getUser(
     @Param('id') id: string,
-    @Inject() userService: UserService // 特定于此端点的实例
+    @Inject() userService: UserService // 此端点的特定实例
   ) {
     return userService.getUser(id);
-  }
-
-  @Get('/')
-  getUsers(@Inject() userService: UserService) {
-    return userService.getAllUsers();
   }
 }
 ```
@@ -163,7 +160,7 @@ export class ApiController {
 
 ### 使用自定义令牌
 
-对于复杂场景，使用带有`@Inject()`的自定义注入令牌。这对于注入原始值、配置或当您需要同一类的多个实例时很有用：
+对于复杂场景，使用带有 `@Inject()` 的自定义注入令牌。这对于注入原始值、配置或当您需要同一个类的多个实例时很有用：
 
 ```typescript
 @Injectable()
@@ -219,7 +216,7 @@ yasui.createServer({
 
 ### 循环依赖
 
-YasuiJS在启动时自动检测并防止循环依赖：
+YasuiJS 在启动时自动检测并防止循环依赖：
 
 ```typescript
 // 这将被检测并报告为错误

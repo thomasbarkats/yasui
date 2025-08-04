@@ -51,14 +51,14 @@ export class UserService {
 export class EmailService {
   sendEmail(to: string, subject: string) {
     // Lógica de email aquí
-    console.log(`Sending email to ${to}: ${subject}`);
+    console.log(`Enviando email a ${to}: ${subject}`);
   }
 }
 ```
 
 ## Inyección en el Constructor
 
-Simplemente declara tus dependencias en controladores, middleware o constructores de servicios. Puedes inyectar múltiples servicios en el mismo constructor. Se resolverán e inyectarán automáticamente:
+Simplemente declara tus dependencias en controladores, middleware o constructores de servicios. Puedes inyectar múltiples servicios en el mismo constructor. Serán resueltos e inyectados automáticamente:
 
 ```typescript
 @Injectable()
@@ -72,7 +72,7 @@ export class OrderService {
   processOrder(orderData: any) {
     const user = this.userService.getUser(orderData.userId);
     const payment = this.paymentService.processPayment(orderData.amount);
-    this.emailService.sendEmail(user.email, 'Order confirmed');
+    this.emailService.sendEmail(user.email, 'Pedido confirmado');
     
     return { order: orderData, payment };
   }
@@ -83,11 +83,11 @@ export class OrderService {
 
 ### Decorador Scope
 
-- `@Scope(scope)` - Especifica el ámbito de dependencia (parámetro de ámbito requerido)
+- `@Scope(scope)` - Especifica el ámbito de dependencia (parámetro scope requerido)
 
-YasuiJS soporta tres ámbitos diferentes de dependencia que controlan cómo se crean y comparten las instancias:
+YasuiJS soporta tres diferentes ámbitos de dependencia que controlan cómo se crean y comparten las instancias:
 
-- **`Scopes.SHARED`** (predeterminado): Instancia singleton compartida en toda la aplicación
+- **`Scopes.SHARED`** (por defecto): Instancia singleton compartida en toda la aplicación
 - **`Scopes.LOCAL`**: Nueva instancia para cada contexto de inyección
 - **`Scopes.DEEP_LOCAL`**: Nueva instancia que propaga la localidad a sus propias dependencias
 
@@ -125,7 +125,9 @@ Puedes inyectar dependencias directamente en parámetros de método de controlad
 ```typescript
 @Controller('/users')
 export class UserController {
-  constructor(private userService: UserService) {} // Instancia compartida para el controlador
+
+  // Instancia compartida para el controlador
+  constructor(private userService: UserService) {}
 
   @Get('/:id')
   getUser(
@@ -133,11 +135,6 @@ export class UserController {
     @Inject() userService: UserService // Instancia específica para este endpoint
   ) {
     return userService.getUser(id);
-  }
-
-  @Get('/')
-  getUsers(@Inject() userService: UserService) {
-    return userService.getAllUsers();
   }
 }
 ```
@@ -161,9 +158,9 @@ export class ApiController {
 
 ## Tokens de Inyección Personalizados
 
-### Uso de Tokens Personalizados
+### Usando Tokens Personalizados
 
-Para escenarios complejos, usa tokens de inyección personalizados con `@Inject()`. Esto es útil para inyectar valores primitivos, configuraciones o cuando necesitas múltiples instancias de la misma clase:
+Para escenarios complejos, usa tokens de inyección personalizados con `@Inject()`. Esto es útil para inyectar valores primitivos, configuraciones, o cuando necesitas múltiples instancias de la misma clase:
 
 ```typescript
 @Injectable()
@@ -172,7 +169,7 @@ export class DatabaseService {
     @Inject('DATABASE_URL') private dbUrl: string,
     @Inject('CONFIG') private config: AppConfig
   ) {
-    console.log(`Connecting to: ${this.dbUrl}`);
+    console.log(`Conectando a: ${this.dbUrl}`);
   }
 }
 
@@ -191,9 +188,9 @@ export class UserController {
 }
 ```
 
-### Registro de Tokens Personalizados
+### Registrando Tokens Personalizados
 
-Registra tokens personalizados en la configuración de tu aplicación:
+Registra tokens personalizados en tu configuración de aplicación:
 
 ```typescript
 interface AppConfig {

@@ -10,18 +10,15 @@ When an error occurs in your application, YasuiJS automatically:
 - Includes HTTP status code, error details, request information, and any additional error data
 
 ```typescript
-@Controller('/users')
-export class UserController {
-  @Get('/:id')
-  getUser(@Param('id') id: string) {
-    const user = this.userService.findById(id);
-    
-    if (!user) {
-      // This error will be automatically caught and formatted
-      throw new HttpError(HttpCode.NOT_FOUND, 'User not found');
-    }
-    return user;
+@Get('/:id')
+getUser(@Param('id') id: string) {
+  const user = this.userService.findById(id);
+
+  if (!user) {
+    // This error will be automatically caught and formatted
+    throw new Error('User not found');
   }
+  return user;
 }
 ```
 
@@ -36,14 +33,14 @@ import { HttpError, HttpCode } from 'yasui';
 
 @Controller('/users')
 export class UserController {
+
  @Get('/:id')
  getUser(@Param('id') id: string) {
    const user = this.userService.findById(id);
-   
+
    if (!user) {
      throw new HttpError(HttpCode.NOT_FOUND, 'User not found');
    }
-   
    return user;
  }
 }
@@ -57,22 +54,22 @@ Create custom error classes for specific business logic errors:
 class ValidationError extends HttpError {
   fields: string[];
 
-  constructor(message: string, fields: string[]) {
-    super(HttpCode.BAD_REQUEST, message);
+  constructor(fields: string[]) {
+    super(HttpCode.BAD_REQUEST, 'Missing required fields');
     this.fields = fields;
   }
 }
 
 @Controller('/users')
 export class UserController {
+
   @Post('/')
   createUser(@Body() userData: any) {
     const missingFields = this.validateUserData(userData);
-    
+
     if (missingFields.length > 0) {
-      throw new ValidationError('Missing required fields', missingFields);
+      throw new ValidationError(missingFields);
     }
-    
     return this.userService.createUser(userData);
   }
 }
@@ -82,77 +79,42 @@ export class UserController {
 
 YasuiJS provides an `HttpCode` enum with common HTTP status codes. For a complete list of HTTP status codes and their meanings, see the [HTTP response status codes documentation](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status).
 
-```typescript
-import { HttpCode } from 'yasui';
-
-@Controller('/api')
-export class ApiController {
-  @Delete('/:id')
-  deleteItem(@Param('id') id: string) {
-    if (!this.service.exists(id)) {
-      throw new HttpError(HttpCode.NOT_FOUND, 'Item not found');
-    }
-    
-    this.service.delete(id);
-  }
-}
-```
-
 ## Error Response Format
 
 When an error is thrown, YasuiJS automatically formats it into a consistent JSON response:
 
 ```json
 {
-  "error": {
-    "status": 404,
-    "message": "User not found",
-    "timestamp": "2024-01-15T10:30:00.000Z",
-    "path": "/api/users/123",
-    "method": "GET",
-    "data": {
-      "resourceType": "User",
-      "resourceId": "123"
-    }
+  "url": "http://localhost:3000/api/users/123",
+  "path": "/api/users/123",
+  "method": "POST",
+  "name": "ValidationError", // Error class name
+  "message": "Missing required fields",
+  "statusMessage": "Bad Request", // HTTP status message
+  "status": 404, // HTTP status code
+  "data": {
+    "fields": ["name", "age"]
   }
 }
 ```
 
-The response includes:
-- **status**: HTTP status code
-- **message**: Error message
-- **timestamp**: When the error occurred
-- **path**: Request path where the error happened
-- **method**: HTTP method
-- **data**: Any additional properties from your custom error
+The properties of custom errors inheriting from HttpError will be included in `data`.
 
 ## Error Handling in Services
 
-Services can throw errors that will be automatically caught when called from controllers:
+Services or any Injectable can throw errors that will be automatically caught when called from controllers:
 
 ```typescript
 @Injectable()
 export class UserService {
+
   findById(id: string) {
     const user = this.database.findUser(id);
-    
     if (!user) {
       // This will be caught by the controller's error handler
       throw new HttpError(HttpCode.NOT_FOUND, 'User not found');
     }
-    
     return user;
-  }
-
-  createUser(userData: any) {
-    if (this.emailExists(userData.email)) {
-      throw new HttpError(HttpCode.CONFLICT, 'Email already exists', {
-        email: userData.email,
-        suggestion: 'Try logging in instead'
-      });
-    }
-    
-    return this.database.createUser(userData);
   }
 }
 ```

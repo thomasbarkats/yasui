@@ -2,12 +2,12 @@
 
 Référence complète de configuration pour les applications YasuiJS utilisant `yasui.createServer()` et `yasui.createApp()`.
 
-## Aperçu
+## Vue d'ensemble
 
-YasuiJS propose deux méthodes principales pour créer votre application :
+YasuiJS propose deux façons principales de créer votre application :
 
-- **`yasui.createServer(config)`** - Crée et démarre automatiquement un serveur HTTP
-- **`yasui.createApp(config)`** - Renvoie une application Express pour une configuration manuelle
+- **`yasui.createServer(config)`** - Crée et démarre un serveur HTTP automatiquement
+- **`yasui.createApp(config)`** - Retourne une application Express pour une configuration manuelle
 
 Les deux méthodes acceptent le même objet de configuration avec les options suivantes.
 
@@ -20,7 +20,7 @@ Les deux méthodes acceptent le même objet de configuration avec les options su
 **Description:** Tableau des classes de contrôleurs à enregistrer dans votre application.
 
 ```typescript
-import { UserController, ProductController } from './controllers';
+import yasui from 'yasui';
 
 yasui.createServer({
   controllers: [UserController, ProductController]
@@ -31,13 +31,10 @@ yasui.createServer({
 
 #### `middlewares`
 **Type:** `Array<Constructor | RequestHandler>`  
-**Défaut:** `[]`  
-**Description:** Tableau de middlewares globaux à appliquer à toutes les requêtes. Peut être des classes middleware YasuiJS ou des fonctions RequestHandler Express.
+**Default:** `[]`  
+**Description:** Tableau des middlewares globaux à appliquer à toutes les requêtes. Peut être des classes middleware YasuiJS ou des fonctions RequestHandler Express.
 
 ```typescript
-import { LoggingMiddleware } from './middleware';
-import cors from 'cors';
-
 yasui.createServer({
   controllers: [UserController],
   middlewares: [LoggingMiddleware, cors()]
@@ -46,7 +43,7 @@ yasui.createServer({
 
 #### `environment`
 **Type:** `string`  
-**Défaut:** `process.env.NODE_ENV || 'development'`  
+**Default:** `process.env.NODE_ENV || 'development'`  
 **Description:** Nom de l'environnement pour votre application.
 
 ```typescript
@@ -58,7 +55,7 @@ yasui.createServer({
 
 #### `port`
 **Type:** `number`  
-**Défaut:** `3000`  
+**Default:** `3000`  
 **Description:** Numéro de port pour le serveur HTTP. Utilisé uniquement avec `createServer()`.
 
 ```typescript
@@ -70,8 +67,8 @@ yasui.createServer({
 
 #### `debug`
 **Type:** `boolean`  
-**Défaut:** `false`  
-**Description:** Active le mode débogage avec journalisation supplémentaire et traçage des requêtes.
+**Default:** `false`  
+**Description:** Active le mode debug avec des logs supplémentaires et le traçage des requêtes.
 
 ```typescript
 yasui.createServer({
@@ -82,7 +79,7 @@ yasui.createServer({
 
 #### `injections`
 **Type:** `Array<{ token: string, provide: any }>`  
-**Défaut:** `[]`  
+**Default:** `[]`  
 **Description:** Jetons d'injection personnalisés pour l'injection de dépendances. Voir [Injection de Dépendances](/fr/reference/dependency-injection) pour plus de détails.
 
 ```typescript
@@ -97,7 +94,7 @@ yasui.createServer({
 
 #### `swagger`
 **Type:** `SwaggerConfig | undefined`  
-**Défaut:** `undefined`  
+**Default:** `undefined`  
 **Description:** Configuration de la documentation Swagger. Voir [Swagger](/fr/reference/swagger) pour plus de détails.
 
 ```typescript
@@ -107,9 +104,9 @@ yasui.createServer({
     enabled: true,
     path: '/api-docs',
     info: {
-      title: 'My API',
+      title: 'Mon API',
       version: '1.0.0',
-      description: 'API documentation'
+      description: 'Documentation API'
     }
   }
 });
@@ -117,7 +114,7 @@ yasui.createServer({
 
 #### `enableDecoratorValidation`
 **Type:** `boolean`  
-**Défaut:** `true`  
+**Default:** `true`  
 **Description:** Active la validation des décorateurs au démarrage pour détecter les erreurs de configuration.
 
 ```typescript
@@ -152,7 +149,7 @@ yasui.createServer({
 
 ### createApp()
 
-Renvoie une application Express pour une configuration manuelle :
+Retourne une application Express pour une configuration manuelle :
 
 ```typescript
 import yasui from 'yasui';
@@ -168,12 +165,12 @@ app.use('/health', (req, res) => {
 
 // Ajouter des routes personnalisées
 app.get('/custom', (req, res) => {
-  res.json({ message: 'Custom route' });
+  res.json({ message: 'Route personnalisée' });
 });
 
 // Démarrer le serveur manuellement
 app.listen(3000, () => {
-  console.log('Server running on port 3000');
+  console.log('Serveur en cours d\'exécution sur le port 3000');
 });
 ```
 
@@ -185,12 +182,9 @@ app.listen(3000, () => {
 
 ## Exemples de Configuration
 
-### Configuration API de Base
+### Configuration API Basique
 
 ```typescript
-import yasui from 'yasui';
-import { UserController, AuthController } from './controllers';
-
 yasui.createServer({
   controllers: [UserController, AuthController],
   port: 3000,
@@ -201,10 +195,6 @@ yasui.createServer({
 ### Configuration Complète
 
 ```typescript
-import yasui from 'yasui';
-import { UserController, AuthController } from './controllers';
-import { AuthMiddleware, LoggingMiddleware } from './middleware';
-
 yasui.createServer({
   controllers: [UserController, AuthController],
   middlewares: [LoggingMiddleware, AuthMiddleware],
@@ -220,9 +210,9 @@ yasui.createServer({
     enabled: true,
     path: '/api-docs',
     info: {
-      title: 'My API',
+      title: 'Mon API',
       version: '1.0.0',
-      description: 'Complete API with all features'
+      description: 'API complète avec toutes les fonctionnalités'
     }
   }
 });
@@ -251,21 +241,21 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Middleware de gestion d'erreurs
+// Middleware de gestion des erreurs
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+  res.status(500).json({ error: 'Quelque chose s\'est mal passé !' });
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Serveur en cours d'exécution sur le port ${PORT}`);
 });
 ```
 
-## Mode Débogage
+## Mode Debug
 
-Activez le mode débogage pour voir des informations détaillées :
+Activez le mode debug pour voir des informations détaillées :
 
 ```typescript
 yasui.createServer({
@@ -274,8 +264,8 @@ yasui.createServer({
 });
 ```
 
-Le mode débogage fournit :
+Le mode debug fournit :
 - Journalisation des requêtes/réponses
-- Détails sur l'injection de dépendances
+- Détails de l'injection de dépendances
 - Informations sur l'enregistrement des routes
-- Traces de pile d'erreurs
+- Traces des piles d'erreurs

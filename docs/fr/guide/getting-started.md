@@ -95,10 +95,6 @@ Visitez `http://localhost:3000` et vous verrez :
 
 Félicitations ! Vous avez une API YasuiJS fonctionnelle.
 
-## Exemples
-
-Consultez les [exemples complets](https://github.com/thomasbarkats/yasui/tree/main/src/examples) dans le dépôt YasuiJS pour plus de modèles et de cas d'utilisation.
-
 ## Besoin d'aide ?
 
 Si vous rencontrez des problèmes :

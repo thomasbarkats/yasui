@@ -95,10 +95,6 @@ npm run dev
 
 恭喜！您已经拥有了一个可工作的YasuiJS API。
 
-## 示例
-
-查看YasuiJS仓库中的[完整示例](https://github.com/thomasbarkats/yasui/tree/main/src/examples)，了解更多模式和用例。
-
 ## 需要帮助？
 
 如果您遇到任何问题：

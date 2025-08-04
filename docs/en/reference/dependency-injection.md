@@ -125,19 +125,16 @@ You can inject dependencies directly into controller or middleware method parame
 ```typescript
 @Controller('/users')
 export class UserController {
-  constructor(private userService: UserService) {} // Shared instance for the controller
+
+  // Shared instance for the controller
+  constructor(private userService: UserService) {}
 
   @Get('/:id')
   getUser(
     @Param('id') id: string,
-    @Inject() userService: UserService // Instance specific to this endpoint
+    @Inject() userService: UserService // Specific instance to this endpoint
   ) {
     return userService.getUser(id);
-  }
-
-  @Get('/')
-  getUsers(@Inject() userService: UserService) {
-    return userService.getAllUsers();
   }
 }
 ```
