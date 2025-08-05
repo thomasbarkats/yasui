@@ -14,13 +14,12 @@ Les middlewares peuvent être appliqués à trois niveaux avec différentes prio
 3. **Niveau point de terminaison** - Appliqué à des routes spécifiques
 
 ```typescript
-import { Middleware, NextFunction } from 'yasui';
+import { Middleware } from 'yasui';
 
 @Middleware()
 export class LoggingMiddleware {
-  use(@Next() next: NextFunction) {
-    console.log('Requête reçue');
-    next();
+  use() {
+    console.log('Request received');
   }
 }
 ```
@@ -29,23 +28,16 @@ export class LoggingMiddleware {
 
 ### Décorateur Middleware
 
-- `@Middleware()` - Marque une classe comme middleware (pas de paramètres)
-
-Le décorateur `@Middleware()` définit une classe comme middleware. La classe doit implémenter une méthode `use()`. Vous pouvez optionnellement implémenter l'interface `IMiddleware` fournie par YasuiJS pour imposer la signature de la méthode.
+Le décorateur `@Middleware()` marque une classe comme middleware. La classe doit implémenter une méthode `use()`. Vous pouvez optionnellement implémenter l'interface `IMiddleware` fournie par YasuiJS pour imposer la signature de la méthode.
 
 ```typescript
-import {
-  Middleware, IMiddleware,
-  Request, Response, NextFunction,
-  Req, Res, Next,
-} from 'yasui';
+import { Middleware, IMiddleware, Request, Response, Req, Res } from 'yasui';
 
 @Middleware()
 export class AuthMiddleware implements IMiddleware {
   use(
     @Req() req: Request,
-    @Res() res: Response,
-    @Next() next: NextFunction
+    @Res() res: Response
   ) {
     const token = req.headers.authorization;
     
@@ -54,14 +46,14 @@ export class AuthMiddleware implements IMiddleware {
     }
     // Logique de validation du token ici
 
-    next(); // Continue vers le prochain middleware ou la logique du contrôleur
+    // Continuera vers le prochain middleware ou la logique du contrôleur si vous ne retournez rien/void
   }
 }
 ```
 
 ### Décorateurs de paramètres dans les Middlewares
 
-Les middlewares peuvent utiliser les mêmes décorateurs de paramètres que les contrôleurs :
+Les middlewares peuvent utiliser les mêmes décorateurs de paramètres que les contrôleurs et bénéficier également de la capture automatique des erreurs :
 
 ```typescript
 @Middleware()
@@ -69,16 +61,13 @@ export class ValidationMiddleware {
   use(
     @Body() body: any,
     @Query('validate') shouldValidate: boolean,
-    @Header('content-type') contentType: string,
-    @Next() next: NextFunction
+    @Header('content-type') contentType: string
   ) {
     if (shouldValidate && !this.isValid(body)) {
-      throw new Error('Données de requête invalides');
+      throw new HttpError(400, 'Données de requête invalides');
     }
-    
-    next();
   }
-  
+
   private isValid(data: any): boolean {
     // Logique de validation
     return true;
@@ -86,21 +75,25 @@ export class ValidationMiddleware {
 }
 ```
 
-### Exécution des Middlewares
+### Injection de dépendances
 
-Vous devez explicitement appeler `next()` pour continuer vers le prochain middleware ou contrôleur. Pour arrêter le pipeline de requête, vous pouvez soit :
-- Retourner une réponse en utilisant `@Res()`
-- Lancer une erreur
-- Ne pas appeler `next()`
+Comme les classes Middleware agissent comme des Contrôleurs, elles permettent également l'injection de dépendances de la même manière :
 
 ```typescript
 @Middleware()
-export class ConditionalMiddleware {
-  use(@Req() req: Request, @Next() next: NextFunction) {
-    if (req.path === '/public') {
-      next(); // Continue le pipeline
+export class LoggingMiddleware {
+  constructor (
+    private validationService: ValidationService, // Injection standard
+    @Inject('CONFIG') private config: AppConfig, // Injection personnalisée pré-enregistrée
+  ) {}
+
+  use(
+    @Body() body: any,
+    @Inject() anotherService: AnotherService, // Pareil au niveau de la méthode
+  ) {
+    if (!this.validationService.isValid(body)) {
+      throw new HttpError(400, 'Données de requête invalides');
     }
-    // Ne pas appeler next() pour arrêter ici
   }
 }
 ```
@@ -136,7 +129,7 @@ yasui.createServer({
 
 ### Niveau Contrôleur
 
-Appliqué à toutes les routes dans un contrôleur spécifique :
+Appliqué à toutes les routes d'un contrôleur spécifique :
 
 ```typescript
 // Middleware unique
@@ -152,7 +145,7 @@ export class AdminController {
 }
 ```
 
-### Niveau Point de Terminaison
+### Niveau Point de terminaison
 
 Appliqué uniquement à des routes spécifiques :
 

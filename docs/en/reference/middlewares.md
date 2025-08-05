@@ -14,13 +14,12 @@ Middlewares can be applied at three levels with different execution priorities:
 3. **Endpoint level** - Applied to specific routes
 
 ```typescript
-import { Middleware, NextFunction } from 'yasui';
+import { Middleware } from 'yasui';
 
 @Middleware()
 export class LoggingMiddleware {
-  use(@Next() next: NextFunction) {
+  use() {
     console.log('Request received');
-    next();
   }
 }
 ```
@@ -29,23 +28,16 @@ export class LoggingMiddleware {
 
 ### Middleware Decorator
 
-- `@Middleware()` - Mark a class as middleware (no parameters)
-
-The `@Middleware()` decorator defines a class as middleware. The class must implement a `use()` method. You can optionally implement the `IMiddleware` interface provided by YasuiJS to enforce the method signature.
+The `@Middleware()` decorator marks a class as middleware. The class must implement a `use()` method. You can optionally implement the `IMiddleware` interface provided by YasuiJS to enforce the method signature.
 
 ```typescript
-import {
-  Middleware, IMiddleware,
-  Request, Response, NextFunction,
-  Req, Res, Next,
-} from 'yasui';
+import { Middleware, IMiddleware, Request, Response, Req, Res } from 'yasui';
 
 @Middleware()
 export class AuthMiddleware implements IMiddleware {
   use(
     @Req() req: Request,
-    @Res() res: Response,
-    @Next() next: NextFunction
+    @Res() res: Response
   ) {
     const token = req.headers.authorization;
     
@@ -54,14 +46,14 @@ export class AuthMiddleware implements IMiddleware {
     }
     // Validate token logic here
 
-    next(); // Continue to next middleware or controller logic
+    // Will continue to next middleware or controller logic if you return nothing/void
   }
 }
 ```
 
 ### Parameter Decorators in Middlewares
 
-Middlewares can use the same parameter decorators as controllers:
+Middlewares can use the same parameter decorators as controllers and benefit from automatic error catching too:
 
 ```typescript
 @Middleware()
@@ -69,16 +61,13 @@ export class ValidationMiddleware {
   use(
     @Body() body: any,
     @Query('validate') shouldValidate: boolean,
-    @Header('content-type') contentType: string,
-    @Next() next: NextFunction
+    @Header('content-type') contentType: string
   ) {
     if (shouldValidate && !this.isValid(body)) {
-      throw new Error('Invalid request data');
+      throw new HttpError(400, 'Invalid request data');
     }
-    
-    next();
   }
-  
+
   private isValid(data: any): boolean {
     // Validation logic
     return true;
@@ -86,21 +75,25 @@ export class ValidationMiddleware {
 }
 ```
 
-### Middleware Execution
+### Dependency Injection
 
-You must explicitly call `next()` to continue to the next middleware or controller. To stop the request pipeline, either:
-- Return a response using `@Res()`
-- Throw an error
-- Don't call `next()`
+As Middleware classes act like Controllers, they also allow dependency injection in the same way:
 
 ```typescript
 @Middleware()
-export class ConditionalMiddleware {
-  use(@Req() req: Request, @Next() next: NextFunction) {
-    if (req.path === '/public') {
-      next(); // Continue pipeline
+export class LoggingMiddleware {
+  constructor (
+    private validationService: ValidationService, // Standard injection
+    @Inject('CONFIG') private config: AppConfig, // Pre-registered custom injection
+  ) {}
+
+  use(
+    @Body() body: any,
+    @Inject() anotherService: AnotherService, // Same at method level
+  ) {
+    if (!this.validationService.isValid(body)) {
+      throw new HttpError(400, 'Invalid request data');
     }
-    // Don't call next() to stop here
   }
 }
 ```

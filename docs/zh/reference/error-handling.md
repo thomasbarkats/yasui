@@ -1,6 +1,6 @@
 # 错误处理
 
-YasuiJS 为日志记录和客户端响应提供自动错误处理和格式化。所有控制器方法都自动包含错误处理，以捕获和处理任何抛出的错误。
+YasuiJS 为日志记录和客户端响应提供自动错误处理和格式化。所有控制器方法都会自动包装错误处理以捕获和处理任何抛出的错误。
 
 ## 概述
 
@@ -26,7 +26,7 @@ getUser(@Param('id') id: string) {
 
 ### HttpError 类
 
-通过扩展或使用 `HttpError` 类创建具有特定状态码和额外数据的自定义错误。您的自定义错误必须设置 `status` 和 `message` 属性，并可以包含任何其他属性。
+如果你抛出一个 `Error`，默认的 HTTP 状态码将是 500（内部服务器错误）。要指定与你的错误相对应的预期 HTTP 返回状态，请抛出 `HttpError`：
 
 ```typescript
 import { HttpError, HttpCode } from 'yasui';
@@ -39,23 +39,25 @@ export class UserController {
    const user = this.userService.findById(id);
 
    if (!user) {
-     throw new HttpError(HttpCode.NOT_FOUND, '未找到用户');
+     throw new HttpError(HttpCode.NOT_FOUND, `User ${id} not found`);
    }
    return user;
  }
 }
 ```
 
+你可以指定一个数字代码（如 400）或使用示例中提供的枚举 `HttpCode`。有关 HTTP 状态码及其含义的完整列表，请参阅 [HTTP 响应状态码文档](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)。
+
 ### 自定义错误类
 
-为特定业务逻辑错误创建自定义错误类：
+通过扩展或使用 `HttpError` 类创建具有特定状态码和附加数据的自定义错误。你的自定义错误必须通过调用父构造函数来设置 `status` 和 `message` 属性，并可以包含任何其他属性。
 
 ```typescript
 class ValidationError extends HttpError {
   fields: string[];
 
   constructor(fields: string[]) {
-    super(HttpCode.BAD_REQUEST, '缺少必填字段');
+    super(HttpCode.BAD_REQUEST, 'Missing required fields');
     this.fields = fields;
   }
 }
@@ -74,10 +76,7 @@ export class UserController {
   }
 }
 ```
-
-## HttpCode 枚举
-
-YasuiJS 提供了一个包含常用 HTTP 状态码的 `HttpCode` 枚举。有关 HTTP 状态码及其含义的完整列表，请参阅 [HTTP 响应状态码文档](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)。
+附加属性将包含在 Yasui 的格式化响应中。
 
 ## 错误响应格式
 
@@ -89,7 +88,7 @@ YasuiJS 提供了一个包含常用 HTTP 状态码的 `HttpCode` 枚举。有关
   "path": "/api/users/123",
   "method": "POST",
   "name": "ValidationError", // 错误类名
-  "message": "缺少必填字段",
+  "message": "Missing required fields",
   "statusMessage": "Bad Request", // HTTP 状态消息
   "status": 404, // HTTP 状态码
   "data": {
@@ -112,16 +111,20 @@ export class UserService {
     const user = this.database.findUser(id);
     if (!user) {
       // 这将被控制器的错误处理器捕获
-      throw new HttpError(HttpCode.NOT_FOUND, '未找到用户');
+      throw new HttpError(HttpCode.NOT_FOUND, 'User not found');
     }
     return user;
   }
 }
 ```
 
+## 错误日志
+
+在调试模式下（Yasui 配置中的 `debug` 选项），端点返回的所有错误都将被记录。在生产环境中，只有 500 错误（内部服务器错误）会被记录，因为它们是意外的，通常不是业务错误。
+
 ## 装饰器验证
 
-YasuiJS 在启动时自动验证您的装饰器，以捕获常见的配置错误。这些错误在服务器初始化后报告，但不会停止服务器运行：
+YasuiJS 在启动时自动验证你的装饰器以捕获常见的配置错误。这些错误在服务器初始化后报告，但不会停止服务器运行：
 
 ```typescript
 // 这将被检测并报告为错误
@@ -145,7 +148,7 @@ export class UserController {
 }
 ```
 
-您可以在配置中禁用装饰器验证（不推荐）：
+你可以在配置中禁用装饰器验证（不推荐）：
 
 ```typescript
 yasui.createServer({

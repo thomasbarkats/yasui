@@ -1,6 +1,6 @@
 # Gestion des Erreurs
 
-YasuiJS fournit une gestion et un formatage automatiques des erreurs pour la journalisation et les réponses client. Toutes les méthodes du contrôleur sont automatiquement encapsulées avec une gestion des erreurs pour capturer et traiter toutes les erreurs levées.
+YasuiJS fournit une gestion et un formatage automatiques des erreurs pour la journalisation et les réponses client. Toutes les méthodes du contrôleur sont automatiquement encapsulées avec une gestion des erreurs pour capturer et traiter les erreurs levées.
 
 ## Aperçu
 
@@ -26,7 +26,7 @@ getUser(@Param('id') id: string) {
 
 ### Classe HttpError
 
-Créez des erreurs personnalisées avec des codes de statut spécifiques et des données supplémentaires en étendant ou en utilisant la classe `HttpError`. Votre erreur personnalisée doit définir les propriétés `status` et `message` et peut inclure des propriétés supplémentaires.
+Le statut HTTP par défaut renvoyé si vous levez une `Error` sera 500 (Erreur Interne du Serveur). Pour spécifier le statut HTTP de retour correspondant à votre erreur, levez un `HttpError` :
 
 ```typescript
 import { HttpError, HttpCode } from 'yasui';
@@ -39,16 +39,18 @@ export class UserController {
    const user = this.userService.findById(id);
 
    if (!user) {
-     throw new HttpError(HttpCode.NOT_FOUND, 'Utilisateur non trouvé');
+     throw new HttpError(HttpCode.NOT_FOUND, `Utilisateur ${id} non trouvé`);
    }
    return user;
  }
 }
 ```
 
+Vous pouvez spécifier un code comme un nombre (ex. 400) ou utiliser l'énumération fournie `HttpCode` comme dans l'exemple. Pour une liste complète des codes de statut HTTP et leurs significations, consultez la [documentation des codes de statut de réponse HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status).
+
 ### Classes d'Erreur Personnalisées
 
-Créez des classes d'erreur personnalisées pour des erreurs de logique métier spécifiques :
+Créez des erreurs personnalisées avec des codes de statut spécifiques et des données supplémentaires en étendant ou en utilisant la classe `HttpError`. Votre erreur personnalisée doit définir les propriétés `status` et `message` en appelant le constructeur parent, et peut inclure des propriétés supplémentaires.
 
 ```typescript
 class ValidationError extends HttpError {
@@ -74,10 +76,7 @@ export class UserController {
   }
 }
 ```
-
-## Énumération HttpCode
-
-YasuiJS fournit une énumération `HttpCode` avec les codes de statut HTTP courants. Pour une liste complète des codes de statut HTTP et leurs significations, consultez la [documentation des codes de statut de réponse HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status).
+Les propriétés supplémentaires seront incluses dans la réponse formatée de Yasui.
 
 ## Format de Réponse d'Erreur
 
@@ -118,6 +117,10 @@ export class UserService {
   }
 }
 ```
+
+## Journaux d'erreurs
+
+En mode debug (option `debug` dans la configuration Yasui), toutes les erreurs renvoyées par les points de terminaison seront journalisées. En production, seules les erreurs 500 (Erreur Interne du Serveur) seront journalisées, considérant qu'elles sont inattendues et ne sont généralement pas des erreurs métier.
 
 ## Validation des Décorateurs
 

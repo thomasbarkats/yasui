@@ -14,13 +14,12 @@ Los middlewares se pueden aplicar en tres niveles con diferentes prioridades de 
 3. **Nivel de endpoint** - Aplicado a rutas específicas
 
 ```typescript
-import { Middleware, NextFunction } from 'yasui';
+import { Middleware } from 'yasui';
 
 @Middleware()
 export class LoggingMiddleware {
-  use(@Next() next: NextFunction) {
+  use() {
     console.log('Request received');
-    next();
   }
 }
 ```
@@ -29,23 +28,16 @@ export class LoggingMiddleware {
 
 ### Decorador Middleware
 
-- `@Middleware()` - Marca una clase como middleware (sin parámetros)
-
-El decorador `@Middleware()` define una clase como middleware. La clase debe implementar un método `use()`. Opcionalmente puede implementar la interfaz `IMiddleware` proporcionada por YasuiJS para forzar la firma del método.
+El decorador `@Middleware()` marca una clase como middleware. La clase debe implementar un método `use()`. Opcionalmente puede implementar la interfaz `IMiddleware` proporcionada por YasuiJS para forzar la firma del método.
 
 ```typescript
-import {
-  Middleware, IMiddleware,
-  Request, Response, NextFunction,
-  Req, Res, Next,
-} from 'yasui';
+import { Middleware, IMiddleware, Request, Response, Req, Res } from 'yasui';
 
 @Middleware()
 export class AuthMiddleware implements IMiddleware {
   use(
     @Req() req: Request,
-    @Res() res: Response,
-    @Next() next: NextFunction
+    @Res() res: Response
   ) {
     const token = req.headers.authorization;
     
@@ -54,14 +46,14 @@ export class AuthMiddleware implements IMiddleware {
     }
     // Lógica de validación del token aquí
 
-    next(); // Continuar al siguiente middleware o lógica del controlador
+    // Continuará al siguiente middleware o lógica del controlador si no devuelve nada/void
   }
 }
 ```
 
 ### Decoradores de Parámetros en Middlewares
 
-Los middlewares pueden usar los mismos decoradores de parámetros que los controladores:
+Los middlewares pueden usar los mismos decoradores de parámetros que los controladores y beneficiarse también de la captura automática de errores:
 
 ```typescript
 @Middleware()
@@ -69,16 +61,13 @@ export class ValidationMiddleware {
   use(
     @Body() body: any,
     @Query('validate') shouldValidate: boolean,
-    @Header('content-type') contentType: string,
-    @Next() next: NextFunction
+    @Header('content-type') contentType: string
   ) {
     if (shouldValidate && !this.isValid(body)) {
-      throw new Error('Datos de solicitud inválidos');
+      throw new HttpError(400, 'Datos de solicitud inválidos');
     }
-    
-    next();
   }
-  
+
   private isValid(data: any): boolean {
     // Lógica de validación
     return true;
@@ -86,21 +75,25 @@ export class ValidationMiddleware {
 }
 ```
 
-### Ejecución de Middleware
+### Inyección de Dependencias
 
-Debe llamar explícitamente a `next()` para continuar al siguiente middleware o controlador. Para detener el pipeline de solicitud, puede:
-- Devolver una respuesta usando `@Res()`
-- Lanzar un error
-- No llamar a `next()`
+Como las clases Middleware actúan como Controladores, también permiten la inyección de dependencias de la misma manera:
 
 ```typescript
 @Middleware()
-export class ConditionalMiddleware {
-  use(@Req() req: Request, @Next() next: NextFunction) {
-    if (req.path === '/public') {
-      next(); // Continuar pipeline
+export class LoggingMiddleware {
+  constructor (
+    private validationService: ValidationService, // Inyección estándar
+    @Inject('CONFIG') private config: AppConfig, // Inyección personalizada pre-registrada
+  ) {}
+
+  use(
+    @Body() body: any,
+    @Inject() anotherService: AnotherService, // Lo mismo a nivel de método
+  ) {
+    if (!this.validationService.isValid(body)) {
+      throw new HttpError(400, 'Datos de solicitud inválidos');
     }
-    // No llamar next() para detenerse aquí
   }
 }
 ```

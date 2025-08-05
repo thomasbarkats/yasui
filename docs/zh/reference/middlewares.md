@@ -5,8 +5,8 @@
 ## 概述
 
 YasuiJS 支持两种类型的中间件：
-- **基于类的中间件**，使用 `@Middleware()` 装饰器
-- **Express RequestHandler 函数**，用于与现有 Express 中间件兼容
+- **基于类的中间件**使用 `@Middleware()` 装饰器
+- **Express RequestHandler 函数**用于与现有 Express 中间件兼容
 
 中间件可以在三个级别应用，具有不同的执行优先级：
 1. **应用程序级别** - 应用于所有请求
@@ -14,13 +14,12 @@ YasuiJS 支持两种类型的中间件：
 3. **端点级别** - 应用于特定路由
 
 ```typescript
-import { Middleware, NextFunction } from 'yasui';
+import { Middleware } from 'yasui';
 
 @Middleware()
 export class LoggingMiddleware {
-  use(@Next() next: NextFunction) {
+  use() {
     console.log('Request received');
-    next();
   }
 }
 ```
@@ -29,23 +28,16 @@ export class LoggingMiddleware {
 
 ### 中间件装饰器
 
-- `@Middleware()` - 将类标记为中间件（无参数）
-
-`@Middleware()` 装饰器将类定义为中间件。该类必须实现 `use()` 方法。您可以选择实现 YasuiJS 提供的 `IMiddleware` 接口来强制执行方法签名。
+`@Middleware()` 装饰器将类标记为中间件。该类必须实现 `use()` 方法。您可以选择实现 YasuiJS 提供的 `IMiddleware` 接口来强制执行方法签名。
 
 ```typescript
-import {
-  Middleware, IMiddleware,
-  Request, Response, NextFunction,
-  Req, Res, Next,
-} from 'yasui';
+import { Middleware, IMiddleware, Request, Response, Req, Res } from 'yasui';
 
 @Middleware()
 export class AuthMiddleware implements IMiddleware {
   use(
     @Req() req: Request,
-    @Res() res: Response,
-    @Next() next: NextFunction
+    @Res() res: Response
   ) {
     const token = req.headers.authorization;
     
@@ -54,14 +46,14 @@ export class AuthMiddleware implements IMiddleware {
     }
     // 在此处验证令牌逻辑
 
-    next(); // 继续执行下一个中间件或控制器逻辑
+    // 如果返回 nothing/void 将继续执行下一个中间件或控制器逻辑
   }
 }
 ```
 
 ### 中间件中的参数装饰器
 
-中间件可以使用与控制器相同的参数装饰器：
+中间件可以使用与控制器相同的参数装饰器，并且也能受益于自动错误捕获：
 
 ```typescript
 @Middleware()
@@ -69,16 +61,13 @@ export class ValidationMiddleware {
   use(
     @Body() body: any,
     @Query('validate') shouldValidate: boolean,
-    @Header('content-type') contentType: string,
-    @Next() next: NextFunction
+    @Header('content-type') contentType: string
   ) {
     if (shouldValidate && !this.isValid(body)) {
-      throw new Error('Invalid request data');
+      throw new HttpError(400, 'Invalid request data');
     }
-    
-    next();
   }
-  
+
   private isValid(data: any): boolean {
     // 验证逻辑
     return true;
@@ -86,21 +75,25 @@ export class ValidationMiddleware {
 }
 ```
 
-### 中间件执行
+### 依赖注入
 
-您必须显式调用 `next()` 以继续执行下一个中间件或控制器。要停止请求管道，可以：
-- 使用 `@Res()` 返回响应
-- 抛出错误
-- 不调用 `next()`
+由于中间件类的行为类似于控制器，它们也以相同的方式允许依赖注入：
 
 ```typescript
 @Middleware()
-export class ConditionalMiddleware {
-  use(@Req() req: Request, @Next() next: NextFunction) {
-    if (req.path === '/public') {
-      next(); // 继续管道
+export class LoggingMiddleware {
+  constructor (
+    private validationService: ValidationService, // 标准注入
+    @Inject('CONFIG') private config: AppConfig, // 预注册的自定义注入
+  ) {}
+
+  use(
+    @Body() body: any,
+    @Inject() anotherService: AnotherService, // 方法级别相同
+  ) {
+    if (!this.validationService.isValid(body)) {
+      throw new HttpError(400, 'Invalid request data');
     }
-    // 不调用 next() 以在此处停止
   }
 }
 ```

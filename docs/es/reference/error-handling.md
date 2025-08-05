@@ -26,7 +26,7 @@ getUser(@Param('id') id: string) {
 
 ### Clase HttpError
 
-Crea errores personalizados con códigos de estado específicos y datos adicionales extendiendo o usando la clase `HttpError`. Tu error personalizado debe establecer las propiedades `status` y `message` y puede incluir cualquier propiedad adicional.
+El estado HTTP predeterminado si lanzas un `Error` será 500 (Error Interno del Servidor). Para especificar el estado HTTP esperado correspondiente a tu error, lanza un `HttpError`:
 
 ```typescript
 import { HttpError, HttpCode } from 'yasui';
@@ -39,16 +39,18 @@ export class UserController {
    const user = this.userService.findById(id);
 
    if (!user) {
-     throw new HttpError(HttpCode.NOT_FOUND, 'Usuario no encontrado');
+     throw new HttpError(HttpCode.NOT_FOUND, `Usuario ${id} no encontrado`);
    }
    return user;
  }
 }
 ```
 
+Puedes especificar un código como número (ej. 400) o usar la enumeración proporcionada `HttpCode` como en el ejemplo. Para una lista completa de códigos de estado HTTP y sus significados, consulta la [documentación de códigos de estado de respuesta HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status).
+
 ### Clases de Error Personalizadas
 
-Crea clases de error personalizadas para errores específicos de lógica de negocio:
+Crea errores personalizados con códigos de estado específicos y datos adicionales extendiendo o usando la clase `HttpError`. Tu error personalizado debe establecer las propiedades `status` y `message` llamando al constructor padre, y puede incluir cualquier propiedad adicional.
 
 ```typescript
 class ValidationError extends HttpError {
@@ -74,10 +76,7 @@ export class UserController {
   }
 }
 ```
-
-## Enum HttpCode
-
-YasuiJS proporciona un enum `HttpCode` con códigos de estado HTTP comunes. Para una lista completa de códigos de estado HTTP y sus significados, consulta la [documentación de códigos de estado de respuesta HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status).
+Las propiedades adicionales se incluirán en la respuesta formateada de Yasui.
 
 ## Formato de Respuesta de Error
 
@@ -93,7 +92,7 @@ Cuando se lanza un error, YasuiJS automáticamente lo formatea en una respuesta 
   "statusMessage": "Bad Request", // Mensaje de estado HTTP
   "status": 404, // Código de estado HTTP
   "data": {
-    "fields": ["name", "age"]
+    "fields": ["nombre", "edad"]
   }
 }
 ```
@@ -118,6 +117,10 @@ export class UserService {
   }
 }
 ```
+
+## Registros de errores
+
+En modo debug (opción `debug` en la configuración de Yasui), todos los errores devueltos por los endpoints serán registrados. En producción, solo los errores 500 (Error Interno del Servidor) serán registrados, considerando que son inesperados y no son usualmente errores de negocio.
 
 ## Validación de Decoradores
 

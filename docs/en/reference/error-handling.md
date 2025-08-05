@@ -26,7 +26,7 @@ getUser(@Param('id') id: string) {
 
 ### HttpError Class
 
-Create custom errors with specific status codes and additional data by extending or using the `HttpError` class. Your custom error must set `status` and `message` properties and can include any additional properties.
+The default HTTP status returned if you raise an `Error` will be 500 (Internal Server Error). To specify the expected HTTP return status corresponding to your error, raise an `HttpError`:
 
 ```typescript
 import { HttpError, HttpCode } from 'yasui';
@@ -39,16 +39,18 @@ export class UserController {
    const user = this.userService.findById(id);
 
    if (!user) {
-     throw new HttpError(HttpCode.NOT_FOUND, 'User not found');
+     throw new HttpError(HttpCode.NOT_FOUND, `User ${id} not found`);
    }
    return user;
  }
 }
 ```
 
+You can specify a code as a number (eg. 400) or use the provided enumeration `HttpCode` as in the example. For a complete list of HTTP status codes and their meanings, see the [HTTP response status codes documentation](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status).
+
 ### Custom Error Classes
 
-Create custom error classes for specific business logic errors:
+Create custom errors with specific status codes and additional data by extending or using the `HttpError` class. Your custom error must set `status` and `message` properties by calling the parent constructor, and can include any additional properties.
 
 ```typescript
 class ValidationError extends HttpError {
@@ -74,10 +76,7 @@ export class UserController {
   }
 }
 ```
-
-## HttpCode Enum
-
-YasuiJS provides an `HttpCode` enum with common HTTP status codes. For a complete list of HTTP status codes and their meanings, see the [HTTP response status codes documentation](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status).
+Additional properties will be included in the formatted response from Yasui.
 
 ## Error Response Format
 
@@ -118,6 +117,10 @@ export class UserService {
   }
 }
 ```
+
+## Error Logs
+
+In debug mode (`debug` option in Yasui configuration), all errors returned by endpoints will be logged. In production, only 500 errors (Internal Server Error) will be logged, considering that they are unexpected and are not usually business errors.
 
 ## Decorator Validation
 
