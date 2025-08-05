@@ -1,6 +1,6 @@
 {
   "name": "yasui",
-  "version": "2.2.2",
+  "version": "2.4.0",
   "description": "Lightweight Express-based framework for REST and web APIs",
   "license": "AGPL-3.0-or-later",
   "author": "Thomas BARKATS",
