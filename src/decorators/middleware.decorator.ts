@@ -7,7 +7,7 @@ import { defineMetadata, getMetadata } from '../utils/reflect';
 
 
 /** express middleware decorator */
-export const Middleware = (): ClassDecorator => {
+export function Middleware(): ClassDecorator {
   return function (target: Function): void {
 
     target.prototype.run = (self: IMiddleware): RequestHandler => {

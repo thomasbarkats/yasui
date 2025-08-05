@@ -61,9 +61,14 @@ export class AppService {
     const errResource = new ErrorResource(err, req);
     res.status(errResource.status).json(errResource);
 
-    const logger: LoggerService = req.logger || this.logger;
-    logger.error(`${err.constructor.name}`, req.source);
-    if (this.appConfig.debug || errResource.status === HttpCode.INTERNAL_SERVER_ERROR) {
+    const isInternalServerError = errResource.status === HttpCode.INTERNAL_SERVER_ERROR;
+
+    if (this.appConfig.debug || isInternalServerError) {
+      const logger: LoggerService = req.logger || this.logger;
+      logger.error(
+        (isInternalServerError ? 'Unexpected ' : '') + err.constructor.name,
+        req.source + (this.appConfig.debug ? '(debug)' : '')
+      );
       console.error(red(
         `source: ${filename ? `${filename} ${line}:${column}` : 'undefined'}\n` +
         errResource.toString(),

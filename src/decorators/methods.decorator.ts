@@ -91,12 +91,12 @@ export function routeHandler(
     const maxIndex = allIndexes.length > 0 ? Math.max(...allIndexes) : -1;
     const args: unknown[] = new Array(maxIndex + 1);
 
-    // Bind Express parameters (@Param, @Body, etc.) with type transformation
+    // Bind Express parameters (@Param, @Body, etc.) with type casting
     for (const param of params) {
       let value = param.path.reduce((prev, curr) => prev && prev[curr] || null, routeHandlerArgs);
 
-      if (value !== null && param.type && shouldTransformParam(param.path)) {
-        value = transformParamValue(value, param.type);
+      if (value !== null && param.type && shouldCastParam(param.path)) {
+        value = castParamValue(value, param.type);
       }
       args[param.index] = value;
     }
@@ -109,8 +109,10 @@ export function routeHandler(
 
     try {
       const result: unknown = await routeFunction.apply(self, args);
-      if (!isMiddleware) {
+      if (result || !isMiddleware) {
         res.status(defaultStatus).json(result);
+      } else {
+        next();
       }
     } catch (err) {
       next(err);
@@ -118,7 +120,7 @@ export function routeHandler(
   };
 }
 
-function shouldTransformParam(path: string[]): boolean {
+function shouldCastParam(path: string[]): boolean {
   if (path.length < 2) {
     return false;
   }
@@ -130,7 +132,7 @@ function shouldTransformParam(path: string[]): boolean {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function transformParamValue(value: string, paramType: Function): any {
+function castParamValue(value: string, paramType: Function): any {
   switch (paramType) {
     case Number:
       return Number(value);
