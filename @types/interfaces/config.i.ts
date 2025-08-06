@@ -1,11 +1,14 @@
 import { TController } from './controller.i';
 import { TMiddleware } from './middleware.i';
-import { Injection } from './utils.i';
+import { IPipeTransform } from './pipe.i';
+import { Constructible, Injection } from './utils.i';
 
 
 export interface YasuiConfig {
   controllers?: TController[];
   middlewares?: TMiddleware[];
+  /** Global pipes applied to all route parameters in sequence */
+  globalPipes?: Constructible<IPipeTransform>[];
   /** Pre-registered customs injections */
   injections?: Injection[];
   environment?: string;

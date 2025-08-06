@@ -1,14 +1,12 @@
-import { RequestHandler, Router } from 'express';
+import { Router, RequestHandler } from 'express';
 import { italic } from 'kleur';
 
 import { Core } from '../core';
 import { LoggerService } from '../services';
-import {
-  IController,
-  TMiddleware,
-} from '~types/interfaces';
-import { ReflectMetadata } from '~types/enums';
 import { defineMetadata, getMetadata } from '../utils/reflect';
+import { routeHandler } from '../utils/route-handler';
+import { ReflectMetadata } from '~types/enums';
+import { Constructible, IController, IPipeTransform, TMiddleware } from '~types/interfaces';
 
 
 export function Controller(
@@ -55,7 +53,18 @@ export function Controller(
         const middlewares: RequestHandler[] = route.middlewares.map(
           (Middleware: TMiddleware) => core.useMiddleware(Middleware)
         );
-        router[route.method](route.path, ...middlewares, route.function);
+
+        const pipes = [
+          ...(core.config.globalPipes || []),
+          ...(getMetadata(ReflectMetadata.PIPES, target.prototype) || []),
+          ...(getMetadata(ReflectMetadata.PIPES, target.prototype, route.methodName) || [])
+        ].map(
+          (Pipe: Constructible<IPipeTransform>) => core.build(Pipe)
+        );
+
+        router[route.method](route.path, ...middlewares,
+          routeHandler(target, route.descriptor, route.params, pipes, false, route.defaultStatus)
+        );
       }
       return router;
     };

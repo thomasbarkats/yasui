@@ -1,9 +1,9 @@
 import { RequestHandler } from 'express';
 
-import { IMiddleware } from '~types/interfaces';
-import { routeHandler } from './methods.decorator';
-import { ReflectMetadata } from '~types/enums';
 import { defineMetadata, getMetadata } from '../utils/reflect';
+import { routeHandler } from '../utils/route-handler';
+import { IMiddleware } from '~types/interfaces';
+import { ReflectMetadata } from '~types/enums';
 
 
 /** express middleware decorator */
@@ -25,6 +25,7 @@ export function Middleware(): ClassDecorator {
         target.prototype,
         descriptor,
         params,
+        [],
         true
       );
     };
