@@ -1,4 +1,11 @@
-import { IControllerRoute, Instance, IRouteParam, ApiPropertyDefinition } from '../interfaces';
+import {
+  IControllerRoute,
+  Instance,
+  IRouteParam,
+  ApiPropertyDefinition,
+  IPipeTransform,
+  Constructible,
+} from '../interfaces';
 import { HttpCode } from './http-code.enum';
 import { Scopes } from './scopes.enum';
 import { OpenAPIOperation } from '../openapi';
@@ -12,6 +19,7 @@ export enum ReflectMetadata {
   METHOD_INJECTED_DEPS = 'METHOD_INJECTED_DEPS',
   RESOLVED_METHOD_DEPS = 'RESOLVED_METHOD_DEPS',
   ROUTES = 'ROUTES',
+  PIPES = 'PIPES',
   HTTP_STATUS = 'HTTP_STATUS',
   PARAMS = 'PARAMS',
   SELF = 'SELF',
@@ -30,6 +38,7 @@ export interface ReflectTypes {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [ReflectMetadata.RESOLVED_METHOD_DEPS]: Record<number, any>;
   [ReflectMetadata.ROUTES]: IControllerRoute[];
+  [ReflectMetadata.PIPES]: Constructible<IPipeTransform>[];
   [ReflectMetadata.HTTP_STATUS]: HttpCode;
   [ReflectMetadata.PARAMS]: IRouteParam[];
   [ReflectMetadata.SELF]: Instance;

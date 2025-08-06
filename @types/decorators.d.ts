@@ -1,13 +1,17 @@
 /* eslint-disable no-redeclare */
 /* eslint-disable max-len */
 
-import { Constructible, ApiPropertyDefinition, TMiddleware } from './interfaces';
+import { Constructible, ApiPropertyDefinition, TMiddleware, IPipeTransform } from './interfaces';
 import { HttpCode, Scopes } from './enums';
 import { HttpError } from './utils';
 
 
 export function Controller(path: string, ...middlewares: TMiddleware[]): ClassDecorator;
 export function Middleware(): ClassDecorator;
+export function PipeTransform(): ClassDecorator;
+
+/** Applies pipes to all routes in the controller or a specific one (use to transform/validate route params) */
+export function UsePipes(...pipes: Constructible<IPipeTransform>[]): ClassDecorator & MethodDecorator;
 
 
 // --- Injections related decorators ---
