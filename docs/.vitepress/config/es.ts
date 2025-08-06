@@ -30,9 +30,10 @@ export default {
           { text: 'Configuración', link: '/es/reference/config' },
           { text: 'Controladores', link: '/es/reference/controllers' },
           { text: 'Middlewares', link: '/es/reference/middlewares' },
+          { text: 'Pipes', link: '/es/reference/pipes' },
           { text: 'Inyección de Dependencias', link: '/es/reference/dependency-injection' },
-          { text: 'Registro de Eventos', link: '/es/reference/logging' },
           { text: 'Manejo de Errores', link: '/es/reference/error-handling' },
+          { text: 'Registro de Eventos', link: '/es/reference/logging' },
           { text: 'Swagger Doc.', link: '/es/reference/swagger' }
         ]
       }

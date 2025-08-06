@@ -9,7 +9,7 @@ YasuiJS 提供两种主要方式来创建应用程序：
 - **`yasui.createServer(config)`** - 自动创建并启动 HTTP 服务器
 - **`yasui.createApp(config)`** - 返回一个可手动配置的 Express 应用程序
 
-这两种方法都接受相同的配置对象，具有以下选项。
+这两种方法接受相同的配置对象，具有以下选项。
 
 ## 配置选项
 
@@ -30,99 +30,66 @@ yasui.createServer({
 ### 可选选项
 
 #### `middlewares`
-**类型:** `Array<Constructor | RequestHandler>`  
-**默认值:** `[]`  
-**描述:** 应用于所有请求的全局中间件数组。可以是 YasuiJS 中间件类或 Express RequestHandler 函数。
+应用于所有请求的全局中间件数组。可以是 YasuiJS 中间件类或 Express RequestHandler 函数。
+- **类型:** `Array<Constructor | RequestHandler>`
+- **默认值:** `[]`
+- **示例值:** `[LoggingMiddleware, cors()]`
 
-```typescript
-yasui.createServer({
-  controllers: [UserController],
-  middlewares: [LoggingMiddleware, cors()]
-});
-```
+#### `globalPipes`
+应用于所有路由参数的全局管道数组。详见 [Pipes](/zh/reference/pipes)。
+- **类型:** `Array<Constructor<IPipeTransform>>`
+- **默认值:** `[]`
+- **示例值:** `[ValidationPipe, TrimPipe]`
 
 #### `environment`
-**类型:** `string`  
-**默认值:** `process.env.NODE_ENV || 'development'`  
-**描述:** 应用程序的环境名称。
-
-```typescript
-yasui.createServer({
-  controllers: [UserController],
-  environment: 'production'
-});
-```
+应用程序的环境名称。
+- **类型:** `string`
+- **默认值:** `process.env.NODE_ENV || 'development'`
+- **示例值:** `production`
 
 #### `port`
-**类型:** `number`  
-**默认值:** `3000`  
-**描述:** HTTP 服务器的端口号。仅用于 `createServer()`。
-
-```typescript
-yasui.createServer({
-  controllers: [UserController],
-  port: 8080
-});
-```
+HTTP 服务器的端口号。仅用于 `createServer()`。
+- **类型:** `number`
+- **默认值:** `3000`
 
 #### `debug`
-**类型:** `boolean`  
-**默认值:** `false`  
-**描述:** 启用调试模式，提供额外的日志记录和请求跟踪。
-
-```typescript
-yasui.createServer({
-  controllers: [UserController],
-  debug: true
-});
-```
+启用调试模式，提供额外的日志和请求跟踪。
+- **类型:** `boolean`
+- **默认值:** `false`
 
 #### `injections`
-**类型:** `Array<{ token: string, provide: any }>`  
-**默认值:** `[]`  
-**描述:** 依赖注入的自定义注入令牌。详见 [依赖注入](/zh/reference/dependency-injection)。
-
+依赖注入的自定义注入令牌。详见 [Dependency Injection](/zh/reference/dependency-injection)。
+- **类型:** `Array<{ token: string, provide: any }>`
+- **默认值:** `[]`
+- **示例值:**
 ```typescript
-yasui.createServer({
-  controllers: [UserController],
-  injections: [
-    { token: 'DATABASE_URL', provide: 'postgresql://localhost:5432/mydb' },
-    { token: 'CONFIG', provide: { apiKey: 'secret' } }
-  ]
-});
+[
+  { token: 'DATABASE_URL', provide: 'postgresql://localhost:5432/mydb' },
+  { token: 'CONFIG', provide: { apiKey: 'secret' } }
+]
 ```
 
 #### `swagger`
-**类型:** `SwaggerConfig | undefined`  
-**默认值:** `undefined`  
-**描述:** Swagger 文档配置。详见 [Swagger](/zh/reference/swagger)。
-
+Swagger 文档配置。详见 [Swagger](/zh/reference/swagger)。
+- **类型:** `SwaggerConfig | undefined`
+- **默认值:** `undefined`
+- **示例值:**
 ```typescript
-yasui.createServer({
-  controllers: [UserController],
-  swagger: {
-    enabled: true,
-    path: '/api-docs',
-    info: {
-      title: 'My API',
-      version: '1.0.0',
-      description: 'API documentation'
-    }
+{
+  enabled: true,
+  path: '/api-docs',
+  info: {
+    title: 'My API',
+    version: '1.0.0',
+    description: 'API documentation'
   }
-});
+}
 ```
 
 #### `enableDecoratorValidation`
-**类型:** `boolean`  
-**默认值:** `true`  
-**描述:** 在启动时启用装饰器验证以捕获配置错误。
-
-```typescript
-yasui.createServer({
-  controllers: [UserController],
-  enableDecoratorValidation: false
-});
-```
+启用启动时的装饰器验证以捕获配置错误。
+- **类型:** `boolean`
+- **默认值:** `true`
 
 ## createServer() 与 createApp() 的比较
 
@@ -142,7 +109,7 @@ yasui.createServer({
 // 服务器自动启动并在端口 3000 上监听
 ```
 
-**适用场景：**
+**使用场景：**
 - 想要立即启动服务器
 - 不需要额外的 Express 配置
 - 构建简单的 API
@@ -174,7 +141,7 @@ app.listen(3000, () => {
 });
 ```
 
-**适用场景：**
+**使用场景：**
 - 需要自定义 Express 配置
 - 想要添加自定义路由或中间件
 - 需要更多服务器启动控制
@@ -198,6 +165,7 @@ yasui.createServer({
 yasui.createServer({
   controllers: [UserController, AuthController],
   middlewares: [LoggingMiddleware, AuthMiddleware],
+  globalPipes: [ValidationPipe, TrimPipe],
   port: 3000,
   debug: false,
   environment: 'production',
@@ -265,7 +233,7 @@ yasui.createServer({
 ```
 
 调试模式提供：
-- 请求/响应日志记录
+- 请求/响应日志
 - 依赖注入详情
 - 路由注册信息
 - 错误堆栈跟踪

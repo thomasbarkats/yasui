@@ -30,99 +30,66 @@ yasui.createServer({
 ### Options Facultatives
 
 #### `middlewares`
-**Type:** `Array<Constructor | RequestHandler>`  
-**Default:** `[]`  
-**Description:** Tableau des middlewares globaux à appliquer à toutes les requêtes. Peut être des classes middleware YasuiJS ou des fonctions RequestHandler Express.
+Tableau des middlewares globaux à appliquer à toutes les requêtes. Peut être des classes middleware YasuiJS ou des fonctions RequestHandler Express.
+- **Type:** `Array<Constructor | RequestHandler>`
+- **Défaut:** `[]`
+- **Exemple:** `[LoggingMiddleware, cors()]`
 
-```typescript
-yasui.createServer({
-  controllers: [UserController],
-  middlewares: [LoggingMiddleware, cors()]
-});
-```
+#### `globalPipes`
+Tableau des pipes globaux à appliquer à tous les paramètres de route. Voir [Pipes](/fr/reference/pipes) pour plus de détails.
+- **Type:** `Array<Constructor<IPipeTransform>>`
+- **Défaut:** `[]`
+- **Exemple:** `[ValidationPipe, TrimPipe]`
 
 #### `environment`
-**Type:** `string`  
-**Default:** `process.env.NODE_ENV || 'development'`  
-**Description:** Nom de l'environnement pour votre application.
-
-```typescript
-yasui.createServer({
-  controllers: [UserController],
-  environment: 'production'
-});
-```
+Nom de l'environnement pour votre application.
+- **Type:** `string`
+- **Défaut:** `process.env.NODE_ENV || 'development'`
+- **Exemple:** `production`
 
 #### `port`
-**Type:** `number`  
-**Default:** `3000`  
-**Description:** Numéro de port pour le serveur HTTP. Utilisé uniquement avec `createServer()`.
-
-```typescript
-yasui.createServer({
-  controllers: [UserController],
-  port: 8080
-});
-```
+Numéro de port pour le serveur HTTP. Utilisé uniquement avec `createServer()`.
+- **Type:** `number`
+- **Défaut:** `3000`
 
 #### `debug`
-**Type:** `boolean`  
-**Default:** `false`  
-**Description:** Active le mode debug avec des logs supplémentaires et le traçage des requêtes.
-
-```typescript
-yasui.createServer({
-  controllers: [UserController],
-  debug: true
-});
-```
+Active le mode debug avec des logs supplémentaires et le traçage des requêtes.
+- **Type:** `boolean`
+- **Défaut:** `false`
 
 #### `injections`
-**Type:** `Array<{ token: string, provide: any }>`  
-**Default:** `[]`  
-**Description:** Jetons d'injection personnalisés pour l'injection de dépendances. Voir [Injection de Dépendances](/fr/reference/dependency-injection) pour plus de détails.
-
+Jetons d'injection personnalisés pour l'injection de dépendances. Voir [Injection de Dépendances](/fr/reference/dependency-injection) pour plus de détails.
+- **Type:** `Array<{ token: string, provide: any }>`
+- **Défaut:** `[]`
+- **Exemple:**
 ```typescript
-yasui.createServer({
-  controllers: [UserController],
-  injections: [
-    { token: 'DATABASE_URL', provide: 'postgresql://localhost:5432/mydb' },
-    { token: 'CONFIG', provide: { apiKey: 'secret' } }
-  ]
-});
+[
+  { token: 'DATABASE_URL', provide: 'postgresql://localhost:5432/mydb' },
+  { token: 'CONFIG', provide: { apiKey: 'secret' } }
+]
 ```
 
 #### `swagger`
-**Type:** `SwaggerConfig | undefined`  
-**Default:** `undefined`  
-**Description:** Configuration de la documentation Swagger. Voir [Swagger](/fr/reference/swagger) pour plus de détails.
-
+Configuration de la documentation Swagger. Voir [Swagger](/fr/reference/swagger) pour plus de détails.
+- **Type:** `SwaggerConfig | undefined`
+- **Défaut:** `undefined`
+- **Exemple:**
 ```typescript
-yasui.createServer({
-  controllers: [UserController],
-  swagger: {
-    enabled: true,
-    path: '/api-docs',
-    info: {
-      title: 'Mon API',
-      version: '1.0.0',
-      description: 'Documentation API'
-    }
+{
+  enabled: true,
+  path: '/api-docs',
+  info: {
+    title: 'Mon API',
+    version: '1.0.0',
+    description: 'Documentation API'
   }
-});
+}
 ```
 
 #### `enableDecoratorValidation`
-**Type:** `boolean`  
-**Default:** `true`  
-**Description:** Active la validation des décorateurs au démarrage pour détecter les erreurs de configuration.
-
-```typescript
-yasui.createServer({
-  controllers: [UserController],
-  enableDecoratorValidation: false
-});
-```
+Active la validation des décorateurs au démarrage pour détecter les erreurs de configuration.
+- **Type:** `boolean`
+- **Défaut:** `true`
 
 ## createServer() vs createApp()
 
@@ -139,7 +106,7 @@ yasui.createServer({
   debug: true
 });
 
-// Le serveur est automatiquement démarré et écoute sur le port 3000
+// Le serveur démarre automatiquement et écoute sur le port 3000
 ```
 
 **À utiliser quand :**
@@ -198,6 +165,7 @@ yasui.createServer({
 yasui.createServer({
   controllers: [UserController, AuthController],
   middlewares: [LoggingMiddleware, AuthMiddleware],
+  globalPipes: [ValidationPipe, TrimPipe],
   port: 3000,
   debug: false,
   environment: 'production',

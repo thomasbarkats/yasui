@@ -30,99 +30,66 @@ yasui.createServer({
 ### Opciones Opcionales
 
 #### `middlewares`
-**Tipo:** `Array<Constructor | RequestHandler>`  
-**Valor Predeterminado:** `[]`  
-**Descripción:** Array de middlewares globales para aplicar a todas las peticiones. Pueden ser clases middleware de YasuiJS o funciones RequestHandler de Express.
+Array de middlewares globales para aplicar a todas las peticiones. Pueden ser clases middleware de YasuiJS o funciones RequestHandler de Express.
+- **Tipo:** `Array<Constructor | RequestHandler>`
+- **Valor predeterminado:** `[]`
+- **Ejemplo:** `[LoggingMiddleware, cors()]`
 
-```typescript
-yasui.createServer({
-  controllers: [UserController],
-  middlewares: [LoggingMiddleware, cors()]
-});
-```
+#### `globalPipes`
+Array de pipes globales para aplicar a todos los parámetros de ruta. Ver [Pipes](/es/reference/pipes) para más detalles.
+- **Tipo:** `Array<Constructor<IPipeTransform>>`
+- **Valor predeterminado:** `[]`
+- **Ejemplo:** `[ValidationPipe, TrimPipe]`
 
 #### `environment`
-**Tipo:** `string`  
-**Valor Predeterminado:** `process.env.NODE_ENV || 'development'`  
-**Descripción:** Nombre del entorno para tu aplicación.
-
-```typescript
-yasui.createServer({
-  controllers: [UserController],
-  environment: 'production'
-});
-```
+Nombre del entorno para tu aplicación.
+- **Tipo:** `string`
+- **Valor predeterminado:** `process.env.NODE_ENV || 'development'`
+- **Ejemplo:** `production`
 
 #### `port`
-**Tipo:** `number`  
-**Valor Predeterminado:** `3000`  
-**Descripción:** Número de puerto para el servidor HTTP. Solo se usa con `createServer()`.
-
-```typescript
-yasui.createServer({
-  controllers: [UserController],
-  port: 8080
-});
-```
+Número de puerto para el servidor HTTP. Solo se usa con `createServer()`.
+- **Tipo:** `number`
+- **Valor predeterminado:** `3000`
 
 #### `debug`
-**Tipo:** `boolean`  
-**Valor Predeterminado:** `false`  
-**Descripción:** Habilita el modo de depuración con registro adicional y seguimiento de peticiones.
-
-```typescript
-yasui.createServer({
-  controllers: [UserController],
-  debug: true
-});
-```
+Habilita el modo debug con registro adicional y seguimiento de peticiones.
+- **Tipo:** `boolean`
+- **Valor predeterminado:** `false`
 
 #### `injections`
-**Tipo:** `Array<{ token: string, provide: any }>`  
-**Valor Predeterminado:** `[]`  
-**Descripción:** Tokens de inyección personalizados para inyección de dependencias. Ver [Inyección de Dependencias](/es/reference/dependency-injection) para más detalles.
-
+Tokens de inyección personalizados para inyección de dependencias. Ver [Inyección de Dependencias](/es/reference/dependency-injection) para más detalles.
+- **Tipo:** `Array<{ token: string, provide: any }>`
+- **Valor predeterminado:** `[]`
+- **Ejemplo:**
 ```typescript
-yasui.createServer({
-  controllers: [UserController],
-  injections: [
-    { token: 'DATABASE_URL', provide: 'postgresql://localhost:5432/mydb' },
-    { token: 'CONFIG', provide: { apiKey: 'secret' } }
-  ]
-});
+[
+  { token: 'DATABASE_URL', provide: 'postgresql://localhost:5432/mydb' },
+  { token: 'CONFIG', provide: { apiKey: 'secret' } }
+]
 ```
 
 #### `swagger`
-**Tipo:** `SwaggerConfig | undefined`  
-**Valor Predeterminado:** `undefined`  
-**Descripción:** Configuración de documentación Swagger. Ver [Swagger](/es/reference/swagger) para más detalles.
-
+Configuración de documentación Swagger. Ver [Swagger](/es/reference/swagger) para más detalles.
+- **Tipo:** `SwaggerConfig | undefined`
+- **Valor predeterminado:** `undefined`
+- **Ejemplo:**
 ```typescript
-yasui.createServer({
-  controllers: [UserController],
-  swagger: {
-    enabled: true,
-    path: '/api-docs',
-    info: {
-      title: 'Mi API',
-      version: '1.0.0',
-      description: 'Documentación de API'
-    }
+{
+  enabled: true,
+  path: '/api-docs',
+  info: {
+    title: 'My API',
+    version: '1.0.0',
+    description: 'API documentation'
   }
-});
+}
 ```
 
 #### `enableDecoratorValidation`
-**Tipo:** `boolean`  
-**Valor Predeterminado:** `true`  
-**Descripción:** Habilita la validación de decoradores al inicio para detectar errores de configuración.
-
-```typescript
-yasui.createServer({
-  controllers: [UserController],
-  enableDecoratorValidation: false
-});
-```
+Habilita la validación de decoradores al inicio para detectar errores de configuración.
+- **Tipo:** `boolean`
+- **Valor predeterminado:** `true`
 
 ## createServer() vs createApp()
 
@@ -165,7 +132,7 @@ app.use('/health', (req, res) => {
 
 // Agregar rutas personalizadas
 app.get('/custom', (req, res) => {
-  res.json({ message: 'Ruta personalizada' });
+  res.json({ message: 'Custom route' });
 });
 
 // Iniciar el servidor manualmente
@@ -198,6 +165,7 @@ yasui.createServer({
 yasui.createServer({
   controllers: [UserController, AuthController],
   middlewares: [LoggingMiddleware, AuthMiddleware],
+  globalPipes: [ValidationPipe, TrimPipe],
   port: 3000,
   debug: false,
   environment: 'production',
@@ -210,7 +178,7 @@ yasui.createServer({
     enabled: true,
     path: '/api-docs',
     info: {
-      title: 'Mi API',
+      title: 'My API',
       version: '1.0.0',
       description: 'API completa con todas las características'
     }
@@ -253,9 +221,9 @@ app.listen(PORT, () => {
 });
 ```
 
-## Modo de Depuración
+## Modo Debug
 
-Habilita el modo de depuración para ver información detallada:
+Habilita el modo debug para ver información detallada:
 
 ```typescript
 yasui.createServer({
@@ -264,7 +232,7 @@ yasui.createServer({
 });
 ```
 
-El modo de depuración proporciona:
+El modo debug proporciona:
 - Registro de peticiones/respuestas
 - Detalles de inyección de dependencias
 - Información de registro de rutas

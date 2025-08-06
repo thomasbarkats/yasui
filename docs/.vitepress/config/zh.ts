@@ -30,9 +30,10 @@ export default {
           { text: '配置', link: '/zh/reference/config' },
           { text: '控制器', link: '/zh/reference/controllers' },
           { text: '中间件', link: '/zh/reference/middlewares' },
+          { text: '管道', link: '/zh/reference/pipes' },
           { text: '依赖注入', link: '/zh/reference/dependency-injection' },
-          { text: '日志', link: '/zh/reference/logging' },
           { text: '错误处理', link: '/zh/reference/error-handling' },
+          { text: '日志', link: '/zh/reference/logging' },
           { text: 'Swagger 文档', link: '/zh/reference/swagger' }
         ]
       }
