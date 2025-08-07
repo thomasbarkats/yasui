@@ -66,10 +66,12 @@ export function routeHandler(
 
     try {
       const result: unknown = await routeFunction.apply(self, args);
-      if (result || !isMiddleware) {
-        res.status(defaultStatus).json(result);
-      } else {
-        next();
+      if (!res.headersSent) {
+        if (result !== undefined || !isMiddleware) {
+          res.status(defaultStatus).json(result);
+        } else {
+          next();
+        }
       }
     } catch (err) {
       next(err);

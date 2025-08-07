@@ -63,7 +63,7 @@ export function Controller(
         );
 
         router[route.method](route.path, ...middlewares,
-          routeHandler(target, route.descriptor, route.params, pipes, false, route.defaultStatus)
+          routeHandler(target.prototype, route.descriptor, route.params, pipes, false, route.defaultStatus)
         );
       }
       return router;
