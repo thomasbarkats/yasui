@@ -1,17 +1,31 @@
-# YasuiJS
+<p align="center">
+  <a href="https://yasui.app">
+    <img src="https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot.png" alt="Logo" height=160 />
+  </a>
+  <h1 align="center">YasuiJS</h1>
+</p>
 
-[![Node.js Version](https://img.shields.io/node/v/yasui.svg)](https://nodejs.org/)
-[![npm downloads](https://img.shields.io/npm/dm/yasui.svg)](https://www.npmjs.com/package/yasui)
-[![npm bundle size](https://img.shields.io/npm/unpacked-size/yasui?color=4DC81F)](https://www.npmjs.com/package/yasui)
-[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
-Ship production-ready REST APIs in minutes⚡
+<div align="center">
 
-<img src="https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot.png" alt="Logo" height=160></a>
+  [![Node.js Version](https://img.shields.io/node/v/yasui.svg?color=EAA458)](https://nodejs.org/)
+  [![npm bundle size](https://img.shields.io/npm/unpacked-size/yasui?color=EAA458)](https://www.npmjs.com/package/yasui)
+  [![npm downloads](https://img.shields.io/npm/dm/yasui.svg?color=C17633)](https://www.npmjs.com/package/yasui)
 
-Yasui -*that can mean "easy" in Japanese*- is a lightweight Express-based framework for Node.js that simplifies REST API development with decorators to build your endpoints, plus complete error management, logging, dependency injection, Swagger integration, and more.
+</div>
 
-Compared to other frameworks, Yasui's philosophy is to keep things minimal and focus on essentials, with minimal dependencies.
+<div align="center">
+
+  <span>Ship production-ready REST APIs in minutes 🐿️</span>
+  <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+  **[Documentation](https://yasui.app/guide/getting-started.html)** 📖
+
+</div>
+<br />
+
+## What is YasuiJS?
+
+Yasui (meaning "easy" in Japanese) is a lightweight Express-based framework for Node.js that simplifies REST API development, designed with a minimal philosophy that focuses on essentials while maintaining minimal dependencies compared to other frameworks.
 
 ## Features Summary
 - **Lightweight**: Built on Express with minimal dependencies
