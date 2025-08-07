@@ -1,6 +1,6 @@
 import { ReflectMetadata, RouteParamTypes } from '~types/enums';
 import { RouteRequestParamTypes } from '~types/enums';
-import { IRouteParam } from '~types/interfaces';
+import { ArrayItem, IRouteParam } from '~types/interfaces';
 import { getMetadata, defineMetadata } from '../utils/reflect';
 
 
@@ -14,9 +14,10 @@ function routeParamDecorator(source: RouteParamTypes): Function {
 /** create express route-request-parameter decorator */
 export function routeRequestParamDecorator(reqProperty: string): Function {
   return function (
-    varName?: string
+    varName?: string,
+    items?: [ArrayItem]
   ): ParameterDecorator {
-    return extractParam(RouteParamTypes.REQ, reqProperty, varName);
+    return extractParam(RouteParamTypes.REQ, reqProperty, varName, items ? items[0] : undefined);
   };
 }
 
@@ -25,7 +26,8 @@ export function routeRequestParamDecorator(reqProperty: string): Function {
 function extractParam(
   source: RouteParamTypes,
   reqProperty?: string,
-  varName?: string
+  varName?: string,
+  itemsType?: ArrayItem
 ): ParameterDecorator {
   return function (
     target: object,
@@ -50,6 +52,7 @@ function extractParam(
     const routeParam: IRouteParam = {
       index: parameterIndex,
       type: paramType,
+      itemsType,
       path,
     };
 

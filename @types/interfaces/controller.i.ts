@@ -20,9 +20,11 @@ export interface IControllerRoute {
   params: IRouteParam[];
 }
 
+export type ArrayItem = Constructible<number | boolean | Date | string>;
 
 export interface IRouteParam {
   index: number;
   type: Function;
+  itemsType?: ArrayItem;
   path: string[];
 }
