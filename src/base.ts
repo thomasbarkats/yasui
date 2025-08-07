@@ -23,12 +23,19 @@ export function createServer(conf: YasuiConfig): Server {
   server.listen(port, () => {
     if (core.decoratorValidator?.hasError()) {
       core.logger.warn('server started with errors');
-      core.logger.log(`server listens on port ${port}`);
       core.decoratorValidator.outputErrors();
       core.decoratorValidator = null;
     } else {
       core.logger.success('server successfully started');
-      core.logger.log(`server listens on port ${port}`);
+    }
+
+    const address = server.address();
+    const protocol: string = conf.protocol || 'http';
+    const host = address && typeof address === 'object' && address.address !== '::' ? address.address : 'localhost';
+    const url = `${protocol}://${host}:${port}`;
+    core.logger.log(`server listens on ${url}`);
+    if (conf.swagger) {
+      core.logger.log(`documentation on ${url}/${conf.swagger.path || 'api-docs'}`);
     }
   });
   return server;
