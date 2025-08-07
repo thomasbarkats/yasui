@@ -2,7 +2,7 @@ import { Request, RequestHandler, Response, NextFunction } from 'express';
 
 import { getMetadata } from './reflect';
 import { HttpCode, ReflectMetadata, RouteRequestParamTypes } from '~types/enums';
-import { IRouteParam, IPipeTransform, IParamMetadata } from '~types/interfaces';
+import { IRouteParam, IPipeTransform, IParamMetadata, ArrayItem } from '~types/interfaces';
 
 
 /** create express-route-handler from controller/middleware method */
@@ -41,7 +41,7 @@ export function routeHandler(
       let value = param.path.reduce((prev, curr) => prev && prev[curr] || null, routeHandlerArgs);
 
       if (value !== null && param.type && shouldCastParam(param.path)) {
-        value = castParamValue(value, param.type);
+        value = castParamValue(value, param.type, param.itemsType);
       }
 
       if (pipes.length > 0) {
@@ -80,7 +80,7 @@ export function routeHandler(
 }
 
 function shouldCastParam(path: string[]): boolean {
-  if (path.length < 2) {
+  if (path.length < 3) {
     return false;
   }
   return (
@@ -90,8 +90,12 @@ function shouldCastParam(path: string[]): boolean {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function castParamValue(value: string, paramType: Function): any {
+function castParamValue(
+  value: string,
+  paramType: Function,
+  itemsType?: ArrayItem
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): any {
   switch (paramType) {
     case Number:
       return Number(value);
@@ -101,15 +105,15 @@ function castParamValue(value: string, paramType: Function): any {
       return new Date(<string>value);
     case Array:
       return Array.isArray(value)
-        ? value
-        : new Array(value);
+        ? (itemsType ? value.map(v => castParamValue(v, itemsType)) : value)
+        : [itemsType ? castParamValue(value, itemsType) : value];
     case String:
       return value;
     default:
       try {
         return JSON.parse(value);
       } catch {
-        return {};
+        return null;
       }
   }
 }

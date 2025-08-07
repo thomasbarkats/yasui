@@ -1,7 +1,7 @@
 /* eslint-disable no-redeclare */
 /* eslint-disable max-len */
 
-import { Constructible, ApiPropertyDefinition, TMiddleware, IPipeTransform } from './interfaces';
+import { Constructible, ApiPropertyDefinition, TMiddleware, IPipeTransform, ArrayItem } from './interfaces';
 import { HttpCode, Scopes } from './enums';
 import { HttpError } from './utils';
 
@@ -54,20 +54,23 @@ export function Req(): ParameterDecorator;
 export function Res(): ParameterDecorator;
 /** Injects Express next function */
 export function Next(): ParameterDecorator;
-/** Extracts specific header or entire headers object if varName omitted */
-export function Header(varName?: string): ParameterDecorator;
-/** Extracts specific path parameter or all params if varName omitted */
-export function Param(varName?: string): ParameterDecorator;
-/** Extracts specific query parameter or entire query object if varName omitted */
-export function Query(varName?: string): ParameterDecorator;
-/** Extracts specific body property or entire body if varName omitted */
-export function Body(varName?: string): ParameterDecorator;
+/** Extracts specific header from `req.headers[name]`
+ *  @param items If you are expecting an array, specify the type of items */
+export function Header(name: string, items?: [ArrayItem]): ParameterDecorator;
+/** Extracts specific path parameter from `req.params[name]`
+ *  @param items If you are expecting an array, specify the type of items */
+export function Param(name: string, items?: [ArrayItem]): ParameterDecorator;
+/** Extracts specific query parameter from `req.query[name]`
+ *  @param items If you are expecting an array, specify the type of items */
+export function Query(name: string, items?: [ArrayItem]): ParameterDecorator;
+/** Extracts specific body property or entire body if propertyName omitted */
+export function Body(propertyName?: string): ParameterDecorator;
 /** Injects timed logger instance dedicated to the current request */
 export function Logger(): ParameterDecorator;
 /** Sets default HTTP status code for the response (e.g., 201 for CREATED) */
 export function HttpStatus(status: HttpCode): MethodDecorator;
 /** Factory function for creating parameter decorators that extract request data */
-export function routeRequestParamDecorator(type: string): (varName?: string) => ParameterDecorator;
+export function routeRequestParamDecorator(type: string): (propertyName?: string) => ParameterDecorator;
 
 
 // --- Swagger decorators ---
