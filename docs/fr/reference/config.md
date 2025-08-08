@@ -49,11 +49,16 @@ Nom de l'environnement pour votre application.
 
 #### `port`
 Numéro de port pour le serveur HTTP. Utilisé uniquement avec `createServer()`.
-- **Type:** `number`
+- **Type:** `number | string`
 - **Défaut:** `3000`
 
+#### `protocol`
+Protocole utilisé pour la journalisation des URL du serveur. Actuellement utilisé uniquement à des fins d'affichage.
+- **Type:** `'http' | 'https'`
+- **Défaut:** `'http'`
+
 #### `debug`
-Active le mode debug avec des logs supplémentaires et le traçage des requêtes.
+Active le mode debug avec journalisation supplémentaire et traçage des requêtes.
 - **Type:** `boolean`
 - **Défaut:** `false`
 
@@ -105,8 +110,6 @@ yasui.createServer({
   port: 3000,
   debug: true
 });
-
-// Le serveur démarre automatiquement et écoute sur le port 3000
 ```
 
 **À utiliser quand :**
@@ -167,6 +170,7 @@ yasui.createServer({
   middlewares: [LoggingMiddleware, AuthMiddleware],
   globalPipes: [ValidationPipe, TrimPipe],
   port: 3000,
+  protocol: 'http',
   debug: false,
   environment: 'production',
   enableDecoratorValidation: true,
@@ -234,6 +238,6 @@ yasui.createServer({
 
 Le mode debug fournit :
 - Journalisation des requêtes/réponses
-- Détails de l'injection de dépendances
+- Détails sur l'injection de dépendances
 - Informations sur l'enregistrement des routes
 - Traces des piles d'erreurs

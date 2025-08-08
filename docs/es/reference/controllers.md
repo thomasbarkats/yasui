@@ -6,7 +6,7 @@ Los controladores son los puntos de entrada de tu API. Definen endpoints HTTP y 
 
 En YasuiJS, los controladores son clases decoradas con `@Controller()` que agrupan endpoints relacionados. Cada método en un controlador representa un endpoint HTTP, definido usando decoradores de método como `@Get()`, `@Post()`, etc.
 
-Los métodos del controlador pueden simplemente devolver cualquier valor, que será automáticamente serializado a JSON con un código de estado 200. Para mayor control, puedes acceder al objeto de respuesta Express directamente usando `@Res()` y utilizar métodos nativos de Express como `res.json()`, `res.status()`, o `res.sendFile()`.
+Los métodos del controlador pueden simplemente devolver cualquier valor, que será automáticamente serializado a JSON con un código de estado 200. Para mayor control, puedes acceder al objeto de respuesta Express directamente usando `@Res()` y usar métodos nativos de Express como `res.json()`, `res.status()`, o `res.sendFile()`.
 
 ```typescript
 import { Controller, Get, Post } from 'yasui';
@@ -102,11 +102,11 @@ export class UserController {
 
 ## Decoradores de Parámetros
 
-Extrae datos de las peticiones HTTP usando decoradores de parámetros. YasuiJS transforma automáticamente los parámetros basándose en sus tipos TypeScript para mejor seguridad de tipos.
+Extrae datos de las peticiones HTTP usando decoradores de parámetros. YasuiJS transforma automáticamente los parámetros basándose en sus tipos TypeScript para una mejor seguridad de tipos.
 
 ### Extraer Cuerpo de la Petición
 
-- `@Body(name?)` - Extrae datos del cuerpo de la petición
+`@Body(name?)` - Extrae datos del cuerpo de la petición
 
 ```typescript
 @Controller('/api/users')
@@ -119,7 +119,7 @@ export class UserController {
 
   @Post('/partial')
   updateUser(@Body('name') name: string) {
-    // Extrae campo específico del cuerpo
+    // Extrae un campo específico del cuerpo
     return { updatedName: name };
   }
 }
@@ -127,60 +127,62 @@ export class UserController {
 
 ### Extraer Parámetros y Cabeceras
 
-- `@Param(name)` - Extrae parámetros de ruta
-- `@Query(name)` - Extrae parámetros de consulta
-- `@Header(name?)` - Extrae cabeceras de la petición
+- `@Param(name, items?)` - Extrae parámetros de ruta
+- `@Query(name, items?)` - Extrae parámetros de consulta
+- `@Header(name, items?)` - Extrae cabeceras de la petición
 
-Los parámetros se transforman automáticamente según sus tipos TypeScript:
+Los parámetros se transforman automáticamente según sus tipos TypeScript. Para arrays con tipos no string, debes especificar el tipo de elemento como segundo parámetro:
 
 ```typescript
 @Controller('/api/users')
 export class UserController {
   @Get('/:id')
-  getUser(@Param('id') id: number) { 
-    // Automáticamente convertido a número
-  }
+  getUser(@Param('id') id: number) {} // Convertido a número.
 
-  @Get('/search')
+  @Get('/search/:term')
   searchUsers(
-    @Query('page') page: number,
-    @Query('active') active: boolean,
-    @Query('tags') tags: string[]
+    @Param('term') term: string,
+    @Header('x-api-version') version: number,
+    @Query('filters', [Boolean]) filters: boolean[],
+    @Query('settings') settings: { theme: string } | null,
   ) {
-    // page: number (convertido de "123" a 123)
-    // active: boolean (convertido de "true"/"1" a true)
-    // tags: string[] (de ?tags=red&tags=blue)
-    return { page, active, tags };
-  }
-
-  @Get('/profile')
-  getProfile(
-    @Query('settings') settings: { theme: string },
-    @Header('x-api-version') version: number
-  ) {
-    // settings: object (de ?settings={"theme":"dark"} - JSON parseado)
     // version: number (cabecera convertida a número)
-    return { settings, version };
+    // filters: boolean[] (desde ?filters=true&filters=false&filters=1)
+    // settings: object (desde ?settings={"theme":"dark"} - JSON parseado, null si falla)
+    return { page, active, tags, priorities };
   }
 }
 ```
 
-### Transformaciones de Tipo Soportadas
+## Conversión Automática de Tipos de Parámetros
 
-YasuiJS convierte automáticamente los parámetros según los tipos TypeScript:
+YasuiJS convierte automáticamente los parámetros según los tipos de TypeScript:
 
-- **string** - Sin conversión (predeterminado)
+### Tipos Básicos
+- **string** - Sin conversión (por defecto)
 - **number** - Convierte a número, devuelve NaN si es inválido
 - **boolean** - Convierte "true"/"1" a true, todo lo demás a false
 - **Date** - Convierte a objeto Date, devuelve Invalid Date si es inválido
-- **string[]** - Para arrays de consulta como `?tags=red&tags=blue`
-- **object** - Parsea cadenas JSON para consultas como `?data={"key":"value"}`
+- **object** - Parsea strings JSON para consultas como `?data={"key":"value"}`, devuelve `null` si falla
 
-### Acceso al Objeto Request
+### Tipos Array
+TypeScript no puede detectar tipos de elementos de array en tiempo de ejecución, así que debes especificar `[Type]` para arrays no string:
+
+- **string[]** - No necesita configuración adicional (comportamiento por defecto)
+- **arrays de number, boolean, o Date** - Debe especificarse el tipo de elemento usando el segundo parámetro
+
+**Sintaxis de Array Tipado:**
+```typescript
+@Query('paramName', [Type]) paramName: Type[]
+@Param('paramName', [Type]) paramName: Type[]  
+@Header('headerName', [Type]) headerName: Type[]
+```
+
+## Acceso al Objeto Request
 
 - `@Req()` - Accede al objeto Request de Express
 - `@Res()` - Accede al objeto Response de Express
-- `@Next()` - Accede a NextFunction de Express
+- `@Next()` - Accede a la función Next de Express
 
 ```typescript
 import { Request, Response, NextFunction } from 'yasui';
@@ -232,7 +234,7 @@ export class UserController {
 
 ### Códigos de Estado Personalizados
 
-- `@HttpStatus(code)` - Establece código de estado HTTP personalizado
+`@HttpStatus(code)` - Establece código de estado HTTP personalizado
 
 Usa el decorador `@HttpStatus()` para establecer códigos de estado personalizados:
 
@@ -268,9 +270,9 @@ import { Response } from 'yasui';
 export class UserController {
   @Get('/custom')
   customResponse(@Res() res: Response) {
-    res.status(418).json({ 
+    res.status(418).json({
       message: "Soy una tetera",
-      custom: true 
+      custom: true
     });
     // No devuelvas nada cuando uses res directamente
   }
@@ -279,4 +281,4 @@ export class UserController {
 
 ## Manejo de Errores
 
-Deja que el framework maneje los errores automáticamente o lanza errores personalizados. Para detalles completos sobre manejo de errores, ve [Manejo de Errores](/es/reference/error-handling).
+Deja que el framework maneje los errores automáticamente o lanza errores personalizados. Para detalles completos sobre manejo de errores, ver [Manejo de Errores](/es/reference/error-handling).

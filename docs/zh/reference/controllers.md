@@ -106,7 +106,7 @@ export class UserController {
 
 ### 提取请求体
 
-- `@Body(name?)` - 提取请求体数据
+`@Body(name?)` - 提取请求体数据
 
 ```typescript
 @Controller('/api/users')
@@ -127,56 +127,58 @@ export class UserController {
 
 ### 提取参数和请求头
 
-- `@Param(name)` - 提取路由参数
-- `@Query(name)` - 提取查询参数
-- `@Header(name?)` - 提取请求头
+- `@Param(name, items?)` - 提取路由参数
+- `@Query(name, items?)` - 提取查询参数
+- `@Header(name, items?)` - 提取请求头
 
-参数会根据TypeScript类型自动转换：
+参数会根据其TypeScript类型自动转换。对于非字符串类型的数组，你必须将项目类型指定为第二个参数：
 
 ```typescript
 @Controller('/api/users')
 export class UserController {
   @Get('/:id')
-  getUser(@Param('id') id: number) { 
-    // 自动转换为数字
-  }
+  getUser(@Param('id') id: number) {} // 转换为数字
 
-  @Get('/search')
+  @Get('/search/:term')
   searchUsers(
-    @Query('page') page: number,
-    @Query('active') active: boolean,
-    @Query('tags') tags: string[]
+    @Param('term') term: string,
+    @Header('x-api-version') version: number,
+    @Query('filters', [Boolean]) filters: boolean[],
+    @Query('settings') settings: { theme: string } | null,
   ) {
-    // page: number (从"123"转换为123)
-    // active: boolean (从"true"/"1"转换为true)
-    // tags: string[] (来自?tags=red&tags=blue)
-    return { page, active, tags };
-  }
-
-  @Get('/profile')
-  getProfile(
-    @Query('settings') settings: { theme: string },
-    @Header('x-api-version') version: number
-  ) {
-    // settings: object (从?settings={"theme":"dark"} - JSON解析)
     // version: number (请求头转换为数字)
-    return { settings, version };
+    // filters: boolean[] (来自 ?filters=true&filters=false&filters=1)
+    // settings: object (来自 ?settings={"theme":"dark"} - JSON解析，失败则为null)
+    return { page, active, tags, priorities };
   }
 }
 ```
 
-### 支持的类型转换
+## 自动参数类型转换
 
 YasuiJS根据TypeScript类型自动转换参数：
 
+### 基本类型
 - **string** - 无转换（默认）
-- **number** - 转换为数字，无效时返回NaN
-- **boolean** - 将"true"/"1"转换为true，其他转换为false
-- **Date** - 转换为Date对象，无效时返回Invalid Date
-- **string[]** - 用于查询数组如`?tags=red&tags=blue`
-- **object** - 解析JSON字符串，用于查询如`?data={"key":"value"}`
+- **number** - 转换为数字，无效则返回NaN
+- **boolean** - 将"true"/"1"转换为true，其他都转换为false
+- **Date** - 转换为Date对象，无效则返回Invalid Date
+- **object** - 解析JSON字符串，如`?data={"key":"value"}`，失败则返回`null`
 
-### 请求对象访问
+### 数组类型
+TypeScript在运行时无法检测数组项目类型，因此对于非字符串数组必须指定`[Type]`：
+
+- **string[]** - 无需额外配置（默认行为）
+- **number、boolean或Date数组** - 必须使用第二个参数指定项目类型
+
+**类型化数组语法：**
+```typescript
+@Query('paramName', [Type]) paramName: Type[]
+@Param('paramName', [Type]) paramName: Type[]  
+@Header('headerName', [Type]) headerName: Type[]
+```
+
+## 请求对象访问
 
 - `@Req()` - 访问Express Request对象
 - `@Res()` - 访问Express Response对象
@@ -232,7 +234,7 @@ export class UserController {
 
 ### 自定义状态码
 
-- `@HttpStatus(code)` - 设置自定义HTTP状态码
+`@HttpStatus(code)` - 设置自定义HTTP状态码
 
 使用`@HttpStatus()`装饰器设置自定义状态码：
 
@@ -268,9 +270,9 @@ import { Response } from 'yasui';
 export class UserController {
   @Get('/custom')
   customResponse(@Res() res: Response) {
-    res.status(418).json({ 
+    res.status(418).json({
       message: "我是茶壶",
-      custom: true 
+      custom: true
     });
     // 直接使用res时不要返回任何内容
   }

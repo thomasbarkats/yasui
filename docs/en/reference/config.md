@@ -49,8 +49,13 @@ Environment name for your application.
 
 #### `port`
 Port number for the HTTP server. Only used with `createServer()`.
-- **Type:** `number`
+- **Type:** `number | string`
 - **Default:** `3000`
+
+#### `protocol`
+Protocol used for server URL logging. Currently used for display purposes only.
+- **Type:** `'http' | 'https'`
+- **Default:** `'http'`
 
 #### `debug`
 Enable debug mode with additional logging and request tracing.
@@ -105,8 +110,6 @@ yasui.createServer({
   port: 3000,
   debug: true
 });
-
-// Server is automatically started and listening on port 3000
 ```
 
 **Use when:**
@@ -167,6 +170,7 @@ yasui.createServer({
   middlewares: [LoggingMiddleware, AuthMiddleware],
   globalPipes: [ValidationPipe, TrimPipe],
   port: 3000,
+  protocol: 'http',
   debug: false,
   environment: 'production',
   enableDecoratorValidation: true,

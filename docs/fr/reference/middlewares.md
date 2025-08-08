@@ -19,7 +19,7 @@ import { Middleware } from 'yasui';
 @Middleware()
 export class LoggingMiddleware {
   use() {
-    console.log('Request received');
+    console.log('Requête reçue');
   }
 }
 ```
@@ -75,6 +75,8 @@ export class ValidationMiddleware {
 }
 ```
 
+**Conversion automatique des types :** Tous les décorateurs de paramètres dans les middlewares bénéficient de la même conversion automatique des types que les contrôleurs. Les paramètres sont convertis vers leurs types spécifiés avant l'exécution du middleware.
+
 ### Injection de dépendances
 
 Comme les classes Middleware agissent comme des Contrôleurs, elles permettent également l'injection de dépendances de la même manière :
@@ -89,7 +91,7 @@ export class LoggingMiddleware {
 
   use(
     @Body() body: any,
-    @Inject() anotherService: AnotherService, // Pareil au niveau de la méthode
+    @Inject() anotherService: AnotherService, // Pareil au niveau méthode
   ) {
     if (!this.validationService.isValid(body)) {
       throw new HttpError(400, 'Données de requête invalides');

@@ -75,6 +75,8 @@ export class ValidationMiddleware {
 }
 ```
 
+**Conversión Automática de Tipos:** Todos los decoradores de parámetros en middlewares se benefician de la misma conversión automática de tipos que los controladores. Los parámetros se convierten a sus tipos especificados antes de la ejecución del middleware.
+
 ### Inyección de Dependencias
 
 Como las clases Middleware actúan como Controladores, también permiten la inyección de dependencias de la misma manera:

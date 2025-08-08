@@ -1,6 +1,6 @@
 import { Server, createServer as createHttpServer } from 'http';
 import { Application } from 'express';
-import { blue, bold, magenta } from 'kleur';
+import kleur, { blue, bold, magenta } from 'kleur';
 
 import { YasuiConfig } from '~types/interfaces';
 import { Core } from './core';
@@ -33,9 +33,9 @@ export function createServer(conf: YasuiConfig): Server {
     const protocol: string = conf.protocol || 'http';
     const host = address && typeof address === 'object' && address.address !== '::' ? address.address : 'localhost';
     const url = `${protocol}://${host}:${port}`;
-    core.logger.log(`server listens on ${url}`);
+    core.logger.log(`server listens on ${kleur.underline(url)}`);
     if (conf.swagger) {
-      core.logger.log(`documentation on ${url}/${conf.swagger.path || 'api-docs'}`);
+      core.logger.log(`documentation on ${kleur.underline(`${url}/${conf.swagger.path || 'api-docs'}`)}`);
     }
   });
   return server;
