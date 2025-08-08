@@ -49,8 +49,13 @@ Nombre del entorno para tu aplicación.
 
 #### `port`
 Número de puerto para el servidor HTTP. Solo se usa con `createServer()`.
-- **Tipo:** `number`
+- **Tipo:** `number | string`
 - **Valor predeterminado:** `3000`
+
+#### `protocol`
+Protocolo usado para el registro de URL del servidor. Actualmente solo se usa para fines de visualización.
+- **Tipo:** `'http' | 'https'`
+- **Valor predeterminado:** `'http'`
 
 #### `debug`
 Habilita el modo debug con registro adicional y seguimiento de peticiones.
@@ -105,8 +110,6 @@ yasui.createServer({
   port: 3000,
   debug: true
 });
-
-// El servidor se inicia automáticamente y escucha en el puerto 3000
 ```
 
 **Usar cuando:**
@@ -167,6 +170,7 @@ yasui.createServer({
   middlewares: [LoggingMiddleware, AuthMiddleware],
   globalPipes: [ValidationPipe, TrimPipe],
   port: 3000,
+  protocol: 'http',
   debug: false,
   environment: 'production',
   enableDecoratorValidation: true,

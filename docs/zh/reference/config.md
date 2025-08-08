@@ -49,16 +49,21 @@ yasui.createServer({
 
 #### `port`
 HTTP 服务器的端口号。仅用于 `createServer()`。
-- **类型:** `number`
+- **类型:** `number | string`
 - **默认值:** `3000`
 
+#### `protocol`
+用于服务器 URL 日志记录的协议。目前仅用于显示目的。
+- **类型:** `'http' | 'https'`
+- **默认值:** `'http'`
+
 #### `debug`
-启用调试模式，提供额外的日志和请求跟踪。
+启用调试模式，提供额外的日志记录和请求跟踪。
 - **类型:** `boolean`
 - **默认值:** `false`
 
 #### `injections`
-依赖注入的自定义注入令牌。详见 [Dependency Injection](/zh/reference/dependency-injection)。
+依赖注入的自定义注入令牌。详见 [依赖注入](/zh/reference/dependency-injection)。
 - **类型:** `Array<{ token: string, provide: any }>`
 - **默认值:** `[]`
 - **示例值:**
@@ -105,8 +110,6 @@ yasui.createServer({
   port: 3000,
   debug: true
 });
-
-// 服务器自动启动并在端口 3000 上监听
 ```
 
 **使用场景：**
@@ -167,6 +170,7 @@ yasui.createServer({
   middlewares: [LoggingMiddleware, AuthMiddleware],
   globalPipes: [ValidationPipe, TrimPipe],
   port: 3000,
+  protocol: 'http',
   debug: false,
   environment: 'production',
   enableDecoratorValidation: true,

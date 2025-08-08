@@ -106,7 +106,7 @@ Extract data from HTTP requests using parameter decorators. YasuiJS automaticall
 
 ### Extract Request Body
 
-- `@Body(name?)` - Extract request body data
+`@Body(name?)` - Extract request body data
 
 ```typescript
 @Controller('/api/users')
@@ -127,56 +127,58 @@ export class UserController {
 
 ### Extract Parameters & Headers
 
-- `@Param(name)` - Extract route parameters
-- `@Query(name)` - Extract query parameters
-- `@Header(name?)` - Extract request headers
+- `@Param(name, items?)` - Extract route parameters
+- `@Query(name, items?)` - Extract query parameters
+- `@Header(name, items?)` - Extract request headers
 
-Parameters are automatically transformed based on their TypeScript types:
+Parameters are automatically transformed based on their TypeScript types. For arrays with non-string types, you must specify the item type as the second parameter:
 
 ```typescript
 @Controller('/api/users')
 export class UserController {
   @Get('/:id')
-  getUser(@Param('id') id: number) { 
-    // Automatically converted to number
-  }
+  getUser(@Param('id') id: number) {} // Converted to number.
 
-  @Get('/search')
+  @Get('/search/:term')
   searchUsers(
-    @Query('page') page: number,
-    @Query('active') active: boolean,
-    @Query('tags') tags: string[]
+    @Param('term') term: string,
+    @Header('x-api-version') version: number,
+    @Query('filters', [Boolean]) filters: boolean[],
+    @Query('settings') settings: { theme: string } | null,
   ) {
-    // page: number (converted from "123" to 123)
-    // active: boolean (converted from "true"/"1" to true)
-    // tags: string[] (from ?tags=red&tags=blue)
-    return { page, active, tags };
-  }
-
-  @Get('/profile')
-  getProfile(
-    @Query('settings') settings: { theme: string },
-    @Header('x-api-version') version: number
-  ) {
-    // settings: object (from ?settings={"theme":"dark"} - JSON parsed)
     // version: number (header converted to number)
-    return { settings, version };
+    // filters: boolean[] (from ?filters=true&filters=false&filters=1)
+    // settings: object (from ?settings={"theme":"dark"} - JSON parsed, null if fails)
+    return { page, active, tags, priorities };
   }
 }
 ```
 
-### Supported Type Transformations
+## Automatic Parameter Types Casting
 
 YasuiJS automatically converts parameters based on TypeScript types:
 
+### Basic Types
 - **string** - No conversion (default)
 - **number** - Converts to number, returns NaN if invalid
 - **boolean** - Converts "true"/"1" to true, everything else to false
 - **Date** - Converts to Date object, returns Invalid Date if invalid
-- **string[]** - For query arrays like `?tags=red&tags=blue`
-- **object** - Parses JSON strings for queries like `?data={"key":"value"}`
+- **object** - Parses JSON strings for queries like `?data={"key":"value"}`, returns `null` if fails
 
-### Request Object Access
+### Array Types
+TypeScript cannot detect array item types at runtime, so you must specify `[Type]` for non-string arrays:
+
+- **string[]** - No additional configuration needed (default behavior)
+- **number, boolean, or Date arrays** - Must specify the item type using the second parameter
+
+**Typed Array Syntax:**
+```typescript
+@Query('paramName', [Type]) paramName: Type[]
+@Param('paramName', [Type]) paramName: Type[]  
+@Header('headerName', [Type]) headerName: Type[]
+```
+
+## Request Object Access
 
 - `@Req()` - Access Express Request object
 - `@Res()` - Access Express Response object
@@ -232,7 +234,7 @@ export class UserController {
 
 ### Custom Status Codes
 
-- `@HttpStatus(code)` - Set custom HTTP status code
+`@HttpStatus(code)` - Set custom HTTP status code
 
 Use the `@HttpStatus()` decorator to set custom status codes:
 
@@ -268,9 +270,9 @@ import { Response } from 'yasui';
 export class UserController {
   @Get('/custom')
   customResponse(@Res() res: Response) {
-    res.status(418).json({ 
+    res.status(418).json({
       message: "I'm a teapot",
-      custom: true 
+      custom: true
     });
     // Don't return anything when using res directly
   }

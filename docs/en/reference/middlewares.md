@@ -75,6 +75,8 @@ export class ValidationMiddleware {
 }
 ```
 
+**Automatic Type Casting:** All parameter decorators in middlewares benefit from the same automatic type casting as controllers. Parameters are cast to their specified types before middleware execution.
+
 ### Dependency Injection
 
 As Middleware classes act like Controllers, they also allow dependency injection in the same way:

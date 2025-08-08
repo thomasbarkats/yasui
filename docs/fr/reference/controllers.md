@@ -106,7 +106,7 @@ Extrayez des données des requêtes HTTP à l'aide de décorateurs de paramètre
 
 ### Extraire le corps de la requête
 
-- `@Body(name?)` - Extraire les données du corps de la requête
+`@Body(name?)` - Extraire les données du corps de la requête
 
 ```typescript
 @Controller('/api/users')
@@ -127,56 +127,58 @@ export class UserController {
 
 ### Extraire les paramètres et les en-têtes
 
-- `@Param(name)` - Extraire les paramètres de route
-- `@Query(name)` - Extraire les paramètres de requête
-- `@Header(name?)` - Extraire les en-têtes de requête
+- `@Param(name, items?)` - Extraire les paramètres de route
+- `@Query(name, items?)` - Extraire les paramètres de requête
+- `@Header(name, items?)` - Extraire les en-têtes de requête
 
-Les paramètres sont automatiquement transformés en fonction de leurs types TypeScript :
+Les paramètres sont automatiquement transformés en fonction de leurs types TypeScript. Pour les tableaux avec des types non-string, vous devez spécifier le type d'élément comme second paramètre :
 
 ```typescript
 @Controller('/api/users')
 export class UserController {
   @Get('/:id')
-  getUser(@Param('id') id: number) { 
-    // Automatiquement converti en nombre
-  }
+  getUser(@Param('id') id: number) {} // Converti en nombre.
 
-  @Get('/search')
+  @Get('/search/:term')
   searchUsers(
-    @Query('page') page: number,
-    @Query('active') active: boolean,
-    @Query('tags') tags: string[]
+    @Param('term') term: string,
+    @Header('x-api-version') version: number,
+    @Query('filters', [Boolean]) filters: boolean[],
+    @Query('settings') settings: { theme: string } | null,
   ) {
-    // page: number (converti de "123" à 123)
-    // active: boolean (converti de "true"/"1" à true)
-    // tags: string[] (de ?tags=red&tags=blue)
-    return { page, active, tags };
-  }
-
-  @Get('/profile')
-  getProfile(
-    @Query('settings') settings: { theme: string },
-    @Header('x-api-version') version: number
-  ) {
-    // settings: object (de ?settings={"theme":"dark"} - JSON analysé)
     // version: number (en-tête converti en nombre)
-    return { settings, version };
+    // filters: boolean[] (depuis ?filters=true&filters=false&filters=1)
+    // settings: object (depuis ?settings={"theme":"dark"} - JSON analysé, null si échec)
+    return { page, active, tags, priorities };
   }
 }
 ```
 
-### Transformations de types prises en charge
+## Conversion automatique des types de paramètres
 
 YasuiJS convertit automatiquement les paramètres en fonction des types TypeScript :
 
+### Types de base
 - **string** - Pas de conversion (par défaut)
 - **number** - Convertit en nombre, renvoie NaN si invalide
 - **boolean** - Convertit "true"/"1" en true, tout le reste en false
 - **Date** - Convertit en objet Date, renvoie Invalid Date si invalide
-- **string[]** - Pour les tableaux de requête comme `?tags=red&tags=blue`
-- **object** - Analyse les chaînes JSON pour les requêtes comme `?data={"key":"value"}`
+- **object** - Analyse les chaînes JSON pour les requêtes comme `?data={"key":"value"}`, renvoie `null` en cas d'échec
 
-### Accès à l'objet Request
+### Types de tableaux
+TypeScript ne peut pas détecter les types d'éléments de tableau à l'exécution, vous devez donc spécifier `[Type]` pour les tableaux non-string :
+
+- **string[]** - Pas de configuration supplémentaire nécessaire (comportement par défaut)
+- **tableaux number, boolean, ou Date** - Doit spécifier le type d'élément en utilisant le second paramètre
+
+**Syntaxe des tableaux typés :**
+```typescript
+@Query('paramName', [Type]) paramName: Type[]
+@Param('paramName', [Type]) paramName: Type[]  
+@Header('headerName', [Type]) headerName: Type[]
+```
+
+## Accès à l'objet Request
 
 - `@Req()` - Accéder à l'objet Request Express
 - `@Res()` - Accéder à l'objet Response Express
@@ -232,7 +234,7 @@ export class UserController {
 
 ### Codes d'état personnalisés
 
-- `@HttpStatus(code)` - Définir un code d'état HTTP personnalisé
+`@HttpStatus(code)` - Définir un code d'état HTTP personnalisé
 
 Utilisez le décorateur `@HttpStatus()` pour définir des codes d'état personnalisés :
 
@@ -268,9 +270,9 @@ import { Response } from 'yasui';
 export class UserController {
   @Get('/custom')
   customResponse(@Res() res: Response) {
-    res.status(418).json({ 
+    res.status(418).json({
       message: "Je suis une théière",
-      custom: true 
+      custom: true
     });
     // Ne rien renvoyer lors de l'utilisation directe de res
   }
