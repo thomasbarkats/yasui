@@ -8,6 +8,7 @@ import {
   ISwaggerRoute,
   SafeApiPropertyRecord,
   TController,
+  YasuiSwaggerConfig,
 } from '~types/interfaces';
 import {
   ObjectSchema,
@@ -140,17 +141,18 @@ export class SwaggerService {
   }
 
   public getSwaggerConfig(
-    info?: Partial<ISwaggerConfig['info']>,
+    config?: Partial<YasuiSwaggerConfig>,
     hasApiKey: boolean = false
   ): ISwaggerConfig {
-    const config: ISwaggerConfig = {
+    const fullConfig: ISwaggerConfig = {
       openapi: '3.0.0',
       paths: {},
+      ...config,
       info: {
         title: 'API Documentation',
         version: '1.0.0',
         description: 'Generated API documentation',
-        ...info
+        ...config?.info
       },
     };
 
@@ -160,7 +162,7 @@ export class SwaggerService {
       this.decoratorValidator?.validateSwaggerSchemaName(className, declaredName);
     });
 
-    config.components = {
+    fullConfig.components = {
       schemas: Object.fromEntries(SwaggerService.schemas),
       ...(hasApiKey && {
         securitySchemes: {
@@ -174,15 +176,15 @@ export class SwaggerService {
     };
 
     for (const route of this.routesRegistry) {
-      if (!config.paths[route.fullPath]) {
-        config.paths[route.fullPath] = {};
+      if (!fullConfig.paths[route.fullPath]) {
+        fullConfig.paths[route.fullPath] = {};
       }
       const operation: OpenAPIOperation = this.buildOperation(route);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (config.paths[route.fullPath] as any)[route.method] = operation;
+      (fullConfig.paths[route.fullPath] as any)[route.method] = operation;
     }
 
-    return config;
+    return fullConfig;
   }
 
   private normalizePath(path: string): string {

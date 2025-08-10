@@ -2,7 +2,6 @@ import { Router, RequestHandler } from 'express';
 import { italic } from 'kleur';
 
 import { Core } from '../core';
-import { LoggerService } from '../services';
 import { defineMetadata, getMetadata } from '../utils/reflect';
 import { routeHandler } from '../utils/route-handler';
 import { ReflectMetadata } from '~types/enums';
@@ -26,13 +25,6 @@ export function Controller(
       /** add target instance metadata to bind his args in route function */
       defineMetadata(ReflectMetadata.SELF, self, target.prototype);
 
-      /** enrich query with controller infos for logs and errors handling */
-      router.use((req, res, next) => {
-        req.source = target.name;
-        req.logger = new LoggerService().start();
-        next();
-      });
-
       /** use other optional middlewares for all controller routes */
       for (const Middleware of middlewares) {
         router.use(core.useMiddleware(Middleware));
@@ -49,7 +41,8 @@ export function Controller(
           );
         }
 
-        /** stack route and middlewares on controller router */
+        /** setup route and middlewares on controller router */
+
         const middlewares: RequestHandler[] = route.middlewares.map(
           (Middleware: TMiddleware) => core.useMiddleware(Middleware)
         );
@@ -63,7 +56,7 @@ export function Controller(
         );
 
         router[route.method](route.path, ...middlewares,
-          routeHandler(target.prototype, route.descriptor, route.params, pipes, false, route.defaultStatus)
+          routeHandler(target, route.descriptor, route.params, pipes, false, route.defaultStatus)
         );
       }
       return router;
