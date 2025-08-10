@@ -69,6 +69,10 @@ export class Core {
       this.logger.warn('debug mode is enabled');
       this.app.use(this.appService.logRequest.bind(this.appService));
     }
+    this.app.use((req, res, next) => {
+      req.logger = new LoggerService().start();
+      next();
+    });
 
     /** register custom injections */
     for (const injection of this.config.injections || []) {
@@ -147,7 +151,7 @@ export class Core {
       if (!swaggerPath.startsWith('/')) {
         swaggerPath = '/' + swaggerPath;
       }
-      const swaggerConfig = this.swagger.getSwaggerConfig(this.config.swagger?.info, !!this.config.apiKey);
+      const swaggerConfig = this.swagger.getSwaggerConfig(this.config.swagger, !!this.config.apiKey);
 
       this.app.use(swaggerPath, swaggerUi.serve);
       this.app.get(swaggerPath, swaggerUi.setup(swaggerConfig, {

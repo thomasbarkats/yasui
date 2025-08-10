@@ -22,7 +22,7 @@ export function Middleware(): ClassDecorator {
       const params = getMetadata(ReflectMetadata.PARAMS, target.prototype, 'use') || [];
 
       return routeHandler(
-        target.prototype,
+        target,
         descriptor,
         params,
         [],

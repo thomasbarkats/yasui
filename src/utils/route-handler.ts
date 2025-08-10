@@ -7,7 +7,7 @@ import { IRouteParam, IPipeTransform, IParamMetadata, ArrayItem } from '~types/i
 
 /** create express-route-handler from controller/middleware method */
 export function routeHandler(
-  target: object,
+  target: Function,
   descriptor: PropertyDescriptor,
   params: IRouteParam[],
   pipes: IPipeTransform[],
@@ -21,9 +21,11 @@ export function routeHandler(
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
+    req.source = target.name;
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const routeHandlerArgs = { req, res, next } as any;
-    const self = getMetadata(ReflectMetadata.SELF, target) || {};
+    const self = getMetadata(ReflectMetadata.SELF, target.prototype) || {};
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const methodDeps: Record<number, any> =
