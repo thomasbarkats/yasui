@@ -16,11 +16,18 @@ npm install swagger-ui-express
 ```typescript
 yasui.createServer({
   controllers: [UserController],
-  swagger: { enabled: true }
+  swagger: {
+    generate: true,
+    path: '/docs',
+    info: {
+      title: 'Mi API',
+      version: '1.0.0',
+    },
+  }
 });
 ```
 
-La documentación será accesible en `/api-docs` (ruta predeterminada) y la especificación JSON en `/api-docs/swagger.json`.
+La documentación será accesible por defecto en `/api-docs` si no se especifica una ruta personalizada, y la especificación JSON en `/<path>/swagger.json`.
 
 YasuiJS genera automáticamente documentación básica a partir de tus controladores y decoradores de ruta existentes, incluso sin decoradores específicos de Swagger. El framework detecta:
 - **Parámetros**: Los parámetros de ruta, parámetros de consulta y encabezados se detectan automáticamente con tipo `string` por defecto
@@ -31,20 +38,77 @@ Las siguientes secciones describen cómo mejorar esta documentación con metadat
 
 ### Configuración Completa
 
+Todas las propiedades estándar de la especificación OpenAPI 3.0 son compatibles y opcionales. El framework maneja automáticamente la generación de `openapi`, `paths` y `components` basándose en tus decoradores.
+
+<details>
+<summary>Ver ejemplo completo con todas las opciones de configuración</summary>
+
 ```typescript
 yasui.createServer({
   controllers: [UserController],
   swagger: {
-    enabled: true,
-    path: '/docs', // Ruta personalizada, especificación JSON en `/docs/swagger.json`
+    generate: true,
+    path: '/docs',
+    // Objeto Info de OpenAPI
     info: {
       title: 'API de Gestión de Usuarios',
       version: '2.1.0',
       description: 'API completa para operaciones de gestión de usuarios',
+      termsOfService: 'https://example.com/terms',
+      contact: {
+        name: 'Soporte API',
+        url: 'https://example.com/support',
+        email: 'support@example.com'
+      },
+      license: {
+        name: 'MIT',
+        url: 'https://opensource.org/licenses/MIT'
+      }
     },
+    // Documentación Externa
+    externalDocs: {
+      description: 'Encuentra más información aquí',
+      url: 'https://example.com/docs'
+    },
+    // Información del Servidor
+    servers: [
+      {
+        url: 'https://api.example.com/v1',
+        description: 'Servidor de producción',
+        variables: {
+          version: {
+            default: 'v1',
+            enum: ['v1', 'v2'],
+            description: 'Versión de API'
+          }
+        }
+      },
+      {
+        url: 'https://staging.example.com/v1',
+        description: 'Servidor de staging'
+      }
+    ],
+    // Requisitos de Seguridad Globales
+    security: [
+      { bearerAuth: [] },
+      { apiKeyAuth: [] }
+    ],
+    // Etiquetas Globales
+    tags: [
+      {
+        name: 'usuarios',
+        description: 'Operaciones de gestión de usuarios',
+        externalDocs: {
+          description: 'Más información',
+          url: 'https://example.com/docs/users'
+        }
+      }
+    ]
   }
 });
 ```
+
+</details>
 
 ## Definición de Esquema
 
@@ -60,15 +124,6 @@ export class CreateUserDto {
   @ApiProperty() // Tipo inferido de TypeScript
   name: string;
 
-  @ApiProperty({ type: 'string', format: 'email' }) // Esquema OpenAPI, personalización completa
-  username: string;
-
-  @ApiProperty({ enum: ['admin', 'user', 'moderator'] }) // Valores enum
-  role: string;
-
-  @ApiProperty({ enum: UserStatus }) // Enum de TypeScript
-  status: UserStatus;
-
   @ApiProperty([String]) // Array de primitivos
   tags: string[];
 
@@ -77,6 +132,16 @@ export class CreateUserDto {
 
   @ApiProperty([AddressDto]) // Array de referencias de clase
   previousAddresses: AddressDto[];
+
+  @ApiProperty({ enum: ['admin', 'user'] }) // Valores enum
+  role: string;
+
+  @ApiProperty({ enum: UserStatus }) // Enum de TypeScript
+  status: UserStatus;
+
+  // Esquema OpenAPI, personalización completa
+  @ApiProperty({ type: 'string', format: 'email' }) 
+  username: string;
 
   @ApiProperty({
     theme: String,

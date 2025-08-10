@@ -16,39 +16,103 @@ npm install swagger-ui-express
 ```typescript
 yasui.createServer({
   controllers: [UserController],
-  swagger: { enabled: true }
-});
-```
-
-La documentation sera accessible à `/api-docs` (chemin par défaut) et la spécification JSON à `/api-docs/swagger.json`.
-
-YasuiJS génère automatiquement une documentation de base à partir de vos contrôleurs et décorateurs de route existants, même sans décorateurs spécifiques à Swagger. Le framework détecte :
-- **Paramètres**: Les paramètres de chemin, les paramètres de requête et les en-têtes sont automatiquement détectés avec le type `string` par défaut
-- **Corps de la requête**: Automatiquement détecté lorsque présent avec un schéma `{}` par défaut
-- **Réponses**: Seul le code de statut 200 (ou le statut par défaut si `@HttpStatus` est présent) est détecté sans information de schéma
-
-Les sections suivantes décrivent comment enrichir cette documentation avec des métadonnées supplémentaires et un typage précis.
-
-### Configuration complète
-
-```typescript
-yasui.createServer({
-  controllers: [UserController],
   swagger: {
-    enabled: true,
-    path: '/docs', // Chemin personnalisé, spécification JSON à `/docs/swagger.json`
+    generate: true,
+    path: '/docs',
     info: {
-      title: 'API de Gestion des Utilisateurs',
-      version: '2.1.0',
-      description: 'API complète pour les opérations de gestion des utilisateurs',
+      title: 'Mon API',
+      version: '1.0.0',
     },
   }
 });
 ```
 
+La documentation sera accessible par défaut à `/api-docs` si aucun chemin personnalisé n'est spécifié, et la spécification JSON à `/<path>/swagger.json`.
+
+YasuiJS génère automatiquement une documentation de base à partir de vos contrôleurs et décorateurs de route existants, même sans décorateurs spécifiques à Swagger. Le framework détecte :
+- **Paramètres** : Les paramètres de chemin, les paramètres de requête et les en-têtes sont automatiquement détectés avec le type `string` par défaut
+- **Corps de la requête** : Automatiquement détecté lorsque présent avec un schéma `{}` par défaut
+- **Réponses** : Seul le code d'état 200 (ou l'état par défaut si `@HttpStatus` est présent) est détecté sans information de schéma
+
+Les sections suivantes décrivent comment enrichir cette documentation avec des métadonnées supplémentaires et un typage précis.
+
+### Configuration complète
+
+Toutes les propriétés de spécification OpenAPI 3.0 standard sont prises en charge et optionnelles. Le framework gère automatiquement la génération de `openapi`, `paths` et `components` basée sur vos décorateurs.
+
+<details>
+<summary>Voir l'exemple complet avec toutes les options de configuration</summary>
+
+```typescript
+yasui.createServer({
+  controllers: [UserController],
+  swagger: {
+    generate: true,
+    path: '/docs',
+    // Objet Info OpenAPI
+    info: {
+      title: 'API de Gestion des Utilisateurs',
+      version: '2.1.0',
+      description: 'API complète pour les opérations de gestion des utilisateurs',
+      termsOfService: 'https://example.com/terms',
+      contact: {
+        name: 'Support API',
+        url: 'https://example.com/support',
+        email: 'support@example.com'
+      },
+      license: {
+        name: 'MIT',
+        url: 'https://opensource.org/licenses/MIT'
+      }
+    },
+    // Documentation Externe
+    externalDocs: {
+      description: 'Plus d\'informations ici',
+      url: 'https://example.com/docs'
+    },
+    // Information sur les Serveurs
+    servers: [
+      {
+        url: 'https://api.example.com/v1',
+        description: 'Serveur de production',
+        variables: {
+          version: {
+            default: 'v1',
+            enum: ['v1', 'v2'],
+            description: 'Version de l\'API'
+          }
+        }
+      },
+      {
+        url: 'https://staging.example.com/v1',
+        description: 'Serveur de staging'
+      }
+    ],
+    // Exigences de Sécurité Globales
+    security: [
+      { bearerAuth: [] },
+      { apiKeyAuth: [] }
+    ],
+    // Tags Globaux
+    tags: [
+      {
+        name: 'users',
+        description: 'Opérations de gestion des utilisateurs',
+        externalDocs: {
+          description: 'En savoir plus',
+          url: 'https://example.com/docs/users'
+        }
+      }
+    ]
+  }
+});
+```
+
+</details>
+
 ## Définition du Schéma
 
-YasuiJS utilise des classes TypeScript avec des décorateurs de propriétés pour définir les schémas API. Les propriétés sont automatiquement déduites des métadonnées TypeScript lorsque les décorateurs sont utilisés sans paramètres.
+YasuiJS utilise des classes TypeScript avec des décorateurs de propriété pour définir les schémas API. Les propriétés sont automatiquement déduites des métadonnées TypeScript lorsque les décorateurs sont utilisés sans paramètres.
 
 Les schémas sont automatiquement enregistrés s'ils sont utilisés dans des décorateurs.
 
@@ -60,15 +124,6 @@ export class CreateUserDto {
   @ApiProperty() // Type déduit de TypeScript
   name: string;
 
-  @ApiProperty({ type: 'string', format: 'email' }) // Schéma OpenAPI, personnalisation complète
-  username: string;
-
-  @ApiProperty({ enum: ['admin', 'user', 'moderator'] }) // Valeurs d'énumération
-  role: string;
-
-  @ApiProperty({ enum: UserStatus }) // Énumération TypeScript
-  status: UserStatus;
-
   @ApiProperty([String]) // Tableau de types primitifs
   tags: string[];
 
@@ -77,6 +132,16 @@ export class CreateUserDto {
 
   @ApiProperty([AddressDto]) // Tableau de références de classe
   previousAddresses: AddressDto[];
+
+  @ApiProperty({ enum: ['admin', 'user'] }) // Valeurs d'énumération
+  role: string;
+
+  @ApiProperty({ enum: UserStatus }) // Énumération TypeScript
+  status: UserStatus;
+
+  // Schéma OpenAPI, personnalisation complète
+  @ApiProperty({ type: 'string', format: 'email' }) 
+  username: string;
 
   @ApiProperty({
     theme: String,
