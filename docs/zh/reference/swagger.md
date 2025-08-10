@@ -6,7 +6,7 @@ YasuiJS提供OpenAPI文档生成功能，可选集成Swagger UI。它会自动�
 
 ### 基本设置
 
-通过在应用程序中添加配置来启用Swagger。YasuiJS从你的控制器、路由和装饰器生成文档。
+通过在应用中添加配置来启用Swagger。YasuiJS从你的控制器、路由和装饰器生成文档。
 
 **注意**：你需要单独安装`swagger-ui-express`：
 ```bash
@@ -16,39 +16,103 @@ npm install swagger-ui-express
 ```typescript
 yasui.createServer({
   controllers: [UserController],
-  swagger: { enabled: true }
-});
-```
-
-文档将可在`/api-docs`（默认路径）访问，JSON规范在`/api-docs/swagger.json`。
-
-即使没有任何Swagger特定的装饰器，YasuiJS也会从你现有的控制器和路由装饰器自动生成基本文档。框架会检测：
-- **参数**：自动检测路径参数、查询参数和请求头，默认类型为`string`
-- **请求体**：当存在时自动检测，默认schema为`{}`
-- **响应**：仅检测200状态码（或存在`@HttpStatus`时的默认状态），不含schema信息
-
-以下部分描述如何通过额外的元数据和精确类型增强此文档。
-
-### 完整配置
-
-```typescript
-yasui.createServer({
-  controllers: [UserController],
   swagger: {
-    enabled: true,
-    path: '/docs', // 自定义路径，JSON规范在`/docs/swagger.json`
+    generate: true,
+    path: '/docs',
     info: {
-      title: '用户管理API',
-      version: '2.1.0',
-      description: '完整的用户管理操作API',
+      title: 'My API',
+      version: '1.0.0',
     },
   }
 });
 ```
 
+如果未指定自定义路径，文档默认可在`/api-docs`访问，JSON规范在`/<path>/swagger.json`。
+
+即使没有任何Swagger特定的装饰器，YasuiJS也会自动从你现有的控制器和路由装饰器生成基本文档。框架会检测：
+- **参数**：路径参数、查询参数和请求头会被自动检测，默认类型为`string`
+- **请求体**：当存在时自动检测，默认schema为`{}`
+- **响应**：仅检测200状态码（或如果存在`@HttpStatus`则为默认状态），不含schema信息
+
+以下部分描述如何通过额外的元数据和精确类型增强此文档。
+
+### 完整配置
+
+支持所有标准OpenAPI 3.0规范属性，且都是可选的。框架会根据你的装饰器自动处理`openapi`、`paths`和`components`的生成。
+
+<details>
+<summary>查看包含所有配置选项的完整示例</summary>
+
+```typescript
+yasui.createServer({
+  controllers: [UserController],
+  swagger: {
+    generate: true,
+    path: '/docs',
+    // OpenAPI Info对象
+    info: {
+      title: '用户管理API',
+      version: '2.1.0',
+      description: '完整的用户管理操作API',
+      termsOfService: 'https://example.com/terms',
+      contact: {
+        name: 'API支持',
+        url: 'https://example.com/support',
+        email: 'support@example.com'
+      },
+      license: {
+        name: 'MIT',
+        url: 'https://opensource.org/licenses/MIT'
+      }
+    },
+    // 外部文档
+    externalDocs: {
+      description: '在此处查找更多信息',
+      url: 'https://example.com/docs'
+    },
+    // 服务器信息
+    servers: [
+      {
+        url: 'https://api.example.com/v1',
+        description: '生产服务器',
+        variables: {
+          version: {
+            default: 'v1',
+            enum: ['v1', 'v2'],
+            description: 'API版本'
+          }
+        }
+      },
+      {
+        url: 'https://staging.example.com/v1',
+        description: '预发布服务器'
+      }
+    ],
+    // 全局安全要求
+    security: [
+      { bearerAuth: [] },
+      { apiKeyAuth: [] }
+    ],
+    // 全局标签
+    tags: [
+      {
+        name: 'users',
+        description: '用户管理操作',
+        externalDocs: {
+          description: '了解更多',
+          url: 'https://example.com/docs/users'
+        }
+      }
+    ]
+  }
+});
+```
+
+</details>
+
 ## Schema定义
 
-YasuiJS使用带有属性装饰器的TypeScript类来定义API schemas。当使用不带参数的装饰器时，属性会自动从TypeScript元数据中推断。
+YasuiJS使用带有属性装饰器的TypeScript类来定义API schema。当装饰器不带参数使用时，属性会自动从TypeScript元数据中推断。
 
 如果在任何装饰器中使用了Schema，它们会被自动注册。
 
@@ -60,15 +124,6 @@ export class CreateUserDto {
   @ApiProperty() // 从TypeScript推断类型
   name: string;
 
-  @ApiProperty({ type: 'string', format: 'email' }) // OpenAPI schema，完全自定义
-  username: string;
-
-  @ApiProperty({ enum: ['admin', 'user', 'moderator'] }) // 枚举值
-  role: string;
-
-  @ApiProperty({ enum: UserStatus }) // TypeScript枚举
-  status: UserStatus;
-
   @ApiProperty([String]) // 基本类型数组
   tags: string[];
 
@@ -77,6 +132,16 @@ export class CreateUserDto {
 
   @ApiProperty([AddressDto]) // 类引用数组
   previousAddresses: AddressDto[];
+
+  @ApiProperty({ enum: ['admin', 'user'] }) // 枚举值
+  role: string;
+
+  @ApiProperty({ enum: UserStatus }) // TypeScript枚举
+  status: UserStatus;
+
+  // OpenAPI schema，完全自定义
+  @ApiProperty({ type: 'string', format: 'email' }) 
+  username: string;
 
   @ApiProperty({
     theme: String,
