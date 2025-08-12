@@ -12,7 +12,7 @@
   --vp-c-brand-2: #DCA347;
   --vp-c-brand-3: #D2932C;
   --vp-c-brand-4: #996447;
-  --vp-c-brand-shadow: #754931;
+  --vp-c-brand-shadow: #69402a;
 }
 
 :root {
@@ -25,7 +25,7 @@
 }
 
 .VPImage {
-  filter: drop-shadow(-8px 8px 64px var(--vp-c-brand-shadow));
+  filter: drop-shadow(-8px 8px 44px var(--vp-c-brand-shadow));
 }
 
 .VPHero .main {
@@ -33,10 +33,23 @@
   width: 100% !important;
 }
 
+@media (max-width: 960px) {
+  .VPHome {
+    margin-bottom: 64px !important;
+  }
+
+  .VPHero .image {
+    margin-top: -92px;
+  }
+}
+
 @media (min-width: 960px) {
+  .VPHome {
+    margin-bottom: 84px !important;
+  }
 
   .VPHero .main {
-    margin-top: -14px;
+    margin-top: -32px;
     flex: 2 !important;
   }
 
@@ -45,7 +58,9 @@
   }
 
   .VPHero .image img {
-    max-width: 250px !important;
+    max-width: 280px !important;
+    margin-left: 28px;
+    margin-top: 8px;
   }
 
   .VPHero .main .text {

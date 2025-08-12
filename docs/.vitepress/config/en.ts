@@ -4,6 +4,7 @@ export default {
   themeConfig: {
     footer: {
       message: 'Released under the AGPL v3 License.',
+      copyright: 'Copyright © 2021-present Thomas BARKATS',
     },
     nav: [
       { text: 'Home', link: '/' },

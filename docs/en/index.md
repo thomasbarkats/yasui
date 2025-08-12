@@ -6,7 +6,7 @@ hero:
   text: "Ship production-ready REST APIs in minutes"
   tagline: A lightweight framework, but with everything you need.
   image:
-    src: https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot.png
+    src: https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot-opt.svg
     alt: YasuiJS
   actions:
     - theme: brand
@@ -20,19 +20,19 @@ features:
   - icon: ⚡
     title: Lightweight & Fast
     details: Built on Express with minimal dependencies. Focus on essentials without the bloat.
-  - icon: 🎯
-    title: Decorator-Based
-    details: Clean, readable code with TypeScript decorators for controllers, routes, middleware and more.
-  - icon: 🔧
-    title: Dependency Injection
-    details: Automatic resolution with scope management for clean, testable architecture.
-  - icon: 📚
-    title: Auto-Generated Swagger
-    details: Generated OpenAPI documentation from your decorator, and fully editable.
   - icon: 🛡️
     title: Complete Error Handling
-    details: Comprehensive error catching, logging, and formatting out of the box.
-  - icon: 🔍
-    title: Built-in Logging
-    details: Timed logging service with color-coded output and performance monitoring.
+    details: Middlewares, services, controllers - everything can throw without try/catch. Automatic error handling everywhere.
+  - icon: 🔧
+    title: Automatic Type-Casting
+    details: Query params automatically converted to proper types. Even in middlewares.
+  - icon: 🧩
+    title: Flexible DI System
+    details: Constructor and method-level injection with configurable scopes for better control.
+  - icon: 📦
+    title: Simple Middlewares
+    details: Apply at global, controller, or route level. Use the same decorators as controllers.
+  - icon: 📚
+    title: Rich Swagger Generation
+    details: Flexible decorators for enums, arrays, classes, OpenAPI schemas. Generated from your existing code.
 ---

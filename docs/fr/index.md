@@ -6,7 +6,7 @@ hero:
   text: "Déployez des API REST prêtes pour la production en quelques minutes"
   tagline: Un framework léger, mais avec tout ce dont vous avez besoin.
   image:
-    src: https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot.png
+    src: https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot-opt.svg
     alt: YasuiJS
   actions:
     - theme: brand
@@ -20,19 +20,19 @@ features:
   - icon: ⚡
     title: Léger & Rapide
     details: Construit sur Express avec un minimum de dépendances. Concentré sur l'essentiel sans superflu.
-  - icon: 🎯
-    title: Basé sur les Décorateurs
-    details: Code propre et lisible avec des décorateurs TypeScript pour les contrôleurs, les routes, les middleware et plus encore.
-  - icon: 🔧
-    title: Injection de Dépendances
-    details: Résolution automatique avec gestion de la portée pour une architecture propre et testable.
-  - icon: 📚
-    title: Swagger Auto-Généré
-    details: Documentation OpenAPI générée à partir de vos décorateurs, et entièrement modifiable.
   - icon: 🛡️
     title: Gestion Complète des Erreurs
-    details: Capture, journalisation et formatage complets des erreurs prêts à l'emploi.
-  - icon: 🔍
-    title: Journalisation Intégrée
-    details: Service de journalisation chronométré avec sortie en couleur et surveillance des performances.
+    details: Middlewares, services, contrôleurs - tout peut lancer des erreurs sans try/catch. Gestion automatique des erreurs partout.
+  - icon: 🔧
+    title: Conversion Automatique des Types
+    details: Paramètres de requête automatiquement convertis aux types appropriés. Même dans les middlewares.
+  - icon: 🧩
+    title: Système d'Injection de Dépendances Flexible
+    details: Injection au niveau du constructeur et des méthodes avec des portées configurables pour un meilleur contrôle.
+  - icon: 📦
+    title: Middlewares Simples
+    details: Application au niveau global, du contrôleur ou de la route. Utilisez les mêmes décorateurs que les contrôleurs.
+  - icon: 📚
+    title: Génération Swagger Complète
+    details: Décorateurs flexibles pour les énumérations, tableaux, classes, schémas OpenAPI. Générés à partir de votre code existant.
 ---

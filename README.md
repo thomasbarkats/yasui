@@ -25,16 +25,15 @@
 
 ## What is YasuiJS?
 
-Yasui (meaning "easy" in Japanese) is a lightweight Express-based framework for Node.js that simplifies REST API development, designed with a minimal philosophy that focuses on essentials while maintaining minimal dependencies compared to other frameworks.
+Yasui (meaning "easy" in Japanese) is a lightweight Express-based framework for Node.js that brings the developer experience of modern frameworks without the complexity and maintaining minimal dependencies. It provides the structure you need with just the features you'll actually use.
 
 ## Features Summary
-- **Lightweight**: Built on Express with minimal dependencies
-- **Decorator-based**: Clean, readable code with TypeScript decorators
-- **Dependency Injection**: Automatic resolution with scope management
-- **Auto Error Handling**: Comprehensive error catching, logging, and formatting
-- **Built-in Logging**: Timed logging service with color-coded output
-- **Flexible Middleware**: Application, controller, and endpoint-level middleware support
-- **Swagger Integration**: Self-generated and editable Swagger documentation
+- **Lightweight & Fast**: Built on Express with minimal dependencies. Focus on essentials without the bloat
+- **Complete Error Handling**: Everything can throw without try/catch - automatic error handling everywhere
+- **Automatic Type-Casting**: Query params automatically converted to proper types. Even in middlewares
+- **Flexible DI System**: Constructor and method-level injection with configurable scopes for better control
+- **Simple Middlewares**: Apply at global, controller, or route level. Use the same decorators as controllers
+- **Rich Swagger Generation**: Flexible decorators for enums, arrays, classes, OpenAPI schemas.
 - **Type-safe**: Full TypeScript support with proper typing
 
 ## Quick Start
@@ -59,23 +58,16 @@ yasui.createServer({
 });
 ```
 
-## Documentation
+## 📖 **[Documentation](https://yasui.app/guide/getting-started.html)**
 
-📖 **[Complete Documentation](https://yasui.app)**
-
-- [Getting Started](https://yasui.app/guide/getting-started) - Set up your first API in minutes
-- [Basic Concepts](https://yasui.app/guide/basic-concepts) - Understand YasuiJS architecture
-- [Controllers](https://yasui.app/reference/controllers) - Define your API endpoints
-- [Middlewares](https://yasui.app/reference/middlewares) - Handle cross-cutting concerns
-- [Dependency Injection](https://yasui.app/reference/dependency-injection) - Manage component relationships
-- [Logging Service](https://yasui.app/reference/logging) - Built-in logging with timing
-- [Error Handling](https://yasui.app/reference/error-handling) - Automatic error management
-- [Swagger Integration](https://yasui.app/reference/swagger) - API documentation generation
-- [Configuration](https://yasui.app/reference/config) - Complete configuration reference
-
-## Examples
-
-Browse the [`src/examples`](./src/examples) folder to get a simple example of a server with Yasui, including controllers, services, middlewares, dependency injection, and error handling. Run it with `npm run example`.
+- [Configuration](https://yasui.app/guide/config.html) - Server setup and global options
+- [Controllers](https://yasui.app/guide/controllers.html) - Define routes with decorators and automatic type casting
+- [Dependency Injection](https://yasui.app/guide/dependency-injection.html) - Constructor and method-level injection with flexible scopes
+- [Error Handling](https://yasui.app/guide/error-handling.html) - Automatic error catching without try/catch blocks
+- [Logging](https://yasui.app/guide/logging.html) - Built-in timing and color-coded logging service
+- [Middlewares](https://yasui.app/guide/middlewares.html) - Apply at multiple levels with same decorators as controllers
+- [Pipes](https://yasui.app/guide/pipes.html) - Transform and validate request data automatically
+- [Swagger Doc.](https://yasui.app/guide/swagger.html) - Generate OpenAPI docs with flexible decorators
 
 ## Why YasuiJS?
 

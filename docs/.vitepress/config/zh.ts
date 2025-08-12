@@ -4,6 +4,7 @@ export default {
   themeConfig: {
     footer: {
       message: '根据AGPL v3许可证发布。',
+      copyright: '版权 © 2021-至今 Thomas BARKATS',
     },
     nav: [
       { text: '首页', link: '/zh/' },

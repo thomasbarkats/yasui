@@ -13,12 +13,13 @@ export default defineConfig({
     ['link', { rel: 'preconnect', href: 'https://raw.githubusercontent.com' }],
     ['link', { 
       rel: 'icon', 
-      href: 'https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot.png' 
+      href: 'https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot.ico' 
     }],
     ['link', { 
       rel: 'preload', 
-      href: 'https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot.png', 
+      href: 'https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot-opt.svg', 
       as: 'image',
+      type: 'image/svg+xml',
       fetchpriority: 'high'
     }],
     ['link', { 
