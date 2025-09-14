@@ -1,6 +1,6 @@
-import { HttpCode, RouteMethods } from '../enums';
-import { Constructible, Instance } from './utils.i';
-import { TMiddleware } from './middleware.i';
+import { HttpCode, RouteMethods } from '../enums/index.js';
+import { Constructible, Instance } from './utils.i.js';
+import { TMiddleware } from './middleware.i.js';
 
 
 /** Controller type */

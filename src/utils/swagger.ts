@@ -1,9 +1,9 @@
 import { HttpCode, ReflectMetadata } from '~types/enums';
 import { ApiPropertyDefinition, Constructible } from '~types/interfaces';
 import { OpenAPISchema } from '~types/openapi';
-import { HttpError, ErrorResourceSchema } from './error.resource';
-import { getMetadata, defineMetadata } from './reflect';
-import { resolveSchema } from '.';
+import { HttpError, ErrorResourceSchema } from './error.resource.js';
+import { getMetadata, defineMetadata } from './reflect.js';
+import { resolveSchema } from './index.js';
 
 
 export const ERROR_RESOURCE_SCHEMA_NAME = 'Error Response';

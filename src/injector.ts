@@ -1,10 +1,10 @@
-import { yellow } from 'kleur';
+import kleur from 'kleur';
 
-import { LoggerService } from './services';
+import { LoggerService } from './services/index.js';
 import { InheritedScopes, ReflectMetadata, Scopes } from '~types/enums';
 import { Constructible, Instance } from '~types/interfaces';
-import { DecoratorValidator } from './utils/decorator-validator';
-import { getMetadata, defineMetadata } from './utils/reflect';
+import { DecoratorValidator } from './utils/decorator-validator.js';
+import { getMetadata, defineMetadata } from './utils/reflect.js';
 
 
 export class Injector {
@@ -34,7 +34,7 @@ export class Injector {
 
     if (this.debug) {
       const name: string = (typeof token === 'symbol' && token.description)
-        ? yellow(token.description)
+        ? kleur.yellow(token.description)
         : token.toString();
       this.logger.debug(`register ${name}`);
     }

@@ -1,4 +1,4 @@
-import { getMetadata, defineMetadata } from '../utils/reflect';
+import { getMetadata, defineMetadata } from '../utils/reflect.js';
 import { HttpCode, ReflectMetadata, RouteMethods } from '~types/enums';
 import { IControllerRoute, TMiddleware } from '~types/interfaces';
 

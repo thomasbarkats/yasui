@@ -1,5 +1,5 @@
-import { IControllerRoute, TController } from './controller.i';
-import { Constructible } from './utils.i';
+import { IControllerRoute, TController } from './controller.i.js';
+import { Constructible } from './utils.i.js';
 import {
   ObjectSchema,
   OpenAPIComponents,
@@ -9,7 +9,7 @@ import {
   OpenAPISchema,
   OpenAPIServer,
   RefSchema,
-} from '../openapi';
+} from '../openapi.js';
 
 
 export type ApiPropertyPrimitiveSchema = Exclude<OpenAPISchema, ObjectSchema | RefSchema> & {

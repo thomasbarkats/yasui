@@ -6,9 +6,9 @@ import {
   YasuiConfig,
 } from '~types/interfaces';
 import { ReflectMetadata, Scopes } from '~types/enums';
-import { LoggerService } from '../services';
-import { getMetadata } from './reflect';
-import { SwaggerService } from './swagger.service';
+import { LoggerService } from '../services/index.js';
+import { getMetadata } from './reflect.js';
+import { SwaggerService } from './swagger.service.js';
 
 
 interface ValidationError {

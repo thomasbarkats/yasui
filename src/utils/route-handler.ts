@@ -1,6 +1,6 @@
 import { Request, RequestHandler, Response, NextFunction } from 'express';
 
-import { getMetadata } from './reflect';
+import { getMetadata } from './reflect.js';
 import { HttpCode, ReflectMetadata, RouteRequestParamTypes } from '~types/enums';
 import { IRouteParam, IPipeTransform, IParamMetadata, ArrayItem } from '~types/interfaces';
 

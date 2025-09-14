@@ -1,8 +1,8 @@
-import { defineMetadata, getMetadata } from '../utils/reflect';
+import { defineMetadata, getMetadata } from '../utils/reflect.js';
 import { Request, Response, RequestHandler, NextFunction } from 'express';
 import { ReflectMetadata, RouteRequestParamTypes } from '~types/enums';
 import { IControllerRoute, IParamMetadata, IPipeTransform, Constructible } from '~types/interfaces';
-import { Injectable } from './injectable.decorator';
+import { Injectable } from './injectable.decorator.js';
 
 
 export const PipeTransform = Injectable;

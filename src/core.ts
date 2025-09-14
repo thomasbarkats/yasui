@@ -5,16 +5,17 @@ import express, {
   Response,
   Router,
 } from 'express';
-import { json } from 'body-parser';
-import { italic } from 'kleur';
+import kleur from 'kleur';
+import bodyParser from 'body-parser';
+import { createRequire } from 'module';
 
 import { Constructible, IController, IDMiddleware, Instance, TMiddleware } from '~types/interfaces';
 import { YasuiConfig } from '~types/interfaces';
-import { AppService } from './utils/app.service';
-import { DecoratorValidator } from './utils/decorator-validator';
-import { LoggerService } from './services';
-import { Injector } from './injector';
-import { SwaggerService } from './utils/swagger.service';
+import { AppService } from './utils/app.service.js';
+import { DecoratorValidator } from './utils/decorator-validator.js';
+import { LoggerService } from './services/index.js';
+import { Injector } from './injector.js';
+import { SwaggerService } from './utils/swagger.service.js';
 
 
 interface IDController extends IController {
@@ -57,7 +58,7 @@ export class Core {
 
   public createApp(): Application {
     this.logger.start();
-    this.app.use(json());
+    this.app.use(bodyParser.json());
 
     /** client authentication */
     if (this.config.apiKey) {
@@ -132,7 +133,7 @@ export class Core {
           this.swagger.registerControllerRoutes(Controller, path);
         }
 
-        this.logger.success(`${italic(`${path}`)} routes loaded`);
+        this.logger.success(`${kleur.italic(`${path}`)} routes loaded`);
 
       } catch (err) {
         this.logger.error(`failed to load ${Controller.name || '<invalid controller>'} routes\n${err}`);
@@ -145,25 +146,32 @@ export class Core {
       return;
     }
     try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const require = createRequire(import.meta.url);
       const swaggerUi = require('swagger-ui-express');
+
       let swaggerPath = this.config.swagger.path || '/api-docs';
       if (!swaggerPath.startsWith('/')) {
         swaggerPath = '/' + swaggerPath;
       }
       const swaggerConfig = this.swagger.getSwaggerConfig(this.config.swagger, !!this.config.apiKey);
 
-      this.app.use(swaggerPath, swaggerUi.serve);
-      this.app.get(swaggerPath, swaggerUi.setup(swaggerConfig, {
-        swaggerOptions: {
-          defaultModelsExpandDepth: 0,
-        }
-      }));
-      this.app.get(`${swaggerPath}/swagger.json`, (req, res) => {
+      const swaggerJsonPath = `${swaggerPath}/swagger.json`;
+      this.app.get(swaggerJsonPath, (req, res) => {
         res.json(swaggerConfig);
       });
 
-      this.logger.success(`${italic(`${swaggerPath}`)} swagger documentation loaded`);
+      this.app.use(
+        swaggerPath,
+        swaggerUi.serve,
+        swaggerUi.setup(swaggerConfig, {
+          swaggerOptions: {
+            defaultModelsExpandDepth: 0,
+            url: swaggerJsonPath,
+          },
+        })
+      );
+
+      this.logger.success(`${kleur.italic(`${swaggerPath}`)} swagger documentation loaded`);
 
     } catch (err) {
       this.logger.warn(

@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { Constructible, Instance } from './utils.i';
+import { Constructible, Instance } from './utils.i.js';
 
 
 /** Middleware type */

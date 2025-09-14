@@ -1,10 +1,10 @@
+import kleur from 'kleur';
 import { NextFunction, Request, Response } from 'express';
-import { italic, red } from 'kleur';
 
 import { HttpCode } from '~types/enums';
 import { YasuiConfig } from '~types/interfaces';
-import { ErrorResource } from './error.resource';
-import { LoggerService } from '../services';
+import { ErrorResource } from './error.resource.js';
+import { LoggerService } from '../services/index.js';
 
 
 export class AppService {
@@ -25,7 +25,7 @@ export class AppService {
       return next();
     }
     res.sendStatus(HttpCode.FORBIDDEN);
-    this.logger.error(`Access denied (query attempt on ${italic(`${req.method} ${req.path}`)})`);
+    this.logger.error(`Access denied (query attempt on ${kleur.italic(`${req.method} ${req.path}`)})`);
   }
 
   public logRequest(
@@ -34,7 +34,7 @@ export class AppService {
     next: NextFunction
   ): void {
     const logger: LoggerService = req.logger || this.logger;
-    logger.debug(`request ${italic(`${req.method} ${req.path}`)}`);
+    logger.debug(`request ${kleur.italic(`${req.method} ${req.path}`)}`);
     next();
   }
 
@@ -69,7 +69,7 @@ export class AppService {
         (isInternalServerError ? 'Unexpected ' : '') + err.constructor.name,
         req.source + (this.appConfig.debug ? '(debug)' : '')
       );
-      console.error(red(
+      console.error(kleur.red(
         `source: ${filename ? `${filename} ${line}:${column}` : 'undefined'}\n` +
         errResource.toString(),
       ));

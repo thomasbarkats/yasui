@@ -1,6 +1,4 @@
-import { LoggerService } from './services';
-
-export { };
+import { LoggerService } from './services/logger.service.js';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -11,3 +9,11 @@ declare global {
     }
   }
 }
+
+export {
+  Application,
+  Request,
+  Response,
+  NextFunction,
+  RequestHandler,
+} from 'express';

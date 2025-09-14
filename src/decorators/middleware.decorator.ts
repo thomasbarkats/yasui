@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 
-import { defineMetadata, getMetadata } from '../utils/reflect';
-import { routeHandler } from '../utils/route-handler';
+import { defineMetadata, getMetadata } from '../utils/reflect.js';
+import { routeHandler } from '../utils/route-handler.js';
 import { IMiddleware } from '~types/interfaces';
 import { ReflectMetadata } from '~types/enums';
 

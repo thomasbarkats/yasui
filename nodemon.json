@@ -1,7 +1,0 @@
-{
-  "exec": "npm run build && node lib/examples/app.js",
-  "watch": [
-    "./src/*"
-  ],
-  "ext": "ts, js, json"
-}

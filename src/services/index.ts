@@ -2,5 +2,5 @@
  * Services provided outside sources
  */
 
-export * from './logger.service';
-export * from './config.service';
+export * from './logger.service.js';
+export * from './config.service.js';

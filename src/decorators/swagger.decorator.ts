@@ -1,5 +1,5 @@
 import { ReflectMetadata } from '~types/enums';
-import { HttpError, resolveSchema } from '../utils';
+import { HttpError, resolveSchema } from '../utils/index.js';
 import {
   Constructible,
   ApiPropertyDefinition,
@@ -12,13 +12,13 @@ import {
 import {
   getMetadata,
   defineMetadata
-} from '../utils/reflect';
+} from '../utils/reflect.js';
 import {
   ERROR_RESOURCE_SCHEMA_NAME,
   extractDecoratorUsage,
   mapTypeToSchema,
   overloadCustomErrorDefinition,
-} from '../utils/swagger';
+} from '../utils/swagger.js';
 
 
 /** swagger operation decorator */

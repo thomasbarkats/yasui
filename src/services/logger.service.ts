@@ -1,6 +1,6 @@
 import kleur from 'kleur';
 
-import { Injectable } from '../decorators';
+import { Injectable } from '../decorators/index.js';
 
 
 @Injectable()
