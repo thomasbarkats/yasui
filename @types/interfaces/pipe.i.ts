@@ -1,5 +1,5 @@
-import { RouteRequestParamTypes } from '../enums';
-import { Instance } from './utils.i';
+import { RouteRequestParamTypes } from '../enums/index.js';
+import { Instance } from './utils.i.js';
 
 
 export interface IParamMetadata {

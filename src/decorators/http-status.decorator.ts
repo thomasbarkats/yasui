@@ -1,5 +1,5 @@
 import { HttpCode, ReflectMetadata } from '~types/enums';
-import { defineMetadata } from '../utils/reflect';
+import { defineMetadata } from '../utils/reflect.js';
 
 /** create express method-routing decorator with custom status */
 export function HttpStatus(status: HttpCode): MethodDecorator {

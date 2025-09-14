@@ -1,19 +1,19 @@
+import kleur from 'kleur';
 import { Server, createServer as createHttpServer } from 'http';
 import { Application } from 'express';
-import kleur, { blue, bold, magenta } from 'kleur';
 
 import { YasuiConfig } from '~types/interfaces';
-import { Core } from './core';
+import { Core } from './core.js';
 
 
 export function createServer(conf: YasuiConfig): Server {
   const core: Core = new Core(conf);
 
   console.clear();
-  core.logger.log(bold('（◠‿◠）やすいです！'), 'yasui', magenta);
+  core.logger.log(kleur.bold('やすいです！'), 'yasui', kleur.magenta);
 
   if (conf.environment) {
-    core.logger.log(`run as ${conf.environment} environment`, 'app', blue);
+    core.logger.log(`run as ${conf.environment} environment`, 'app', kleur.blue);
   }
 
   const app: Application = core.createApp();

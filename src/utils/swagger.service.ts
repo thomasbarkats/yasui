@@ -17,10 +17,10 @@ import {
   OpenAPIResponses,
   OpenAPISchema,
 } from '~types/openapi';
-import { defineMetadata, getMetadata } from './reflect';
-import { ERROR_RESOURCE_SCHEMA_NAME, extractDecoratorUsage, mapTypeToSchema } from './swagger';
-import { DecoratorValidator } from './decorator-validator';
-import { ErrorResourceSchema } from './error.resource';
+import { defineMetadata, getMetadata } from './reflect.js';
+import { ERROR_RESOURCE_SCHEMA_NAME, extractDecoratorUsage, mapTypeToSchema } from './swagger.js';
+import { DecoratorValidator } from './decorator-validator.js';
+import { ErrorResourceSchema } from './error.resource.js';
 
 
 export class SwaggerService {

@@ -1,7 +1,7 @@
 import { ReflectMetadata, RouteParamTypes } from '~types/enums';
 import { RouteRequestParamTypes } from '~types/enums';
 import { ArrayItem, IRouteParam } from '~types/interfaces';
-import { getMetadata, defineMetadata } from '../utils/reflect';
+import { getMetadata, defineMetadata } from '../utils/reflect.js';
 
 
 /** create express route-parameter decorator */

@@ -1,4 +1,4 @@
-import { italic } from 'kleur';
+import kleur from 'kleur';
 import { Request } from 'express';
 
 import { HttpCode, HttpCodeMap } from '~types/enums';
@@ -42,7 +42,7 @@ export class ErrorResource {
 
   public toString(): string {
     return `url: ${this.url}\n` +
-      `request: ${italic(`${this.method} ${this.path}`)}\n` +
+      `request: ${kleur.italic(`${this.method} ${this.path}`)}\n` +
       `status: ${this.status} (${this.statusMessage})\n` +
       `message: ${this.message}\n` +
       `data: ${JSON.stringify(this.data, null, 2)}`;

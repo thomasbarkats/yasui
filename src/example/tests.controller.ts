@@ -11,11 +11,9 @@ import {
   Param,
   Post,
   Put,
-} from '..';
-
-import { HttpCode } from '~types/enums';
-import { TestsService } from './tests.service';
-import { HelloMiddleware } from './hello.middleware';
+} from 'yasui';
+import { TestsService } from './tests.service.js';
+import { HelloMiddleware } from './hello.middleware.js';
 
 
 @Controller('/tests', HelloMiddleware)
@@ -41,7 +39,7 @@ export class TestsController {
    * will still have minimal documentation by default
    */
   @Post('/')
-  @HttpStatus(HttpCode.CREATED)
+  @HttpStatus(201)
   private post(
     @Header('name') name: string,
     @Body() data: { message: string; },

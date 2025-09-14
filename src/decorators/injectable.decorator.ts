@@ -1,6 +1,6 @@
 import { ReflectMetadata, Scopes } from '~types/enums';
 import { Constructible } from '~types/interfaces';
-import { defineMetadata, getMetadata } from '../utils/reflect';
+import { defineMetadata, getMetadata } from '../utils/reflect.js';
 
 
 export function Injectable(): ClassDecorator {

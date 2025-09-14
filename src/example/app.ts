@@ -1,8 +1,8 @@
-import yasui from '..';
-import { TestsController } from './tests.controller';
+import { createServer } from 'yasui';
+import { TestsController } from './tests.controller.js';
 
 
-yasui.createServer({
+createServer({
   controllers: [TestsController],
   middlewares: [],
   environment: 'development',

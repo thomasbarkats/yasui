@@ -1,11 +1,22 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "CommonJS",
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "declaration": false,
     "outDir": "./lib",
     "paths": {
-      "~types/*": [
-        "./@types/*"
+      "~types/interfaces": [
+        "./@types/interfaces/index.js",
+      ],
+      "~types/enums": [
+        "./@types/enums/index.js",
+      ],
+      "~types/openapi": [
+        "./@types/openapi.js",
+      ],
+      "yasui": [
+        "./src/index.js"
       ]
     },
     "strict": true,

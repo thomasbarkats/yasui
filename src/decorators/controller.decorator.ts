@@ -1,9 +1,9 @@
+import kleur from 'kleur';
 import { Router, RequestHandler } from 'express';
-import { italic } from 'kleur';
 
-import { Core } from '../core';
-import { defineMetadata, getMetadata } from '../utils/reflect';
-import { routeHandler } from '../utils/route-handler';
+import { Core } from '../core.js';
+import { defineMetadata, getMetadata } from '../utils/reflect.js';
+import { routeHandler } from '../utils/route-handler.js';
 import { ReflectMetadata } from '~types/enums';
 import { Constructible, IController, IPipeTransform, TMiddleware } from '~types/interfaces';
 
@@ -36,7 +36,7 @@ export function Controller(
       for (const route of routes) {
         if (core.config.debug) {
           core.logger.debug(
-            `stack route ${italic(`${route.method.toUpperCase()} ${route.path}`)}`,
+            `stack route ${kleur.italic(`${route.method.toUpperCase()} ${route.path}`)}`,
             target.name
           );
         }

@@ -1,8 +1,8 @@
-import { TController } from './controller.i';
-import { TMiddleware } from './middleware.i';
-import { IPipeTransform } from './pipe.i';
-import { ISwaggerConfig } from './swagger.i';
-import { Constructible, Injection } from './utils.i';
+import { TController } from './controller.i.js';
+import { TMiddleware } from './middleware.i.js';
+import { IPipeTransform } from './pipe.i.js';
+import { ISwaggerConfig } from './swagger.i.js';
+import { Constructible, Injection } from './utils.i.js';
 
 
 export interface YasuiSwaggerConfig extends Omit<ISwaggerConfig, 'openapi' | 'paths' | 'components'> {

@@ -1,4 +1,4 @@
-import { Injectable, LoggerService } from '..';
+import { Injectable, LoggerService } from 'yasui';
 
 
 @Injectable()
