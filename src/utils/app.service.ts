@@ -1,11 +1,10 @@
 import kleur from 'kleur';
 import { NextFunction, Response } from 'express';
-
-import { HttpCode } from '~types/enums';
-import { YasuiConfig } from '~types/interfaces';
-import { Request } from '../express.js';
 import { ErrorResource } from './error.resource.js';
+import { Request } from '../express.js';
+import { HttpCode } from '../enums/index.js';
 import { LoggerService } from '../services/index.js';
+import { YasuiConfig } from '../interfaces/index.js';
 
 
 export class AppService {

@@ -1,11 +1,11 @@
 import kleur from 'kleur';
 import { Server, createServer as createHttpServer } from 'http';
 import { Application } from 'express';
-
-import { YasuiConfig } from '~types/interfaces';
 import { Core } from './core.js';
+import { YasuiConfig } from './interfaces/index.js';
 
 
+/** Create an HTTP server with Yasui's configuration and defined routes, and listening */
 export function createServer(conf: YasuiConfig): Server {
   const core: Core = new Core(conf);
 
@@ -41,6 +41,7 @@ export function createServer(conf: YasuiConfig): Server {
   return server;
 }
 
+/** Create only an Express Application with Yasui's configuration and defined routes */
 export function createApp(conf: YasuiConfig): Application {
   const core: Core = new Core(conf);
   const app: Application = core.createApp();

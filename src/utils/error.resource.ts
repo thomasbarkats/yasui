@@ -1,13 +1,14 @@
 import kleur from 'kleur';
-
-import { HttpCode, HttpCodeMap } from '~types/enums';
-import { ObjectSchema } from '~types/openapi';
 import { Request } from '../express.js';
+import { HttpCode, HttpCodeMap } from '../enums/index.js';
+import { ObjectSchema } from '../interfaces/index.js';
 
 
 export class HttpError extends Error {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [index: string]: any;
+  /** HTTP status code associated with the error
+   *  @default 500 */
   public status?: HttpCode;
 
   constructor(status: HttpCode, message: string) {

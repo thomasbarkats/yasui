@@ -1,9 +1,8 @@
 import { RequestHandler, Response, NextFunction } from 'express';
-
-import { getMetadata } from './reflect.js';
+import { ReflectMetadata, getMetadata } from './reflect.js';
 import { Request } from '../express.js';
-import { HttpCode, ReflectMetadata, RouteRequestParamTypes } from '~types/enums';
-import { IRouteParam, IPipeTransform, IParamMetadata, ArrayItem } from '~types/interfaces';
+import { HttpCode, RouteRequestParamTypes } from '../enums/index.js';
+import { IRouteParam, IPipeTransform, IParamMetadata, ArrayItem } from '../interfaces/index.js';
 
 
 /** create express-route-handler from controller/middleware method */

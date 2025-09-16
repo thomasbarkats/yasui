@@ -1,18 +1,12 @@
-import { ReflectMetadata } from '~types/enums';
 import { HttpError, resolveSchema } from '../utils/index.js';
+import { ReflectMetadata, getMetadata, defineMetadata } from '../utils/reflect.js';
 import {
   Constructible,
   ApiPropertyDefinition,
   ApiPropertyPrimitiveSchema,
-} from '~types/interfaces';
-import {
   OpenAPIParamater,
   OpenAPIResponses,
-} from '~types/openapi';
-import {
-  getMetadata,
-  defineMetadata
-} from '../utils/reflect.js';
+} from '../interfaces/index.js';
 import {
   ERROR_RESOURCE_SCHEMA_NAME,
   extractDecoratorUsage,
@@ -21,7 +15,7 @@ import {
 } from '../utils/swagger.js';
 
 
-/** swagger operation decorator */
+/** Documents API endpoint */
 export function ApiOperation(
   summary: string,
   description?: string,
@@ -52,14 +46,20 @@ function addSwaggerOperation(
 }
 
 
-/** swagger schema name decorator */
+/**
+ * Defines custom name for a class API schema
+ * @default name Class.name // if non-decorated
+ */
 export function ApiSchema(name: string): ClassDecorator {
   return function (target: Function): void {
     defineMetadata(ReflectMetadata.SWAGGER_SCHEMA_NAME, name, target.prototype);
   };
 }
 
-/** swagger schema required property definition decorator */
+/**
+ * Defines property for a class API schema
+ * @default schema.required true
+ */
 export function ApiProperty(def?: ApiPropertyDefinition, isRequired: boolean = true): PropertyDecorator {
   return function (target: object, propertyKey: string | symbol): void {
 
@@ -82,13 +82,16 @@ export function ApiProperty(def?: ApiPropertyDefinition, isRequired: boolean = t
   };
 }
 
-/** swagger schema optional property definition decorator */
+/** Defines non-required property for a class API schema */
 export function ApiPropertyOptional(def?: ApiPropertyDefinition): PropertyDecorator {
   return ApiProperty(def, false);
 }
 
 
-/** swagger response decorator */
+/**
+ * Documents API response
+ * @param descArg can be used with class reference only (description will be the schema name)
+ */
 export function ApiResponse(
   statusCode: number,
   descArg: string | Constructible,
@@ -98,7 +101,10 @@ export function ApiResponse(
   return addSwaggerResponse(statusCode, description, definition);
 }
 
-/** swagger error response decorator */
+/**
+ * Documents API error response with base error schema and custom properties schema (record or class reference)
+ * @param descArg can be used with with class reference only (description will be the schema name)
+ */
 export function ApiErrorResponse<T extends HttpError>(
   statusCode: number,
   descArg: string | Constructible<T>,
@@ -139,7 +145,11 @@ function addSwaggerResponse(
 }
 
 
-/** swagger body decorator */
+/**
+ * Documents request body schema and content type
+ * @param descArg can be used with class reference only (description will be the schema name)
+ * @default contentType "application/json"
+ */
 export function ApiBody(
   descArg?: string | Constructible,
   defArg?: ApiPropertyDefinition,
@@ -190,8 +200,15 @@ function extractDescArgUsage(
 }
 
 
+type SwaggerParamDecorator = (
+  name: string,
+  description?: string,
+  required?: boolean,
+  definition?: ApiPropertyDefinition
+) => MethodDecorator;
+
 /** create swagger parameter decorator */
-function swaggerParamDecorator(paramIn: 'path' | 'query' | 'header'): Function {
+function swaggerParamDecorator(paramIn: 'path' | 'query' | 'header'): SwaggerParamDecorator {
   return function (
     name: string,
     description?: string,
@@ -234,10 +251,18 @@ function addSwaggerParam(
 }
 
 
-export const ApiParam = swaggerParamDecorator('path');
-export const ApiQuery = swaggerParamDecorator('query');
-export const ApiHeader = swaggerParamDecorator('header');
+/** Documents path parameter with validation schema
+ *  @default required false */
+export const ApiParam: SwaggerParamDecorator = swaggerParamDecorator('path');
+/** Documents query parameter with validation schema
+ *  @default required false */
+export const ApiQuery: SwaggerParamDecorator = swaggerParamDecorator('query');
+/** Documents header parameter with validation schema
+ *  @default required false */
+export const ApiHeader: SwaggerParamDecorator = swaggerParamDecorator('header');
 
-// Aliases
+
+/** Alias for '@ApiProperty()` */
 export const AP = ApiProperty;
+/** Alias for `@ApiPropertyOptional()` */
 export const APO = ApiPropertyOptional;

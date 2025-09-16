@@ -5,6 +5,7 @@ import { ISwaggerConfig } from './swagger.i.js';
 import { Constructible, Injection } from './utils.i.js';
 
 
+/** YasuiJS Swagger configuration */
 export interface YasuiSwaggerConfig extends Omit<ISwaggerConfig, 'openapi' | 'paths' | 'components'> {
   /** Whether to generate swagger documentation
    *  @default false */
@@ -14,6 +15,7 @@ export interface YasuiSwaggerConfig extends Omit<ISwaggerConfig, 'openapi' | 'pa
   path?: string;
 }
 
+/** YasuiJS configuration */
 export interface YasuiConfig {
   controllers?: TController[];
   middlewares?: TMiddleware[];

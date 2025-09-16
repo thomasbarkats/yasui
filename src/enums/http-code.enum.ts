@@ -1,3 +1,4 @@
+/** List of valid HTTP codes */
 export enum HttpCode {
   CONTINUE = 100,
   SWITCHING_PROTOCOLS = 101,
@@ -61,6 +62,7 @@ export enum HttpCode {
   NETWORK_AUTHENTICATION_REQUIRED = 511,
 }
 
+/** Retrieve the official message corresponding to an HTTP error code */
 export const HttpCodeMap: Record<number, string> = {
   [HttpCode.CONTINUE]: 'Continue',
   [HttpCode.SWITCHING_PROTOCOLS]: 'Switching Protocols',

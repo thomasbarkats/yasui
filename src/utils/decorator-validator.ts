@@ -1,14 +1,14 @@
+import { ReflectMetadata, getMetadata } from './reflect.js';
+import { SwaggerService } from './swagger.service.js';
+import { LoggerService } from '../services/index.js';
+import { Scopes } from '../enums/index.js';
 import {
   Constructible,
   IController,
   IControllerRoute,
   Injection,
   YasuiConfig,
-} from '~types/interfaces';
-import { ReflectMetadata, Scopes } from '~types/enums';
-import { LoggerService } from '../services/index.js';
-import { getMetadata } from './reflect.js';
-import { SwaggerService } from './swagger.service.js';
+} from '../interfaces/index.js';
 
 
 interface ValidationError {

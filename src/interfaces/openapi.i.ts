@@ -1,5 +1,6 @@
 /** OpenAPI 3.0 simplified schema with generic typing */
 
+/** Base schema properties shared by all OpenAPI schema types */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface BaseSchema<T = any> {
   description?: string;
@@ -14,6 +15,7 @@ export interface BaseSchema<T = any> {
   deprecated?: boolean;
 }
 
+/** OpenAPI schema for string values with validation constraints */
 export interface StringSchema extends BaseSchema<string> {
   type: 'string';
   /** Validates string format (e.g., 'email' enforces email pattern) */
@@ -26,6 +28,7 @@ export interface StringSchema extends BaseSchema<string> {
   maxLength?: number;
 }
 
+/** OpenAPI schema for floating-point numbers */
 export interface NumberSchema extends BaseSchema<number> {
   type: 'number';
   /** Precision hint for serialization */
@@ -41,6 +44,7 @@ export interface NumberSchema extends BaseSchema<number> {
   enum?: number[];
 }
 
+/** OpenAPI schema for integer values */
 export interface IntegerSchema extends BaseSchema<number> {
   type: 'integer';
   /** Bit width constraint for serialization */
@@ -56,10 +60,12 @@ export interface IntegerSchema extends BaseSchema<number> {
   enum?: number[];
 }
 
+/** OpenAPI schema for boolean values */
 export interface BooleanSchema extends BaseSchema<boolean> {
   type: 'boolean';
 }
 
+/** OpenAPI schema for object types with property validation */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ObjectSchema<T = Record<string, any>> extends BaseSchema<T> {
   type: 'object';
@@ -73,6 +79,7 @@ export interface ObjectSchema<T = Record<string, any>> extends BaseSchema<T> {
   maxProperties?: number;
 }
 
+/** OpenAPI schema for array types with element validation */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ArraySchema<T = any[]> extends BaseSchema<T> {
   type: 'array';
@@ -84,11 +91,13 @@ export interface ArraySchema<T = any[]> extends BaseSchema<T> {
   uniqueItems?: boolean;
 }
 
+/** Reference to another schema definition */
 export interface RefSchema {
   /** Reference path to another schema (e.g., "#/components/schemas/User") */
   $ref: string;
 }
 
+/** Union of all possible OpenAPI schema types */
 export type OpenAPISchema =
   | StringSchema
   | NumberSchema
@@ -98,7 +107,7 @@ export type OpenAPISchema =
   | ArraySchema
   | RefSchema;
 
-
+/** API metadata and documentation information */
 export interface OpenAPIInfo {
   title: string;
   version: string;
@@ -115,6 +124,7 @@ export interface OpenAPIInfo {
   };
 }
 
+/** Server configuration for API endpoints */
 export interface OpenAPIServer {
   url: string;
   description?: string;
@@ -125,6 +135,7 @@ export interface OpenAPIServer {
   }>;
 }
 
+/** Available HTTP operations for a specific path */
 export interface OpenAPIPathItem {
   get?: OpenAPIOperation;
   post?: OpenAPIOperation;
@@ -139,6 +150,7 @@ export interface OpenAPIPathItem {
   description?: string;
 }
 
+/** Reusable OpenAPI components and definitions */
 export interface OpenAPIComponents {
   schemas?: Record<string, OpenAPISchema>;
   responses?: Record<string, {
@@ -168,6 +180,7 @@ export interface OpenAPIComponents {
   }>;
 }
 
+/** Parameter definition for OpenAPI operations */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface OpenAPIParamater<T = any> {
   name: string;
@@ -184,6 +197,7 @@ export interface OpenAPIParamater<T = any> {
   examples?: Record<string, T>;
 }
 
+/** Complete OpenAPI operation specification */
 export interface OpenAPIOperation {
   summary?: string;
   description?: string;
@@ -207,6 +221,7 @@ export interface OpenAPIOperation {
   };
 }
 
+/** Possible HTTP response definitions for an operation */
 export type OpenAPIResponses = Partial<Record<number | 'default', {
   description: string;
   schema?: OpenAPISchema;

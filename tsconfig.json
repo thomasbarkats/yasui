@@ -3,18 +3,11 @@
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "node",
-    "declaration": false,
     "outDir": "./lib",
+    "declaration": true,
+    "declarationDir": "./lib",
+    "emitDeclarationOnly": false,
     "paths": {
-      "~types/interfaces": [
-        "./@types/interfaces/index.js",
-      ],
-      "~types/enums": [
-        "./@types/enums/index.js",
-      ],
-      "~types/openapi": [
-        "./@types/openapi.js",
-      ],
       "yasui": [
         "./src/index.js"
       ]
@@ -22,7 +15,7 @@
     "strict": true,
     "esModuleInterop": true,
     "inlineSourceMap": true,
-    "removeComments": true,
+    "removeComments": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "forceConsistentCasingInFileNames": true,

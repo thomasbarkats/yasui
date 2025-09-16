@@ -1,13 +1,12 @@
 import kleur from 'kleur';
 import { Router, RequestHandler } from 'express';
-
 import { Core } from '../core.js';
-import { defineMetadata, getMetadata } from '../utils/reflect.js';
 import { routeHandler } from '../utils/route-handler.js';
-import { ReflectMetadata } from '~types/enums';
-import { Constructible, IController, IPipeTransform, TMiddleware } from '~types/interfaces';
+import { ReflectMetadata, defineMetadata, getMetadata } from '../utils/reflect.js';
+import { Constructible, IController, IPipeTransform, TMiddleware } from '../interfaces/index.js';
 
 
+/** Define a Controller with optional middleware */
 export function Controller(
   path: string,
   ...middlewares: TMiddleware[]

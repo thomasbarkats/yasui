@@ -1,4 +1,9 @@
-import { HttpCode, HttpCodeMap, ReflectMetadata } from '~types/enums';
+import { defineMetadata, getMetadata } from './reflect.js';
+import { ERROR_RESOURCE_SCHEMA_NAME, extractDecoratorUsage, mapTypeToSchema } from './swagger.js';
+import { DecoratorValidator } from './decorator-validator.js';
+import { ErrorResourceSchema } from './error.resource.js';
+import { HttpCode, HttpCodeMap } from '../enums/index.js';
+import { ReflectMetadata } from '../utils/reflect.js';
 import {
   ApiPropertyDefinition,
   ApiPropertyEnumSchema,
@@ -8,19 +13,13 @@ import {
   ISwaggerRoute,
   SafeApiPropertyRecord,
   TController,
-  YasuiSwaggerConfig,
-} from '~types/interfaces';
-import {
   ObjectSchema,
   OpenAPIOperation,
   OpenAPIParamater,
   OpenAPIResponses,
   OpenAPISchema,
-} from '~types/openapi';
-import { defineMetadata, getMetadata } from './reflect.js';
-import { ERROR_RESOURCE_SCHEMA_NAME, extractDecoratorUsage, mapTypeToSchema } from './swagger.js';
-import { DecoratorValidator } from './decorator-validator.js';
-import { ErrorResourceSchema } from './error.resource.js';
+  YasuiSwaggerConfig,
+} from '../interfaces/index.js';
 
 
 export class SwaggerService {

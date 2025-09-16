@@ -1,14 +1,24 @@
-import { ReflectMetadata, Scopes } from '~types/enums';
-import { Constructible } from '~types/interfaces';
-import { defineMetadata, getMetadata } from '../utils/reflect.js';
+import { Scopes } from '../enums/index.js';
+import { ReflectMetadata, defineMetadata, getMetadata } from '../utils/reflect.js';
+import { Constructible } from '../interfaces/index.js';
 
 
+/**
+ * Mark a class as injectable —
+ * Required to detect dependency injection through class constructor parameter types
+ */
 export function Injectable(): ClassDecorator {
   return function (target: Function): void {
     defineMetadata(ReflectMetadata.INJECTABLE, true, target);
   };
 }
 
+/**
+ * Injects a dependency by token or auto-inferred type —
+ * Usage:
+ * - Class constructor parameters: Only needed for custom token injection
+ * - Controller/middleware method parameters: Required for any dependency injection
+ */
 export function Inject(token?: string): ParameterDecorator {
   return function (
     target: object,
@@ -37,6 +47,12 @@ export function Inject(token?: string): ParameterDecorator {
   };
 }
 
+/**
+ * Define scope of dependency injection
+ * - SHARED (default): Use singleton instance shared across the application
+ * - LOCAL: New instance the injection context
+ * - DEEP_LOCAL: New instance, propagates locality to its own dependencies
+ */
 export function Scope(scope: Scopes): ParameterDecorator {
   return function (
     target: object,

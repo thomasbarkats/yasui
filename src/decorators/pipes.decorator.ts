@@ -1,14 +1,15 @@
 import { Response, RequestHandler, NextFunction } from 'express';
-
-import { ReflectMetadata, RouteRequestParamTypes } from '~types/enums';
-import { IControllerRoute, IParamMetadata, IPipeTransform, Constructible } from '~types/interfaces';
-import { Request } from '../express.js';
-import { defineMetadata, getMetadata } from '../utils/reflect.js';
 import { Injectable } from './injectable.decorator.js';
+import { Request } from '../express.js';
+import { RouteRequestParamTypes } from '../enums/index.js';
+import { ReflectMetadata, defineMetadata, getMetadata } from '../utils/reflect.js';
+import { IControllerRoute, IParamMetadata, IPipeTransform, Constructible } from '../interfaces/index.js';
 
 
+/** Define a Pipe-transform */
 export const PipeTransform = Injectable;
 
+/** Applies pipes to all routes in the controller or a specific one (use to transform/validate route params) */
 export function UsePipes(...pipes: Constructible<IPipeTransform>[]): ClassDecorator & MethodDecorator {
   return function (
     target: object | Function,

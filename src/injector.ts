@@ -1,11 +1,14 @@
 import kleur from 'kleur';
-
+import { Scopes } from './enums/index.js';
 import { LoggerService } from './services/index.js';
-import { InheritedScopes, ReflectMetadata, Scopes } from '~types/enums';
-import { Constructible, Instance } from '~types/interfaces';
 import { DecoratorValidator } from './utils/decorator-validator.js';
-import { getMetadata, defineMetadata } from './utils/reflect.js';
+import { ReflectMetadata, getMetadata, defineMetadata } from './utils/reflect.js';
+import { Constructible, Instance } from './interfaces/index.js';
 
+
+const InheritedScopes: Scopes[] = [
+  Scopes.DEEP_LOCAL,
+];
 
 export class Injector {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

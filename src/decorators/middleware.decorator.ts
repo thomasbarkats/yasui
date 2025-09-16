@@ -1,12 +1,10 @@
 import { RequestHandler } from 'express';
-
-import { defineMetadata, getMetadata } from '../utils/reflect.js';
 import { routeHandler } from '../utils/route-handler.js';
-import { IMiddleware } from '~types/interfaces';
-import { ReflectMetadata } from '~types/enums';
+import { ReflectMetadata, defineMetadata, getMetadata } from '../utils/reflect.js';
+import { IMiddleware } from '../interfaces/index.js';
 
 
-/** express middleware decorator */
+/** Define a Middleware */
 export function Middleware(): ClassDecorator {
   return function (target: Function): void {
 

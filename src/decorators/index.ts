@@ -1,3 +1,5 @@
+/** Decorators provided outside sources */
+
 export * from './controller.decorator.js';
 export * from './http-status.decorator.js';
 export * from './middleware.decorator.js';

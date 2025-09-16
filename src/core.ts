@@ -1,21 +1,27 @@
+import kleur from 'kleur';
+import bodyParser from 'body-parser';
+import { createRequire } from 'module';
 import express, {
   Application,
   RequestHandler,
   Response,
   Router,
 } from 'express';
-import kleur from 'kleur';
-import bodyParser from 'body-parser';
-import { createRequire } from 'module';
 
-import { Constructible, IController, IDMiddleware, Instance, TMiddleware } from '~types/interfaces';
-import { YasuiConfig } from '~types/interfaces';
 import { Request } from './express.js';
+import { Injector } from './injector.js';
+import { LoggerService } from './services/index.js';
 import { AppService } from './utils/app.service.js';
 import { DecoratorValidator } from './utils/decorator-validator.js';
-import { LoggerService } from './services/index.js';
-import { Injector } from './injector.js';
 import { SwaggerService } from './utils/swagger.service.js';
+import {
+  Constructible,
+  IController,
+  IDMiddleware,
+  Instance,
+  TMiddleware,
+  YasuiConfig,
+} from './interfaces/index.js';
 
 
 interface IDController extends IController {

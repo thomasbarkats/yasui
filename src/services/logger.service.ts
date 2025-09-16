@@ -1,12 +1,15 @@
 import kleur from 'kleur';
-
 import { Injectable } from '../decorators/index.js';
 
 
+/** Standardized logging utility service */
 @Injectable()
 export class LoggerService {
+  /** Timestamp when timer was started (milliseconds) */
   public startTime: number | undefined;
+  /** Timestamp of the last recorded time point */
   public lastTime: number | undefined;
+  /** Timestamp when timer was stopped */
   public endTime: number | undefined;
 
   public start(): this {
@@ -22,6 +25,7 @@ export class LoggerService {
     return this;
   }
 
+  /** Returns elapsed time in milliseconds */
   public stop(): number {
     if (this.startTime) {
       this.endTime = new Date().getTime();
@@ -30,6 +34,7 @@ export class LoggerService {
     throw new Error('No timers started');
   }
 
+  /** Returns current elapsed time without stopping the timer */
   public getTime(): number {
     if (this.lastTime) {
       const currentTime: number = new Date().getTime();
@@ -40,6 +45,7 @@ export class LoggerService {
     throw new Error('No timers started');
   }
 
+  /** Logs message with optional source and custom color using kleur */
   public log(message: string, src?: string, color?: kleur.Color): void {
     const text = this.getText(message, src);
     console.log(color ? color(text) : text);

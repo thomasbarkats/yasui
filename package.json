@@ -27,17 +27,16 @@
   },
   "type": "module",
   "main": "./lib/index.js",
-  "types": "./@types/index.d.ts",
+  "types": "./lib/index.d.ts",
   "exports": {
     ".": {
-      "types": "./@types/index.d.ts",
+      "types": "./lib/index.d.ts",
       "import": "./lib/index.js"
     }
   },
   "files": [
     "lib/**/*",
-    "!lib/example/**/*",
-    "@types/**/*"
+    "!lib/example/**/*"
   ],
   "engines": {
     "node": ">=18.0.0"
@@ -45,8 +44,7 @@
   "scripts": {
     "example": "npm run build && node lib/example/app.js",
     "preinstall": "rm -f package-lock.json && sh only-allow-pnpm.sh",
-    "build": "rm -rf lib && tsc && pnpm run flatten-lib && tsc-alias --verbose",
-    "flatten-lib": "mv lib/src/* lib/ && rm -rf lib/src && mv lib/@types/* lib/ && rm -rf lib/@types",
+    "build": "rm -rf lib && tsc",
     "lint": "eslint . --ext .ts --fix",
     "prepublishOnly": "pnpm run build && pnpm run lint",
     "preversion": "pnpm run lint",
@@ -77,7 +75,6 @@
     "format-commit": "^0.4.0",
     "globals": "^16.4.0",
     "swagger-ui-express": "^5.0.1",
-    "tsc-alias": "^1.8.16",
     "typescript": "^5.9.2",
     "vitepress": "^1.6.4",
     "vue": "^3.5.21"

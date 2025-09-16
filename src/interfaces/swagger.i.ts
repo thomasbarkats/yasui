@@ -9,13 +9,15 @@ import {
   OpenAPISchema,
   OpenAPIServer,
   RefSchema,
-} from '../openapi.js';
+} from './openapi.i.js';
 
 
+/** Primitive OpenAPI schema type for API properties */
 export type ApiPropertyPrimitiveSchema = Exclude<OpenAPISchema, ObjectSchema | RefSchema> & {
   required?: boolean;
 };
 
+/** Safe record type for nested API property definitions */
 export type SafeApiPropertyRecord = {
   type?: never;
   $ref?: never;
@@ -24,6 +26,7 @@ export type SafeApiPropertyRecord = {
   [K in string]: (Constructible | [Constructible]) | SafeApiPropertyRecord;
 };
 
+/** Enum schema type for API properties */
 export type ApiPropertyEnumSchema = {
   enum: (string | number)[] | Record<string, string | number>;
 };
@@ -38,7 +41,7 @@ export type ApiPropertyDefinition =
   | [Constructible]
   | SafeApiPropertyRecord;
 
-
+/** Route metadata enhanced with Swagger/OpenAPI information */
 export interface ISwaggerRoute extends IControllerRoute {
   controllerName: string;
   controllerPrototype: TController['prototype'];
@@ -47,6 +50,7 @@ export interface ISwaggerRoute extends IControllerRoute {
   swaggerMetadata?: OpenAPIOperation;
 }
 
+/** Complete Swagger/OpenAPI specification configuration */
 export interface ISwaggerConfig {
   openapi: string;
   info: OpenAPIInfo;

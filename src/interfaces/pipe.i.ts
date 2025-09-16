@@ -1,7 +1,8 @@
-import { RouteRequestParamTypes } from '../enums/index.js';
 import { Instance } from './utils.i.js';
+import { RouteRequestParamTypes } from '../enums/index.js';
 
 
+/** Metadata for route handler parameters */
 export interface IParamMetadata {
   /** Source of the parameter (body, query, param, headers etc) */
   readonly type: RouteRequestParamTypes;

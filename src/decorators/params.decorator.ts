@@ -1,18 +1,28 @@
-import { ReflectMetadata, RouteParamTypes } from '~types/enums';
-import { RouteRequestParamTypes } from '~types/enums';
-import { ArrayItem, IRouteParam } from '~types/interfaces';
-import { getMetadata, defineMetadata } from '../utils/reflect.js';
+import { RouteRequestParamTypes, RouteParamTypes } from '../enums/index.js';
+import { ReflectMetadata, getMetadata, defineMetadata } from '../utils/reflect.js';
+import { ArrayItem, IRouteParam } from '../interfaces/index.js';
 
+
+type RouteParamDecorator = (
+  varName?: string,
+  items?: [ArrayItem]
+) => ParameterDecorator;
 
 /** create express route-parameter decorator */
-function routeParamDecorator(source: RouteParamTypes): Function {
+function routeParamDecorator(source: RouteParamTypes): RouteParamDecorator {
   return function (): ParameterDecorator {
     return extractParam(source);
   };
 }
 
-/** create express route-request-parameter decorator */
-export function routeRequestParamDecorator(reqProperty: string): Function {
+
+type RouteReqParamDecorator = (
+  varName?: string,
+  items?: [ArrayItem]
+) => ParameterDecorator;
+
+/** Factory function for creating parameter decorators that extract request data */
+export function routeRequestParamDecorator(reqProperty: string): RouteReqParamDecorator {
   return function (
     varName?: string,
     items?: [ArrayItem]
@@ -67,13 +77,23 @@ function extractParam(
   };
 }
 
+/** Injects Express Request object */
+export const Req: RouteParamDecorator = routeParamDecorator(RouteParamTypes.REQ);
+/** Injects Express Response object */
+export const Res: RouteParamDecorator = routeParamDecorator(RouteParamTypes.RES);
+/** Injects Express Next object */
+export const Next: RouteParamDecorator = routeParamDecorator(RouteParamTypes.NEXT);
 
-export const Req = routeParamDecorator(RouteParamTypes.REQ);
-export const Res = routeParamDecorator(RouteParamTypes.RES);
-export const Next = routeParamDecorator(RouteParamTypes.NEXT);
-
-export const Header = routeRequestParamDecorator(RouteRequestParamTypes.HEADER);
-export const Param = routeRequestParamDecorator(RouteRequestParamTypes.PARAM);
-export const Query = routeRequestParamDecorator(RouteRequestParamTypes.QUERY);
-export const Body = routeRequestParamDecorator(RouteRequestParamTypes.BODY);
-export const Logger = routeRequestParamDecorator(RouteRequestParamTypes.LOGGER);
+/** Extracts specific header from `req.headers[name]`
+ *  @param items If you are expecting an array, specify the type of items */
+export const Header: RouteReqParamDecorator = routeRequestParamDecorator(RouteRequestParamTypes.HEADER);
+/** Extracts specific path parameter from `req.params[name]`
+ *  @param items If you are expecting an array, specify the type of items */
+export const Param: RouteReqParamDecorator = routeRequestParamDecorator(RouteRequestParamTypes.PARAM);
+/** Extracts specific query parameter from `req.query[name]`
+ *  @param items If you are expecting an array, specify the type of items */
+export const Query: RouteReqParamDecorator = routeRequestParamDecorator(RouteRequestParamTypes.QUERY);
+/** Extracts specific body property or entire body if propertyName omitted */
+export const Body: RouteReqParamDecorator = routeRequestParamDecorator(RouteRequestParamTypes.BODY);
+/** Injects timed logger instance dedicated to the current request */
+export const Logger: RouteReqParamDecorator = routeRequestParamDecorator(RouteRequestParamTypes.LOGGER);

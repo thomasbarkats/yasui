@@ -1,7 +1,8 @@
-import { HttpCode, ReflectMetadata } from '~types/enums';
-import { defineMetadata } from '../utils/reflect.js';
+import { HttpCode } from '../enums/index.js';
+import { ReflectMetadata, defineMetadata } from '../utils/reflect.js';
 
-/** create express method-routing decorator with custom status */
+
+/** Sets default HTTP status code for the response (e.g., 201 for CREATED) */
 export function HttpStatus(status: HttpCode): MethodDecorator {
   return function (
     target: object,

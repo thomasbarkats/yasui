@@ -1,3 +1,6 @@
+import { HttpCode } from './http-code.enum.js';
+import { Scopes } from './scopes.enum.js';
+import { OpenAPIOperation } from '../interfaces/openapi.i.js';
 import {
   IControllerRoute,
   Instance,
@@ -6,9 +9,6 @@ import {
   IPipeTransform,
   Constructible,
 } from '../interfaces/index.js';
-import { HttpCode } from './http-code.enum.js';
-import { Scopes } from './scopes.enum.js';
-import { OpenAPIOperation } from '../openapi.js';
 
 
 export enum ReflectMetadata {

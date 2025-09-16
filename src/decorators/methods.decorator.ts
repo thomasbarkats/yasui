@@ -1,10 +1,15 @@
-import { getMetadata, defineMetadata } from '../utils/reflect.js';
-import { HttpCode, ReflectMetadata, RouteMethods } from '~types/enums';
-import { IControllerRoute, TMiddleware } from '~types/interfaces';
+import { ReflectMetadata, getMetadata, defineMetadata } from '../utils/reflect.js';
+import { HttpCode, RouteMethods } from '../enums/index.js';
+import { IControllerRoute, TMiddleware } from '../interfaces/index.js';
 
+
+type RouteDecorator = (
+  path: string,
+  ...middlewares: TMiddleware[]
+) => MethodDecorator;
 
 /** create express method-routing decorator */
-function routeDecorator(method: RouteMethods): Function {
+function routeDecorator(method: RouteMethods): RouteDecorator {
   return function (
     path: string,
     ...middlewares: TMiddleware[]
@@ -44,8 +49,13 @@ function addRoute(
 }
 
 
-export const Get = routeDecorator(RouteMethods.GET);
-export const Post = routeDecorator(RouteMethods.POST);
-export const Put = routeDecorator(RouteMethods.PUT);
-export const Delete = routeDecorator(RouteMethods.DELETE);
-export const Patch = routeDecorator(RouteMethods.PATCH);
+/** Define a GET endpoint with optional middleware */
+export const Get: RouteDecorator = routeDecorator(RouteMethods.GET);
+/** Define a POST endpoint with optional middleware */
+export const Post: RouteDecorator = routeDecorator(RouteMethods.POST);
+/** Define a PUT endpoint with optional middleware */
+export const Put: RouteDecorator = routeDecorator(RouteMethods.PUT);
+/** Define a DELETE endpoint with optional middleware */
+export const Delete: RouteDecorator = routeDecorator(RouteMethods.DELETE);
+/** Define a PATCH endpoint with optional middleware */
+export const Patch: RouteDecorator = routeDecorator(RouteMethods.PATCH);
