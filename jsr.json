@@ -1,6 +1,6 @@
 {
   "name": "@yasui/yasui",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "exports": {
     ".": "./src/index.ts"
   },
