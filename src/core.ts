@@ -1,6 +1,5 @@
 import express, {
   Application,
-  Request,
   RequestHandler,
   Response,
   Router,
@@ -11,6 +10,7 @@ import { createRequire } from 'module';
 
 import { Constructible, IController, IDMiddleware, Instance, TMiddleware } from '~types/interfaces';
 import { YasuiConfig } from '~types/interfaces';
+import { Request } from './express.js';
 import { AppService } from './utils/app.service.js';
 import { DecoratorValidator } from './utils/decorator-validator.js';
 import { LoggerService } from './services/index.js';
@@ -71,7 +71,7 @@ export class Core {
       this.app.use(this.appService.logRequest.bind(this.appService));
     }
     this.app.use((req, res, next) => {
-      req.logger = new LoggerService().start();
+      (req as Request).logger = new LoggerService().start();
       next();
     });
 

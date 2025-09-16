@@ -1,21 +1,21 @@
 {
-  "name": "@thomasbarkats/yasui",
-  "version": "2.5.2",
+  "name": "@yasui/yasui",
+  "version": "3.0.0",
   "exports": {
-    ".": {
-      "types": "./@types/index.d.ts",
-      "default": "./lib/index.js"
-    }
+    ".": "./src/index.ts",
+    "./types": "./@types/index.d.ts"
+  },
+  "imports": {
+    "~types/": "./@types/"
   },
   "publish": {
     "include": [
-      "lib/",
-      "@types/"
+      "src/**/*",
+      "@types/**/*",
+      "README.md"
     ],
     "exclude": [
-      "lib/example/",
-      "docs/",
-      "scripts/"
+      "src/example/**/*"
     ]
   }
 }

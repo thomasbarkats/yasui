@@ -1,8 +1,8 @@
 import kleur from 'kleur';
-import { Request } from 'express';
 
 import { HttpCode, HttpCodeMap } from '~types/enums';
 import { ObjectSchema } from '~types/openapi';
+import { Request } from '../express.js';
 
 
 export class HttpError extends Error {
