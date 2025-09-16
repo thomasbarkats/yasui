@@ -14,7 +14,8 @@ export default {
     ],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/thomasbarkats/yasui' },
-      { icon: 'npm', link: 'http://npmjs.com/package/yasui' }
+      { icon: 'npm', link: 'https://npmjs.com/package/yasui' },
+      { icon: 'jsr', link: 'https://jsr.io/@yasui/yasui' }
     ],
     sidebar: [
       {
