@@ -18,8 +18,7 @@ export * from './interfaces/index.js';
 export * from './express.js';
 export * from './utils/index.js';
 
-
-const yasui = {
+export default {
   ...base,
   ...services,
   ...decorators,
@@ -28,4 +27,3 @@ const yasui = {
   ...express,
   ...utils,
 };
-export default yasui;

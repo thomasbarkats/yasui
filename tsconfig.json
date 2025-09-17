@@ -3,10 +3,6 @@
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "node",
-    "outDir": "./lib",
-    "declaration": true,
-    "declarationDir": "./lib",
-    "emitDeclarationOnly": false,
     "paths": {
       "yasui": [
         "./src/index.js"
