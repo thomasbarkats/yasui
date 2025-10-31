@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express';
+import { RequestHandler } from '../web.js';
 import { routeHandler } from '../utils/route-handler.js';
 import { ReflectMetadata, defineMetadata, getMetadata } from '../utils/reflect.js';
 import { IMiddleware } from '../interfaces/index.js';

@@ -1,34 +1,28 @@
-import { RequestHandler, Response, NextFunction } from 'express';
+import { RequestHandler, NextFunction, YasuiRequest } from '../web.js';
 import { ReflectMetadata, getMetadata } from './reflect.js';
-import { Request } from '../express.js';
-import { HttpCode, RouteRequestParamTypes } from '../enums/index.js';
+import { RouteRequestParamTypes } from '../enums/index.js';
 import { IRouteParam, IPipeTransform, IParamMetadata, ArrayItem } from '../interfaces/index.js';
 
 
-/** create express-route-handler from controller/middleware method */
+/** Create yasui route handler from controller/middleware method */
 export function routeHandler(
   target: Function,
   descriptor: PropertyDescriptor,
   params: IRouteParam[],
   pipes: IPipeTransform[],
   isMiddleware?: boolean,
-  defaultStatus: HttpCode = HttpCode.OK,
 ): RequestHandler {
   const routeFunction: Function = descriptor.value;
 
   return async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> => {
+    req: YasuiRequest,
+    next?: NextFunction,
+  ): Promise<unknown> => {
     req.source = target.name;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const routeHandlerArgs = { req, res, next } as any;
     const self = getMetadata(ReflectMetadata.SELF, target.prototype) || {};
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const methodDeps: Record<number, any> =
+    const methodDeps: Record<number, unknown> =
       getMetadata(ReflectMetadata.RESOLVED_METHOD_DEPS, self, String(descriptor.value.name)) || {};
 
     const allIndexes = [
@@ -38,14 +32,32 @@ export function routeHandler(
     const maxIndex = allIndexes.length > 0 ? Math.max(...allIndexes) : -1;
     const args: unknown[] = new Array(maxIndex + 1);
 
-    // Bind Express parameters (@Param, @Body, etc.) with type casting and pipes
-    for (const param of params) {
-      let value = param.path.reduce((prev, curr) => prev && prev[curr] || null, routeHandlerArgs);
+    // Parse body if needed (only for non-GET requests with JSON content-type)
+    if (req.method !== 'GET' && req.headers['content-type']?.includes('application/json')) {
+      try {
+        await req.json();
+      } catch {
+        // Body parsing failed, will be undefined
+      }
+    }
 
-      if (value !== null && param.type && shouldCastParam(param.path)) {
-        value = castParamValue(value, param.type, param.itemsType);
+    // Bind route parameters (@Param, @Body, @Query, etc.) with type casting and pipes
+    for (const param of params) {
+      let value: unknown;
+
+      if (param.path[0] === 'next') {
+        value = next;
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        value = param.path.slice(1).reduce((prev: any, curr: string) => prev?.[curr] ?? null, req);
       }
 
+      // Cast string values from HTTP (params/query/headers) to target types
+      if (value !== null && param.type && shouldCastParam(param.path)) {
+        value = castParamValue(<string>value, param.type, param.itemsType);
+      }
+
+      // Apply validation/transformation pipes
       if (pipes.length > 0) {
         const metadata: IParamMetadata = {
           type: param.path[1] as RouteRequestParamTypes,
@@ -66,18 +78,13 @@ export function routeHandler(
       args[index] = methodDeps[index];
     }
 
-    try {
-      const result: unknown = await routeFunction.apply(self, args);
-      if (!res.headersSent) {
-        if (result !== undefined || !isMiddleware) {
-          res.status(defaultStatus).json(result);
-        } else {
-          next();
-        }
-      }
-    } catch (err) {
-      next(err);
+    const result: unknown = await routeFunction.apply(self, args);
+
+    if (isMiddleware && result === undefined && next) {
+      return next();
     }
+
+    return result;
   };
 }
 
@@ -96,8 +103,7 @@ function castParamValue(
   value: string,
   paramType: Function,
   itemsType?: ArrayItem
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): any {
+): unknown {
   switch (paramType) {
     case Number:
       return Number(value);

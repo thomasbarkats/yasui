@@ -1,9 +1,6 @@
-import { Response, RequestHandler, NextFunction } from 'express';
 import { Injectable } from './injectable.decorator.js';
-import { Request } from '../express.js';
-import { RouteRequestParamTypes } from '../enums/index.js';
-import { ReflectMetadata, defineMetadata, getMetadata } from '../utils/reflect.js';
-import { IControllerRoute, IParamMetadata, IPipeTransform, Constructible } from '../interfaces/index.js';
+import { ReflectMetadata, defineMetadata } from '../utils/reflect.js';
+import { IPipeTransform, Constructible } from '../interfaces/index.js';
 
 
 /** Define a Pipe-transform */
@@ -21,44 +18,5 @@ export function UsePipes(...pipes: Constructible<IPipeTransform>[]): ClassDecora
     } else {
       defineMetadata(ReflectMetadata.PIPES, pipes, (<Function>target).prototype);
     }
-  };
-}
-
-
-export function createPipeMiddleware(
-  route: IControllerRoute,
-  target: Function,
-  pipes: IPipeTransform[]
-): RequestHandler {
-  return async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    const routeParams = getMetadata(ReflectMetadata.PARAMS, target.prototype, route.methodName) || [];
-
-    for (const param of routeParams) {
-      const [, paramType, propertyName] = param.path;
-      const source = req[<RouteRequestParamTypes>paramType];
-      const metadata: IParamMetadata = {
-        type: paramType as RouteRequestParamTypes,
-        metatype: param.type,
-        name: propertyName || ''
-      };
-
-      let paramValue = propertyName
-        ? source?.[propertyName]
-        : source;
-
-      for (const pipe of pipes) {
-        paramValue = await pipe.transform(paramValue, metadata);
-      }
-      if (propertyName) {
-        source[propertyName] = paramValue;
-      } else {
-        req[<RouteRequestParamTypes>paramType] = paramValue;
-      }
-    }
-    next();
   };
 }

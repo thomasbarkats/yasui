@@ -8,7 +8,7 @@ type RouteParamDecorator = (
   items?: [ArrayItem]
 ) => ParameterDecorator;
 
-/** create express route-parameter decorator */
+/** create yasui route-parameter decorator */
 function routeParamDecorator(source: RouteParamTypes): RouteParamDecorator {
   return function (): ParameterDecorator {
     return extractParam(source);
@@ -32,7 +32,7 @@ export function routeRequestParamDecorator(reqProperty: string): RouteReqParamDe
 }
 
 
-/** extract route param from express req object */
+/** extract route param from yasui request object */
 function extractParam(
   source: RouteParamTypes,
   reqProperty?: string,
@@ -77,11 +77,11 @@ function extractParam(
   };
 }
 
-/** Injects Express Request object */
+/** Injects YasuiRequest object (Web Standard Request with yasui extensions) */
 export const Req: RouteParamDecorator = routeParamDecorator(RouteParamTypes.REQ);
-/** Injects Express Response object */
+/** @deprecated Use return values instead of manual response handling */
 export const Res: RouteParamDecorator = routeParamDecorator(RouteParamTypes.RES);
-/** Injects Express Next object */
+/** @deprecated Middleware should use async/await pattern instead of next() */
 export const Next: RouteParamDecorator = routeParamDecorator(RouteParamTypes.NEXT);
 
 /** Extracts specific header from `req.headers[name]`
