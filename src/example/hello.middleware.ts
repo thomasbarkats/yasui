@@ -1,4 +1,4 @@
-import { Inject, Logger, Middleware, Req, LoggerService, IMiddleware, Request } from 'yasui';
+import { Inject, Logger, Middleware, Req, LoggerService, IMiddleware, type Request } from 'yasui';
 import { TestsService } from './tests.service.js';
 
 
