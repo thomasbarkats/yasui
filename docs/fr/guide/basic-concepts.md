@@ -1,24 +1,24 @@
-# Concepts de Base
+# Concepts de base
 
 Ce guide présente les concepts fondamentaux qui font fonctionner YasuiJS. Comprendre ces concepts vous aidera à construire de meilleures API et à tirer le meilleur parti de l'architecture du framework.
 
-## Aperçu
+## Vue d'ensemble
 
-YasuiJS est construit autour de quelques concepts clés :
+YasuiJS est construit autour de quelques concepts centraux :
 
-- **Contrôleurs** : Définissent vos points d'entrée d'API et gèrent les requêtes HTTP
+- **Contrôleurs** : Définissent vos endpoints d'API et gèrent les requêtes HTTP
 - **Services** : Contiennent votre logique métier et les opérations de données
-- **Injection de Dépendances** : Gère automatiquement les relations entre les composants
-- **Décorateurs** : Fournissent des métadonnées et de la configuration de manière déclarative
-- **Middleware** : Traite les requêtes dans un pipeline avant d'atteindre les contrôleurs
+- **Injection de dépendances** : Gèrent automatiquement les relations entre composants
+- **Décorateurs** : Fournissent des métadonnées et une configuration de manière déclarative
+- **Middleware** : Traitent les requêtes dans un pipeline avant d'atteindre les contrôleurs
 
 ## Contrôleurs
 
-**Les contrôleurs sont les points d'entrée de votre API.** Ils définissent quels points d'entrée existent et comment répondre aux requêtes HTTP.
+**Les contrôleurs sont les points d'entrée de votre API.** Ils définissent quels endpoints existent et comment répondre aux requêtes HTTP.
 
-### Ce que font les Contrôleurs
+### Ce que font les contrôleurs
 
-Les contrôleurs ont une responsabilité principale : traduire les requêtes HTTP en opérations métier et renvoyer des réponses appropriées. Ils devraient être des couches minces qui délèguent le travail réel aux services.
+Les contrôleurs ont une responsabilité principale : traduire les requêtes HTTP en opérations métier et retourner des réponses appropriées. Ils doivent être des couches minces qui délèguent le travail réel aux services.
 
 ```typescript
 @Controller('/users')
@@ -37,22 +37,22 @@ export class UserController {
 }
 ```
 
-### Pourquoi les Contrôleurs sont Importants
+### Pourquoi les contrôleurs sont importants
 
-- **Organisation des Routes** : Regrouper logiquement les points d'entrée connexes
-- **Gestion des Requêtes** : Extraire et valider automatiquement les données de requête
-- **Formatage des Réponses** : Renvoyer des données qui sont automatiquement sérialisées
-- **Séparation des Préoccupations** : Garder la logique HTTP séparée de la logique métier
+- **Organisation des routes** : Grouper logiquement les endpoints liés
+- **Gestion des requêtes** : Extraire et valider automatiquement les données de requête
+- **Formatage des réponses** : Retourner des données qui sont automatiquement sérialisées
+- **Séparation des préoccupations** : Garder la logique HTTP séparée de la logique métier
 
-Les contrôleurs doivent se concentrer sur les préoccupations HTTP (routage, codes d'état, en-têtes) tout en déléguant la logique métier aux services.
+Les contrôleurs doivent se concentrer sur les préoccupations HTTP (routage, codes de statut, en-têtes) tout en déléguant la logique métier aux services.
 
 ## Services
 
-**Les services contiennent votre logique métier.** Ils effectuent le travail réel dont votre application a besoin, indépendamment de la façon dont ce travail a été demandé.
+**Les services contiennent votre logique métier.** Ils effectuent le travail réel que votre application doit faire, indépendamment de la façon dont ce travail a été demandé.
 
-### Ce que font les Services
+### Ce que font les services
 
-Les services encapsulent les opérations métier et peuvent être utilisés par plusieurs contrôleurs. Ils gèrent des choses comme le traitement des données, les appels API externes et les règles métier.
+Les services encapsulent les opérations métier et peuvent être utilisés par plusieurs contrôleurs. Ils gèrent des choses comme le traitement des données, les appels d'API externes et les règles métier.
 
 ```typescript
 @Injectable()
@@ -72,20 +72,20 @@ export class UserService {
 }
 ```
 
-### Pourquoi les Services sont Importants
+### Pourquoi les services sont importants
 
 - **Réutilisabilité** : Plusieurs contrôleurs peuvent utiliser le même service
-- **Testabilité** : La logique métier peut être testée indépendamment du HTTP
-- **Organisation** : Les opérations métier connexes sont regroupées
-- **Maintenabilité** : Les changements dans la logique métier n'affectent pas les contrôleurs
+- **Testabilité** : La logique métier peut être testée indépendamment de HTTP
+- **Organisation** : Les opérations métier liées sont groupées ensemble
+- **Maintenabilité** : Les changements de logique métier n'affectent pas les contrôleurs
 
 Les services doivent se concentrer sur "ce que" fait votre application, pas "comment" on y accède.
 
-## Injection de Dépendances
+## Injection de dépendances
 
-**L'Injection de Dépendances gère automatiquement les relations entre les composants.** Au lieu de créer et de connecter manuellement des objets, YasuiJS le fait pour vous.
+**L'injection de dépendances gère automatiquement les relations entre composants.** Au lieu de créer et connecter manuellement les objets, YasuiJS le fait pour vous.
 
-### Comment Ça Fonctionne
+### Comment ça fonctionne
 
 Quand YasuiJS voit un contrôleur qui a besoin d'un service, il crée automatiquement le service et l'injecte :
 
@@ -102,20 +102,20 @@ export class UserController {
 }
 ```
 
-### Pourquoi l'Injection de Dépendances est Importante
+### Pourquoi l'injection de dépendances est importante
 
-- **Couplage Faible** : Les composants ne créent pas leurs propres dépendances
+- **Couplage faible** : Les composants ne créent pas leurs propres dépendances
 - **Testabilité** : Facile de remplacer les dépendances par des mocks pour les tests
 - **Flexibilité** : Changer les implémentations sans modifier les consommateurs
-- **Gestion du Cycle de Vie** : Le framework gère la création et le nettoyage des objets
+- **Gestion du cycle de vie** : Le framework gère la création et le nettoyage des objets
 
 Vous déclarez ce dont vous avez besoin, et le framework détermine comment le fournir.
 
 ## Décorateurs
 
-**Les décorateurs fournissent des métadonnées sur votre code.** Ils indiquent à YasuiJS comment interpréter et configurer vos classes et méthodes.
+**Les décorateurs fournissent des métadonnées sur votre code.** Ils disent à YasuiJS comment interpréter et configurer vos classes et méthodes.
 
-### Ce que font les Décorateurs
+### Ce que font les décorateurs
 
 Les décorateurs remplacent les fichiers de configuration et la configuration manuelle par des annotations déclaratives :
 
@@ -124,52 +124,54 @@ Les décorateurs remplacent les fichiers de configuration et la configuration ma
 export class UserController {
   
   @Get('/:id')              // Cette méthode gère les requêtes GET
-  getUser(@Param('id') id: string) {  // Extrait 'id' de l'URL
+  getUser(@Param('id') id: string) {  // Extraire 'id' de l'URL
     return { id, name: 'John' };
   }
 }
 ```
 
-### Types de Décorateurs
+### Types de décorateurs
 
-- **Décorateurs de Classe** : `@Controller()`, `@Injectable()`, `@Middleware()` - définissent ce que représente une classe
-- **Décorateurs de Méthode** : `@Get()`, `@Post()`, `@Put()` - définissent les méthodes HTTP et les routes
-- **Décorateurs de Paramètre** : `@Param()`, `@Body()`, `@Query()` - extraient les données de requête
+- **Décorateurs de classe** : `@Controller()`, `@Injectable()`, `@Middleware()` - définissent ce qu'une classe représente
+- **Décorateurs de méthode** : `@Get()`, `@Post()`, `@Put()` - définissent les méthodes HTTP et les routes
+- **Décorateurs de paramètre** : `@Param()`, `@Body()`, `@Query()` - extraient les données de requête
 
-### Pourquoi les Décorateurs sont Importants
+### Pourquoi les décorateurs sont importants
 
-- **Déclaratif** : Le code indique clairement son intention
+- **Déclaratif** : Le code exprime clairement son intention
 - **Co-localisation** : La configuration vit à côté du code qu'elle configure
-- **Sécurité de Type** : TypeScript peut valider l'utilisation des décorateurs
-- **Traitement Automatique** : Le framework lit les décorateurs et configure tout
+- **Sécurité de type** : TypeScript peut valider l'utilisation des décorateurs
+- **Traitement automatique** : Le framework lit les décorateurs et configure tout
 
 Les décorateurs rendent votre code auto-documenté et éliminent le câblage manuel.
 
 ## Middleware
 
-**Le middleware traite les requêtes dans un pipeline.** Chaque middleware peut examiner, modifier ou arrêter une requête avant qu'elle n'atteigne votre contrôleur.
+**Les middleware traitent les requêtes dans un pipeline.** Chaque middleware peut examiner, modifier ou arrêter une requête avant qu'elle n'atteigne votre contrôleur.
 
-### Comment Fonctionne le Middleware
+### Comment fonctionnent les middleware
 
-Les fonctions middleware s'exécutent en séquence, chacune décidant de continuer vers l'étape suivante ou non :
+Les fonctions middleware s'exécutent en séquence, chacune décidant de continuer ou non à l'étape suivante :
 
 ```typescript
 @Middleware()
 export class AuthMiddleware {
-  use(@Req() req: Request, @Next() next: NextFunction) {
+  use(@Req() req: Request) {
     // Vérifier l'authentification
-    if (req.headers.authorization) {
-      next(); // Continuer vers le prochain middleware ou contrôleur
-    } else {
-      throw new Error('Unauthorized'); // Arrêter ici
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      throw new Error('Unauthorized'); // S'arrêter ici
     }
+    // Continuer automatiquement au middleware suivant ou au contrôleur
   }
 }
 ```
 
-### Niveaux de Middleware
+Les middlewares fonctionnent comme les méthodes de contrôleur - vous pouvez retourner des valeurs, lancer des erreurs, ou ne rien retourner pour continuer. Utiliser `@Next()` n'est nécessaire que si vous voulez modifier la réponse.
 
-Le middleware peut être appliqué à différents niveaux :
+### Niveaux de middleware
+
+Les middleware peuvent être appliqués à différents niveaux :
 
 ```typescript
 // Global : s'applique à toutes les requêtes
@@ -181,21 +183,21 @@ yasui.createServer({
 @Controller('/users', AuthMiddleware)
 export class UserController {}
 
-// Route : s'applique à un point d'entrée spécifique
+// Route : s'applique à un endpoint spécifique
 @Get('/', ValidationMiddleware)
 getUsers() {}
 ```
 
-### Pourquoi le Middleware est Important
+### Pourquoi les middleware sont importants
 
-- **Préoccupations Transversales** : Gérer l'authentification, la journalisation, la validation globalement
+- **Préoccupations transversales** : Gérer l'authentification, la journalisation, la validation globalement
 - **Réutilisabilité** : Le même middleware peut être utilisé sur différentes routes
-- **Composabilité** : Combiner plusieurs middlewares pour un comportement complexe
-- **Séparation** : Garder des préoccupations comme l'authentification séparées de la logique métier
+- **Composabilité** : Combiner plusieurs middleware pour un comportement complexe
+- **Séparation** : Garder les préoccupations comme l'auth séparées de la logique métier
 
-Le middleware vous permet de construire des pipelines de traitement de requêtes à la fois puissants et maintenables.
+Les middleware vous permettent de construire des pipelines de traitement de requêtes qui sont à la fois puissants et maintenables.
 
-## Comment Tout Fonctionne Ensemble
+## Comment tout fonctionne ensemble
 
 Ces concepts se combinent pour créer une architecture propre :
 
@@ -203,9 +205,12 @@ Ces concepts se combinent pour créer une architecture propre :
 // 1. Le middleware traite la requête
 @Middleware()
 export class AuthMiddleware {
-  use(@Req() req: Request, @Next() next: NextFunction) {
+  use(@Req() req: Request) {
     // Authentifier la requête
-    next();
+    if (!req.headers.get('authorization')) {
+      throw new HttpError(401, 'Unauthorized');
+    }
+    // Continuer automatiquement
   }
 }
 
@@ -230,29 +235,29 @@ export class UserController {
 }
 ```
 
-### Le Flux de Requête
+### Le flux de requête
 
 1. **La requête arrive** à votre API
-2. **Le middleware** la traite (auth, journalisation, etc.)
+2. **Le middleware** la traite (auth, logging, etc.)
 3. **Le contrôleur** reçoit la requête via les décorateurs
 4. **L'injection de dépendances** fournit les services requis
 5. **Le service** effectue l'opération métier
-6. **Le contrôleur** renvoie le résultat
+6. **Le contrôleur** retourne le résultat
 7. **Le framework** sérialise et envoie la réponse
 
-## Avantages de Cette Architecture
+## Avantages de cette architecture
 
-### Séparation des Préoccupations
+### Séparation des préoccupations
 Chaque composant a une responsabilité claire et unique :
 - Les contrôleurs gèrent HTTP
 - Les services gèrent la logique métier
-- Le middleware gère les préoccupations transversales
+- Les middleware gèrent les préoccupations transversales
 
 ### Testabilité
-Les composants peuvent être testés isolément :
+Les composants peuvent être testés en isolation :
 - Tester les services sans HTTP
-- Tester les contrôleurs avec des services simulés
-- Tester le middleware indépendamment
+- Tester les contrôleurs avec des services mockés
+- Tester les middleware indépendamment
 
 ### Maintenabilité
 Les changements sont localisés :
@@ -263,36 +268,36 @@ Les changements sont localisés :
 ### Évolutivité
 L'architecture supporte la croissance :
 - Ajouter facilement de nouveaux contrôleurs
-- Partager des services entre contrôleurs
-- Composer des middlewares pour des exigences complexes
+- Partager les services entre contrôleurs
+- Composer les middleware pour des exigences complexes
 
-## Quand Utiliser Quoi
+## Quand utiliser quoi
 
-### Utilisez les Contrôleurs Pour :
-- Définir les points d'entrée API
+### Utiliser les contrôleurs pour :
+- Définir les endpoints d'API
 - Extraire les données de requête
-- Définir les codes d'état de réponse
-- Coordonner entre les services
+- Définir les codes de statut de réponse
+- Coordonner entre services
 
-### Utilisez les Services Pour :
+### Utiliser les services pour :
 - La logique et les règles métier
 - Le traitement des données
-- Les appels API externes
+- Les appels d'API externes
 - Les opérations qui pourraient être réutilisées
 
-### Utilisez l'Injection de Dépendances Pour :
+### Utiliser l'injection de dépendances pour :
 - Connecter les services aux contrôleurs
 - Gérer les cycles de vie des objets
 - Faciliter les tests
 - Garder le code faiblement couplé
 
-### Utilisez les Décorateurs Pour :
+### Utiliser les décorateurs pour :
 - Définir les routes et méthodes HTTP
 - Extraire les paramètres de requête
-- Configurer le middleware
+- Configurer les middleware
 - Ajouter des métadonnées pour la documentation
 
-### Utilisez le Middleware Pour :
+### Utiliser les middleware pour :
 - L'authentification et l'autorisation
 - La journalisation des requêtes/réponses
 - La validation des entrées

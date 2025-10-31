@@ -2,7 +2,7 @@
 
 Esta guía introduce los conceptos fundamentales que hacen funcionar YasuiJS. Entender estos conceptos te ayudará a construir mejores APIs y aprovechar al máximo la arquitectura del framework.
 
-## Descripción General
+## Resumen
 
 YasuiJS está construido alrededor de algunos conceptos centrales:
 
@@ -18,7 +18,7 @@ YasuiJS está construido alrededor de algunos conceptos centrales:
 
 ### Qué Hacen los Controladores
 
-Los controladores tienen una responsabilidad principal: traducir las peticiones HTTP en operaciones de negocio y devolver respuestas apropiadas. Deben ser capas delgadas que deleguen el trabajo real a los servicios.
+Los controladores tienen una responsabilidad principal: traducir las peticiones HTTP en operaciones de negocio y devolver respuestas apropiadas. Deben ser capas delgadas que delegan el trabajo real a los servicios.
 
 ```typescript
 @Controller('/users')
@@ -37,14 +37,14 @@ export class UserController {
 }
 ```
 
-### Por Qué Son Importantes los Controladores
+### Por Qué Importan los Controladores
 
 - **Organización de Rutas**: Agrupa endpoints relacionados de forma lógica
 - **Manejo de Peticiones**: Extrae y valida datos de petición automáticamente
-- **Formateo de Respuestas**: Devuelve datos que se serializan automáticamente
+- **Formato de Respuestas**: Devuelve datos que se serializan automáticamente
 - **Separación de Responsabilidades**: Mantiene la lógica HTTP separada de la lógica de negocio
 
-Los controladores deben centrarse en aspectos HTTP (rutas, códigos de estado, cabeceras) mientras delegan la lógica de negocio a los servicios.
+Los controladores deben enfocarse en aspectos HTTP (enrutamiento, códigos de estado, headers) mientras delegan la lógica de negocio a los servicios.
 
 ## Servicios
 
@@ -72,14 +72,14 @@ export class UserService {
 }
 ```
 
-### Por Qué Son Importantes los Servicios
+### Por Qué Importan los Servicios
 
-- **Reusabilidad**: Múltiples controladores pueden usar el mismo servicio
-- **Testabilidad**: La lógica de negocio puede probarse independientemente del HTTP
-- **Organización**: Las operaciones de negocio relacionadas están agrupadas
+- **Reutilización**: Múltiples controladores pueden usar el mismo servicio
+- **Testabilidad**: La lógica de negocio puede ser probada independientemente de HTTP
+- **Organización**: Las operaciones de negocio relacionadas se agrupan juntas
 - **Mantenibilidad**: Los cambios en la lógica de negocio no afectan a los controladores
 
-Los servicios deben centrarse en "qué" hace tu aplicación, no en "cómo" se accede a ella.
+Los servicios deben enfocarse en "qué" hace tu aplicación, no en "cómo" se accede a ella.
 
 ## Inyección de Dependencias
 
@@ -102,14 +102,14 @@ export class UserController {
 }
 ```
 
-### Por Qué Es Importante la Inyección de Dependencias
+### Por Qué Importa la Inyección de Dependencias
 
-- **Acoplamiento Débil**: Los componentes no crean sus propias dependencias
-- **Testabilidad**: Fácil reemplazar dependencias con mocks para pruebas
+- **Bajo Acoplamiento**: Los componentes no crean sus propias dependencias
+- **Testabilidad**: Fácil reemplazar dependencias con mocks para testing
 - **Flexibilidad**: Cambiar implementaciones sin modificar consumidores
 - **Gestión del Ciclo de Vida**: El framework maneja la creación y limpieza de objetos
 
-Tú declaras lo que necesitas, y el framework determina cómo proporcionarlo.
+Declaras lo que necesitas, y el framework se encarga de cómo proporcionarlo.
 
 ## Decoradores
 
@@ -120,7 +120,7 @@ Tú declaras lo que necesitas, y el framework determina cómo proporcionarlo.
 Los decoradores reemplazan archivos de configuración y configuración manual con anotaciones declarativas:
 
 ```typescript
-@Controller('/api/users')    // Esta clase maneja las rutas /api/users
+@Controller('/api/users')    // Esta clase maneja rutas /api/users
 export class UserController {
   
   @Get('/:id')              // Este método maneja peticiones GET
@@ -132,18 +132,18 @@ export class UserController {
 
 ### Tipos de Decoradores
 
-- **Decoradores de Clase**: `@Controller()`, `@Injectable()`, `@Middleware()` - definen lo que representa una clase
+- **Decoradores de Clase**: `@Controller()`, `@Injectable()`, `@Middleware()` - definen qué representa una clase
 - **Decoradores de Método**: `@Get()`, `@Post()`, `@Put()` - definen métodos HTTP y rutas
-- **Decoradores de Parámetros**: `@Param()`, `@Body()`, `@Query()` - extraen datos de la petición
+- **Decoradores de Parámetro**: `@Param()`, `@Body()`, `@Query()` - extraen datos de petición
 
-### Por Qué Son Importantes los Decoradores
+### Por Qué Importan los Decoradores
 
 - **Declarativo**: El código declara claramente su intención
 - **Co-ubicación**: La configuración vive junto al código que configura
 - **Seguridad de Tipos**: TypeScript puede validar el uso de decoradores
 - **Procesamiento Automático**: El framework lee decoradores y configura todo
 
-Los decoradores hacen que tu código sea autodocumentado y eliminan la conexión manual.
+Los decoradores hacen que tu código se autodocumente y eliminan el cableado manual.
 
 ## Middleware
 
@@ -156,20 +156,22 @@ Las funciones middleware se ejecutan en secuencia, cada una decidiendo si contin
 ```typescript
 @Middleware()
 export class AuthMiddleware {
-  use(@Req() req: Request, @Next() next: NextFunction) {
+  use(@Req() req: Request) {
     // Verificar autenticación
-    if (req.headers.authorization) {
-      next(); // Continuar al siguiente middleware o controlador
-    } else {
-      throw new Error('No autorizado'); // Detener aquí
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      throw new Error('Unauthorized'); // Detener aquí
     }
+    // Continuar automáticamente al siguiente middleware o controlador
   }
 }
 ```
 
+Los middlewares funcionan como métodos de controlador - puedes devolver valores, lanzar errores, o no devolver nada para continuar. Usar `@Next()` solo es necesario si quieres modificar la respuesta.
+
 ### Niveles de Middleware
 
-El middleware puede aplicarse en diferentes niveles:
+El middleware puede aplicarse a diferentes niveles:
 
 ```typescript
 // Global: se aplica a todas las peticiones
@@ -181,21 +183,21 @@ yasui.createServer({
 @Controller('/users', AuthMiddleware)
 export class UserController {}
 
-// Ruta: se aplica a un endpoint específico
+// Ruta: se aplica a endpoint específico
 @Get('/', ValidationMiddleware)
 getUsers() {}
 ```
 
-### Por Qué Es Importante el Middleware
+### Por Qué Importa el Middleware
 
-- **Preocupaciones Transversales**: Maneja autenticación, logging, validación globalmente
-- **Reusabilidad**: El mismo middleware puede usarse en diferentes rutas
+- **Aspectos Transversales**: Maneja autenticación, logging, validación globalmente
+- **Reutilización**: El mismo middleware puede usarse en diferentes rutas
 - **Composabilidad**: Combina múltiples middleware para comportamiento complejo
-- **Separación**: Mantiene preocupaciones como auth separadas de la lógica de negocio
+- **Separación**: Mantiene aspectos como auth separados de la lógica de negocio
 
-El middleware te permite construir pipelines de procesamiento de peticiones que son potentes y mantenibles.
+El middleware te permite construir pipelines de procesamiento de peticiones que son tanto poderosos como mantenibles.
 
-## Cómo Todo Funciona Junto
+## Cómo Funciona Todo Junto
 
 Estos conceptos se combinan para crear una arquitectura limpia:
 
@@ -203,9 +205,12 @@ Estos conceptos se combinan para crear una arquitectura limpia:
 // 1. El middleware procesa la petición
 @Middleware()
 export class AuthMiddleware {
-  use(@Req() req: Request, @Next() next: NextFunction) {
+  use(@Req() req: Request) {
     // Autenticar petición
-    next();
+    if (!req.headers.get('authorization')) {
+      throw new HttpError(401, 'Unauthorized');
+    }
+    // Continuar automáticamente
   }
 }
 
@@ -225,12 +230,12 @@ export class UserController {
 
   @Post('/') // El decorador define la ruta
   createUser(@Body() userData: any) { // El decorador extrae datos
-    return this.userService.createUser(userData); // Delega al servicio
+    return this.userService.createUser(userData); // Delegar al servicio
   }
 }
 ```
 
-### El Flujo de la Petición
+### El Flujo de Petición
 
 1. **La petición llega** a tu API
 2. **El middleware** la procesa (auth, logging, etc.)
@@ -246,31 +251,31 @@ export class UserController {
 Cada componente tiene una responsabilidad clara y única:
 - Los controladores manejan HTTP
 - Los servicios manejan lógica de negocio
-- El middleware maneja preocupaciones transversales
+- El middleware maneja aspectos transversales
 
 ### Testabilidad
 Los componentes pueden probarse de forma aislada:
 - Probar servicios sin HTTP
-- Probar controladores con servicios simulados
+- Probar controladores con servicios mockeados
 - Probar middleware independientemente
 
 ### Mantenibilidad
 Los cambios están localizados:
-- Los cambios en la lógica de negocio no afectan a los controladores
-- Los cambios en las rutas no afectan a los servicios
-- Las nuevas funcionalidades pueden reutilizar servicios existentes
+- Los cambios en lógica de negocio no afectan controladores
+- Los cambios de ruta no afectan servicios
+- Las nuevas características pueden reutilizar servicios existentes
 
 ### Escalabilidad
-La arquitectura soporta el crecimiento:
-- Añadir nuevos controladores fácilmente
+La arquitectura soporta crecimiento:
+- Agregar nuevos controladores fácilmente
 - Compartir servicios entre controladores
-- Componer middleware para requisitos complejos
+- Componer middleware para requerimientos complejos
 
 ## Cuándo Usar Qué
 
 ### Usar Controladores Para:
 - Definir endpoints de API
-- Extraer datos de peticiones
+- Extraer datos de petición
 - Establecer códigos de estado de respuesta
 - Coordinar entre servicios
 
@@ -281,20 +286,20 @@ La arquitectura soporta el crecimiento:
 - Operaciones que podrían reutilizarse
 
 ### Usar Inyección de Dependencias Para:
-- Conectar servicios con controladores
+- Conectar servicios a controladores
 - Gestionar ciclos de vida de objetos
-- Facilitar las pruebas
-- Mantener código débilmente acoplado
+- Hacer las pruebas más fáciles
+- Mantener el código débilmente acoplado
 
 ### Usar Decoradores Para:
 - Definir rutas y métodos HTTP
 - Extraer parámetros de petición
 - Configurar middleware
-- Añadir metadatos para documentación
+- Agregar metadatos para documentación
 
 ### Usar Middleware Para:
 - Autenticación y autorización
-- Logging de peticiones/respuestas
+- Logging de petición/respuesta
 - Validación de entrada
-- Limitación de tasa
+- Limitación de velocidad
 - Manejo de errores

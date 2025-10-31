@@ -6,14 +6,21 @@ This guide will get you up and running with your first API in just a few minutes
 
 Before we begin, make sure you have:
 
-- **Node.js** (version 18 or higher) - [Download here](https://nodejs.org/)
-- **npm** or **yarn** package manager
+- **Node.js** (version 18 or higher), **Deno**, or **Bun** - YasuiJS works on all runtimes
+- **npm**, **pnpm**, **yarn**, or your preferred package manager
 - Basic knowledge of **TypeScript**
 
-You can check your Node.js version with:
+You can check your runtime version with:
 ```bash
-node --version
+node --version  # Node.js
+deno --version  # Deno
+bun --version   # Bun
 ```
+
+This guide uses Node.js, but the same code works on:
+- Traditional runtimes: Node.js, Deno, Bun
+- Edge runtimes: Cloudflare Workers, Vercel Edge, Netlify Edge, Deno Deploy
+- Serverless: AWS Lambda, Vercel Functions, Netlify Functions
 
 ## Quick Start
 

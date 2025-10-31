@@ -1,6 +1,6 @@
 # What is YasuiJS?
 
-YasuiJS is a modern, lightweight REST API framework designed specifically for TypeScript developers. It takes the simplicity of Express.js and enhances it with powerful decorators and dependency injection, making API development more intuitive and maintainable.
+YasuiJS is a modern, lightweight REST API framework designed specifically for TypeScript developers. Built on Web Standards with multi-runtime support (Node.js, Deno, and Bun), it provides powerful decorators and dependency injection, making API development more intuitive and maintainable.
 
 ## Why YasuiJS?
 
@@ -107,12 +107,25 @@ YasuiJS is perfect when you need:
 - **Domain-Driven Design**: Applications with complex business logic
 - **Microservices**: Services that need to be independently deployable and testable
 
-## Express.js Foundation
+## Multi-Runtime & Platform-Agnostic Foundation
 
-YasuiJS is built on top of Express.js, so you get:
-- All the performance and ecosystem benefits of Express.js
-- Compatibility with existing Express.js middleware
-- Gradual migration path from existing Express.js applications
-- Familiar concepts for Express.js developers
+YasuiJS is built on Web Standards, providing true deployment flexibility:
 
-YasuiJS doesn't replace Express.js—it enhances it with modern architectural patterns while maintaining all the benefits of the Express.js ecosystem.
+### With createServer() (srvx)
+- **Multi-Runtime Support**: Node.js, Deno, and Bun
+- **Simple Setup**: One command starts your server
+- **Built-in Features**: TLS/HTTPS, HTTP/2, static files
+
+### With createApp() (fetch handler)
+- **Platform Agnostic**: Returns a standard fetch handler
+- **Edge Runtime Compatible**: Cloudflare Workers, Vercel Edge, Netlify Edge, Deno Deploy
+- **Serverless Ready**: AWS Lambda, Vercel Functions, Netlify Functions
+- **Flexible**: Use any Web Standards-compatible server or platform
+
+### Core Benefits
+- **Modern Standards**: Built on fetch API and Web Standards Request/Response
+- **Performance**: Optimized for each runtime's strengths
+- **Future-Proof**: Based on web platform standards, not framework-specific APIs
+- **Express-Compatible Properties**: YasuiJS Request includes familiar properties (req.query, req.params, req.body) for easier migration
+
+YasuiJS embraces modern web standards while providing a familiar developer experience. Deploy anywhere - from traditional servers to edge runtimes.

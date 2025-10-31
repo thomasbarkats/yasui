@@ -8,9 +8,9 @@ YasuiJS provides OpenAPI documentation generation with optional Swagger UI integ
 
 Enable Swagger by adding configuration to your app. YasuiJS generates documentation from your controllers, routes, and decorators.
 
-**Note**: You need to install `swagger-ui-express` separately:
+**Note**: You need to install `swagger-ui-dist` separately:
 ```bash
-npm install swagger-ui-express
+npm install swagger-ui-dist
 ```
 
 ```typescript

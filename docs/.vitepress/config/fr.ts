@@ -9,8 +9,7 @@ export default {
     nav: [
       { text: 'Accueil', link: '/fr/' },
       { text: 'Guide', link: '/fr/guide/what-is-yasuijs' },
-      { text: 'Référence', link: '/fr/reference/config' },
-      { text: 'Équipe', link: '/fr/team' },
+      { text: 'Référence', link: '/fr/reference/config' }
     ],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/thomasbarkats/yasui' },
@@ -23,7 +22,9 @@ export default {
         items: [
           { text: 'Qu\'est-ce que YasuiJS ?', link: '/fr/guide/what-is-yasuijs' },
           { text: 'Démarrage', link: '/fr/guide/getting-started' },
-          { text: 'Concepts de base', link: '/fr/guide/basic-concepts' }
+          { text: 'Concepts de base', link: '/fr/guide/basic-concepts' },
+          { text: 'Comparaisons', link: '/fr/guide/comparisons' },
+          { text: 'Migration v4.x', link: '/fr/guide/migration-v4' }
         ]
       },
       {

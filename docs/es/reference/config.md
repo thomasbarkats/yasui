@@ -6,8 +6,8 @@ Referencia completa de configuración para aplicaciones YasuiJS usando `yasui.cr
 
 YasuiJS proporciona dos formas principales de crear tu aplicación:
 
-- **`yasui.createServer(config)`** - Crea e inicia un servidor HTTP automáticamente
-- **`yasui.createApp(config)`** - Devuelve una aplicación Express para configuración manual
+- **`yasui.createServer(config)`** - Crea e inicia un servidor automáticamente
+- **`yasui.createApp(config)`** - Devuelve un manejador fetch para configuración manual del servidor
 
 Ambos métodos aceptan el mismo objeto de configuración con las siguientes opciones.
 
@@ -30,43 +30,73 @@ yasui.createServer({
 ### Opciones Opcionales
 
 #### `middlewares`
-Array de middlewares globales para aplicar a todas las peticiones. Pueden ser clases middleware de YasuiJS o funciones RequestHandler de Express.
-- **Tipo:** `Array<Constructor | RequestHandler>`
-- **Valor predeterminado:** `[]`
-- **Ejemplo:** `[LoggingMiddleware, cors()]`
+Array de middlewares globales para aplicar a todas las solicitudes. Deben ser clases middleware de YasuiJS decoradas con `@Middleware()`.
+- **Tipo:** `Array<Constructor>`
+- **Por defecto:** `[]`
+- **Valor de ejemplo:** `[LoggingMiddleware, AuthMiddleware]`
+- **Nota:** Los middlewares de Express (como `cors()`, `helmet()`) no son compatibles con YasuiJS 4.x
 
 #### `globalPipes`
-Array de pipes globales para aplicar a todos los parámetros de ruta. Ver [Pipes](/es/reference/pipes) para más detalles.
+Array de pipes globales para aplicar a todos los parámetros de ruta. Ver [Pipes](/es/reference/pipes) para detalles.  
 - **Tipo:** `Array<Constructor<IPipeTransform>>`
-- **Valor predeterminado:** `[]`
-- **Ejemplo:** `[ValidationPipe, TrimPipe]`
+- **Por defecto:** `[]`
+- **Valor de ejemplo:** `[ValidationPipe, TrimPipe]`
 
 #### `environment`
 Nombre del entorno para tu aplicación.
 - **Tipo:** `string`
-- **Valor predeterminado:** `process.env.NODE_ENV || 'development'`
-- **Ejemplo:** `production`
+- **Por defecto:** `process.env.NODE_ENV || 'development'`
+- **Valor de ejemplo:** `production`
 
 #### `port`
-Número de puerto para el servidor HTTP. Solo se usa con `createServer()`.
+Número de puerto para el servidor. Solo se usa con `createServer()`.
 - **Tipo:** `number | string`
-- **Valor predeterminado:** `3000`
+- **Por defecto:** `3000`
 
-#### `protocol`
-Protocolo usado para el registro de URL del servidor. Actualmente solo se usa para fines de visualización.
-- **Tipo:** `'http' | 'https'`
-- **Valor predeterminado:** `'http'`
+#### `hostname`
+Nombre del host al cual vincular el servidor.
+- **Tipo:** `string | undefined`
+- **Por defecto:** `'localhost'` en desarrollo, undefined en producción
+
+#### `tls`
+Configuración TLS/HTTPS. Cuando se proporciona, el servidor usa HTTPS automáticamente.
+- **Tipo:** `TLSConfig | undefined`
+- **Por defecto:** `undefined` (HTTP)
+- **Valor de ejemplo:**
+```typescript
+{
+  cert: './path/to/cert.pem',  // o string PEM
+  key: './path/to/key.pem',    // o string PEM
+  passphrase: 'optional',      // frase de contraseña opcional de la clave
+  ca: './path/to/ca.pem'       // certificados CA opcionales
+}
+```
+
+#### `runtimeOptions`
+Opciones de configuración específicas del runtime.
+- **Tipo:** `RuntimeOptions | undefined`
+- **Por defecto:** `undefined`
+- **Valor de ejemplo:**
+```typescript
+{
+  node: {
+    http2: true,              // Habilitar HTTP/2 (por defecto: true con TLS)
+    maxHeaderSize: 16384,     // Personalizar tamaño de encabezado
+    ipv6Only: false           // Modo solo IPv6
+  }
+}
+```
 
 #### `debug`
-Habilita el modo debug con registro adicional y seguimiento de peticiones.
+Habilitar modo debug con logging adicional y rastreo de solicitudes.
 - **Tipo:** `boolean`
-- **Valor predeterminado:** `false`
+- **Por defecto:** `false`
 
 #### `injections`
-Tokens de inyección personalizados para inyección de dependencias. Ver [Inyección de Dependencias](/es/reference/dependency-injection) para más detalles.
+Tokens de inyección personalizados para inyección de dependencias. Ver [Inyección de Dependencias](/es/reference/dependency-injection) para detalles.
 - **Tipo:** `Array<{ token: string, provide: any }>`
-- **Valor predeterminado:** `[]`
-- **Ejemplo:**
+- **Por defecto:** `[]`
+- **Valor de ejemplo:**
 ```typescript
 [
   { token: 'DATABASE_URL', provide: 'postgresql://localhost:5432/mydb' },
@@ -75,32 +105,32 @@ Tokens de inyección personalizados para inyección de dependencias. Ver [Inyecc
 ```
 
 #### `swagger`
-Configuración de documentación Swagger. Ver [Swagger](/es/reference/swagger) para más detalles.
+Configuración de documentación Swagger. Ver [Swagger](/es/reference/swagger) para detalles.
 - **Tipo:** `SwaggerConfig | undefined`
-- **Valor predeterminado:** `undefined`
-- **Ejemplo:**
+- **Por defecto:** `undefined`
+- **Valor de ejemplo:**
 ```typescript
 {
   enabled: true,
   path: '/api-docs',
   info: {
-    title: 'My API',
+    title: 'Mi API',
     version: '1.0.0',
-    description: 'API documentation'
+    description: 'Documentación de la API'
   }
 }
 ```
 
 #### `enableDecoratorValidation`
-Habilita la validación de decoradores al inicio para detectar errores de configuración.
+Habilitar validación de decoradores al inicio para detectar errores de configuración.
 - **Tipo:** `boolean`
-- **Valor predeterminado:** `true`
+- **Por defecto:** `true`
 
 ## createServer() vs createApp()
 
 ### createServer()
 
-Crea un servidor HTTP e inicia la escucha automáticamente:
+Crea un servidor y comienza a escuchar automáticamente:
 
 ```typescript
 import yasui from 'yasui';
@@ -114,12 +144,12 @@ yasui.createServer({
 
 **Usar cuando:**
 - Quieres iniciar tu servidor inmediatamente
-- No necesitas configuración adicional de Express
-- Estás construyendo una API simple
+- Estás construyendo una API estándar
+- No necesitas configuración personalizada del servidor
 
 ### createApp()
 
-Devuelve una aplicación Express para configuración manual:
+Devuelve un manejador fetch compatible con cualquier servidor o plataforma basada en Web Standards:
 
 ```typescript
 import yasui from 'yasui';
@@ -128,27 +158,47 @@ const app = yasui.createApp({
   controllers: [UserController]
 });
 
-// Agregar middleware personalizado de Express
-app.use('/health', (req, res) => {
-  res.json({ status: 'ok' });
+// app.fetch es un manejador fetch estándar - usar con CUALQUIER servidor compatible
+
+// Opción 1: SRVX (multi-runtime)
+import { serve } from 'srvx';
+serve({
+  fetch: app.fetch,
+  port: 3000
 });
 
-// Agregar rutas personalizadas
-app.get('/custom', (req, res) => {
-  res.json({ message: 'Custom route' });
+// Opción 2: Deno Nativo
+Deno.serve({ port: 3000 }, app.fetch);
+
+// Opción 3: Bun Nativo
+Bun.serve({
+  port: 3000,
+  fetch: app.fetch
 });
 
-// Iniciar el servidor manualmente
-app.listen(3000, () => {
-  console.log('Servidor ejecutándose en el puerto 3000');
+// Opción 4: Cloudflare Workers
+export default {
+  fetch: app.fetch
+};
+
+// Opción 5: Vercel Edge Functions
+export const GET = app.fetch;
+export const POST = app.fetch;
+
+// Opción 6: Servidor http de Node.js
+import { createServer } from 'http';
+createServer(async (req, res) => {
+  const response = await app.fetch(req);
+  // Convertir Response a respuesta de Node.js
 });
 ```
 
 **Usar cuando:**
-- Necesitas configuración personalizada de Express
-- Quieres agregar rutas o middleware personalizados
-- Necesitas más control sobre el inicio del servidor
-- Estás integrando con aplicaciones Express existentes
+- Necesitas configuración personalizada del servidor
+- Quieres más control sobre el inicio del servidor
+- Estás desplegando en runtimes edge (Cloudflare Workers, Vercel Edge, Netlify Edge, Deno Deploy)
+- Estás desplegando en plataformas serverless
+- Estás integrando con características específicas de la plataforma
 
 ## Ejemplos de Configuración
 
@@ -162,15 +212,26 @@ yasui.createServer({
 });
 ```
 
-### Configuración Completa
+### Configuración Completa con HTTPS
 
 ```typescript
 yasui.createServer({
   controllers: [UserController, AuthController],
   middlewares: [LoggingMiddleware, AuthMiddleware],
   globalPipes: [ValidationPipe, TrimPipe],
-  port: 3000,
-  protocol: 'http',
+  port: 443,
+  hostname: 'api.example.com',
+  tls: {
+    cert: './certs/cert.pem',
+    key: './certs/key.pem',
+    passphrase: 'optional-passphrase'
+  },
+  runtimeOptions: {
+    node: {
+      http2: true,
+      maxHeaderSize: 16384
+    }
+  },
   debug: false,
   environment: 'production',
   enableDecoratorValidation: true,
@@ -179,10 +240,10 @@ yasui.createServer({
     { token: 'JWT_SECRET', provide: process.env.JWT_SECRET }
   ],
   swagger: {
-    enabled: true,
+    generate: true,
     path: '/api-docs',
     info: {
-      title: 'My API',
+      title: 'Mi API',
       version: '1.0.0',
       description: 'API completa con todas las características'
     }
@@ -190,39 +251,39 @@ yasui.createServer({
 });
 ```
 
-### Integración con Express
+### Configuración Multi-Runtime
+
+La misma configuración funciona en Node.js, Deno y Bun:
 
 ```typescript
-import yasui from 'yasui';
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
+// Funciona en Node.js, Deno y Bun
+yasui.createServer({
+  controllers: [UserController],
+  port: 3000,
+  middlewares: [CorsMiddleware], // Usar middlewares nativos de YasuiJS
+  debug: true
+});
+```
 
+### Despliegue en Runtime Edge
+
+Para runtimes edge, usa `createApp()` para obtener un manejador fetch estándar:
+
+```typescript
 const app = yasui.createApp({
   controllers: [UserController],
-  middlewares: [LoggingMiddleware]
+  middlewares: [CorsMiddleware]
 });
 
-// Agregar middleware de Express
-app.use(cors());
-app.use(helmet());
-app.use(express.json({ limit: '10mb' }));
+// Desplegar en Cloudflare Workers
+export default { fetch: app.fetch };
 
-// Agregar rutas personalizadas
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+// Desplegar en Vercel Edge
+export const GET = app.fetch;
+export const POST = app.fetch;
 
-// Middleware de manejo de errores
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: '¡Algo salió mal!' });
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor ejecutándose en el puerto ${PORT}`);
-});
+// Desplegar en Deno Deploy
+Deno.serve(app.fetch);
 ```
 
 ## Modo Debug
@@ -237,7 +298,7 @@ yasui.createServer({
 ```
 
 El modo debug proporciona:
-- Registro de peticiones/respuestas
+- Logging de solicitudes/respuestas
 - Detalles de inyección de dependencias
 - Información de registro de rutas
-- Trazas de errores
+- Trazas de pila de errores

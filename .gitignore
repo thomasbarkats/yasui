@@ -4,6 +4,7 @@
 /.vscode
 /.claude
 .DS_Store
+/benchmarks
 
 # Docs
 docs/.vitepress/dist
