@@ -1,19 +1,14 @@
 import kleur from 'kleur';
-import bodyParser from 'body-parser';
-import { createRequire } from 'module';
-import express, {
-  Application,
-  RequestHandler,
-  Response,
-  Router,
-} from 'express';
+import { createRouter, RadixRouter } from 'radix3';
 
-import { Request } from './express.js';
+import { YasuiRequest, RequestHandler, NextFunction, FetchHandler } from './web.js';
 import { Injector } from './injector.js';
 import { LoggerService } from './services/index.js';
 import { AppService } from './utils/app.service.js';
 import { DecoratorValidator } from './utils/decorator-validator.js';
 import { SwaggerService } from './utils/swagger.service.js';
+import { setupSwaggerUI } from './utils/swagger.js';
+import { HttpCode } from './enums/index.js';
 import {
   Constructible,
   IController,
@@ -26,7 +21,15 @@ import {
 
 interface IDController extends IController {
   path: string;
-  configureRoutes: (self: this, core: Core) => Router;
+  configureRoutes: (self: this, core: Core) => void;
+}
+
+interface RouteData {
+  handler: RequestHandler;
+  middlewares: RequestHandler[];
+  method: string;
+  source?: string;
+  defaultStatus?: HttpCode;
 }
 
 
@@ -38,7 +41,8 @@ export class Core {
 
   private appService: AppService;
   private injector: Injector;
-  private app: Application;
+  private router: RadixRouter<RouteData>;
+  private globalMiddlewares: RequestHandler[] = [];
 
   constructor(conf: YasuiConfig) {
     this.config = conf;
@@ -58,35 +62,30 @@ export class Core {
     this.swagger = new SwaggerService(
       this.decoratorValidator,
     );
-    this.app = express();
+    this.router = createRouter<RouteData>();
   }
 
 
-  public createApp(): Application {
+  public createApp(): FetchHandler {
     this.logger.start();
-    this.app.use(bodyParser.json());
-
-    /** client authentication */
-    if (this.config.apiKey) {
-      this.app.use(this.appService.auth.bind(this.appService));
-    }
-
-    /** logs for debugging */
-    if (this.config.debug) {
-      this.logger.warn('debug mode is enabled');
-      this.app.use(this.appService.logRequest.bind(this.appService));
-    }
-    this.app.use((req, res, next) => {
-      (req as Request).logger = new LoggerService().start();
-      next();
-    });
 
     /** register custom injections */
     for (const injection of this.config.injections || []) {
       this.injector.register(injection.token, injection.provide);
     }
 
-    /** use other optional middlewares */
+    /** client authentication middleware */
+    if (this.config.apiKey) {
+      this.globalMiddlewares.push(this.appService.auth.bind(this.appService));
+    }
+
+    /** debug logging middleware */
+    if (this.config.debug) {
+      this.logger.warn('debug mode is enabled');
+      this.globalMiddlewares.push(this.appService.logRequest.bind(this.appService));
+    }
+
+    /** load other optional middlewares */
     this.loadMiddlewares();
 
     this.logger.log('load routes from controllers...');
@@ -95,11 +94,39 @@ export class Core {
     /** setup swagger documentation if enabled */
     this.setupSwagger();
 
-    this.app.get('/', (req: Request, res: Response) => { res.sendStatus(200); });
-    this.app.use(this.appService.handleNotFound.bind(this.appService));
-    this.app.use(this.appService.handleErrors.bind(this.appService));
+    /** add root health check route */
+    this.addRoute('/', 'GET', () => new Response(null, { status: 200 }), []);
 
-    return this.app;
+    /** create fetch handler */
+    const handler = async (standardReq: Request): Promise<Response> => {
+      try {
+        const req = new YasuiRequest(standardReq);
+
+        const url = new URL(req.url);
+        const routeKey = `${req.method}:${url.pathname}`;
+        const match = this.router.lookup(routeKey);
+
+        if (!match) {
+          return this.appService.handleNotFound(req);
+        }
+        req.params = match.params || {};
+        req.logger = new LoggerService().start();
+        req.source = match.source;
+
+        return await this.executeChain(req, match);
+
+      } catch (error) {
+        // minimal request for error handling if conversion failed
+        const req = new YasuiRequest(standardReq.url, {
+          method: standardReq.method,
+          headers: standardReq.headers,
+        });
+        req.logger = new LoggerService().start();
+        return this.appService.handleErrors(<Error>error, req);
+      }
+    };
+
+    return { fetch: handler };
   }
 
   public build<T extends Instance>(Provided: Constructible<T>): T {
@@ -114,11 +141,63 @@ export class Core {
     return <RequestHandler>Middleware;
   }
 
+  public addRoute(
+    path: string,
+    method: string,
+    handler: RequestHandler,
+    middlewares: RequestHandler[],
+    source?: string,
+    defaultStatus?: HttpCode
+  ): void {
+    const routeKey = `${method.toUpperCase()}:${path}`;
+    this.router.insert(routeKey, {
+      handler,
+      middlewares,
+      method: method.toUpperCase(),
+      source,
+      defaultStatus,
+    });
+  }
+
+
+  private async executeChain(
+    req: YasuiRequest,
+    routeData: RouteData & { params?: Record<string, unknown> }
+  ): Promise<Response> {
+    const allMiddlewares: RequestHandler[] = [
+      ...this.globalMiddlewares,
+      ...(routeData.middlewares || [])
+    ];
+    let index = 0;
+
+    const next: NextFunction = async (): Promise<Response> => {
+      if (index < allMiddlewares.length) {
+        const middleware = allMiddlewares[index++];
+        return middleware(req, next);
+      }
+      const result = await routeData.handler(req);
+
+      if (result instanceof globalThis.Response) {
+        return result;
+      }
+      if (result === undefined || result === null) {
+        return new Response(null, { status: 204 });
+      }
+      const status = routeData.defaultStatus || HttpCode.OK;
+      return Response.json(result, { status });
+    };
+
+    try {
+      return await next();
+    } catch (error) {
+      return this.appService.handleErrors(<Error>error, req);
+    }
+  }
 
   private loadMiddlewares(): void {
     for (const Middleware of this.config.middlewares || []) {
       try {
-        this.app.use(this.useMiddleware(Middleware));
+        this.globalMiddlewares.push(this.useMiddleware(Middleware));
       } catch (err) {
         this.logger.error(`failed to load ${Middleware.name || '<invalid function>'} middleware\n${err}`);
       }
@@ -132,8 +211,7 @@ export class Core {
 
         const controller = this.build(Controller) as IDController;
         const path: string = controller.path;
-        const router: Router = controller.configureRoutes(controller, this);
-        this.app.use(path, router);
+        controller.configureRoutes(controller, this);
 
         if (this.config.swagger?.generate) {
           this.swagger.registerControllerRoutes(Controller, path);
@@ -151,43 +229,16 @@ export class Core {
     if (!this.config.swagger?.generate) {
       return;
     }
-    try {
-      const require = createRequire(import.meta.url);
-      const swaggerUi = require('swagger-ui-express');
+    const swaggerPath = this.config.swagger.path || '/api-docs';
+    const swaggerConfig = this.swagger.getSwaggerConfig(this.config.swagger, !!this.config.apiKey);
 
-      let swaggerPath = this.config.swagger.path || '/api-docs';
-      if (!swaggerPath.startsWith('/')) {
-        swaggerPath = '/' + swaggerPath;
-      }
-      const swaggerConfig = this.swagger.getSwaggerConfig(this.config.swagger, !!this.config.apiKey);
-
-      const swaggerJsonPath = `${swaggerPath}/swagger.json`;
-      this.app.get(swaggerJsonPath, (req, res) => {
-        res.json(swaggerConfig);
-      });
-
-      this.app.use(
-        swaggerPath,
-        swaggerUi.serve,
-        swaggerUi.setup(swaggerConfig, {
-          swaggerOptions: {
-            defaultModelsExpandDepth: 0,
-            url: swaggerJsonPath,
-          },
-        })
-      );
-
-      this.logger.success(`${kleur.italic(`${swaggerPath}`)} swagger documentation loaded`);
-
-    } catch (err) {
-      this.logger.warn(
-        'swagger-ui-express not found.\n' +
-        'Install it to enable swagger documentation: npm install swagger-ui-express.'
-      );
-      if (this.config.debug) {
-        this.logger.error(`swagger setup error: ${err}`);
-      }
-    }
+    setupSwaggerUI(
+      this.addRoute.bind(this),
+      swaggerConfig,
+      swaggerPath,
+      this.logger,
+      !!this.config.debug
+    );
   }
 
 

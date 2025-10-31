@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express';
+import { RequestHandler } from '../web.js';
 import { Constructible, Instance } from './utils.i.js';
 
 

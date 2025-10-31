@@ -25,15 +25,17 @@
 
 ## What is YasuiJS?
 
-Yasui (meaning "easy" in Japanese) is a lightweight Express-based framework for Node.js that brings the developer experience of modern frameworks without the complexity and maintaining minimal dependencies. It provides the structure you need with just the features you'll actually use.
+Yasui (meaning "easy" in Japanese) is a lightweight multi-runtime framework built on Web Standards and pushed with [SRVX](https://srvx.h3.dev), that brings the developer experience of modern frameworks without the complexity. It runs on Node.js, Deno, and Bun, providing the structure you need with just the features you'll actually use.
 
 ## Features Summary
-- **Lightweight & Fast**: Built on Express with minimal dependencies. Focus on essentials without the bloat
+- **Multi-Runtime**: Runs on Node.js, Deno, and Bun via SRVX and Web Standards
+- **Lightweight & Fast**: Minimal dependencies with focus on essentials without the bloat
 - **Complete Error Handling**: Everything can throw without try/catch - automatic error handling everywhere
 - **Automatic Type-Casting**: Query params automatically converted to proper types. Even in middlewares
 - **Flexible DI System**: Constructor and method-level injection with configurable scopes for better control
 - **Simple Middlewares**: Apply at global, controller, or route level. Use the same decorators as controllers
-- **Rich Swagger Generation**: Flexible decorators for enums, arrays, classes, OpenAPI schemas.
+- **Rich Swagger Generation**: Flexible decorators for enums, arrays, classes, OpenAPI schemas
+- **HTTPS/HTTP2 Support**: Built-in TLS configuration with automatic HTTP/2 on Node.js
 - **Type-safe**: Full TypeScript support with proper typing
 
 ## Quick Start
@@ -71,7 +73,7 @@ yasui.createServer({
 
 ## Why YasuiJS?
 
-YasuiJS adopts a **class-based, object-oriented approach** with decorators, bringing significant architectural advantages over traditional functional Express.js approaches:
+YasuiJS adopts a **class-based, object-oriented approach** with decorators, bringing significant architectural advantages:
 
 ### Better Code Organization
 Classes and decorators provide better organization, encapsulation, and maintainability. This approach naturally supports established architectural patterns like onion architecture, hexagonal architecture, and clean architecture.
@@ -81,6 +83,19 @@ Built-in dependency injection enables loose coupling, better testability, and cl
 
 ### Declarative Over Imperative
 Instead of manually registering routes and extracting parameters, you declare what you want using decorators. The framework handles the implementation details.
+
+### Multi-Runtime Support
+Built on web standards, YasuiJS provides a portable, standard codebase for JavaScript runtimes, capable of running on Node.js, Deno, and Bun with [SRVX](https://srvx.h3.dev), a universal server abstraction based on the Fetch API. Future-proof your applications with standard web APIs.
+
+## Migration from 3.x (Express)
+
+Version 4.x migrated from Express to Web Standards. **Key breaking changes:**
+
+- **Express middlewares are not compatible** - Use Web Standards-based alternatives or write native Yasui middlewares
+- Request/Response objects now follow Web Standards (immutable)
+- Most features remain unchanged - decorators, DI, routing all work the same way
+
+See the [migration guide](https://yasui.app/guide/migration.html) for more details.
 
 ## Contributing
 

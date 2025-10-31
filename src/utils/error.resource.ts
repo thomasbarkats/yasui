@@ -1,5 +1,5 @@
 import kleur from 'kleur';
-import { Request } from '../express.js';
+import { YasuiRequest } from '../web.js';
 import { HttpCode, HttpCodeMap } from '../enums/index.js';
 import { ObjectSchema } from '../interfaces/index.js';
 
@@ -27,9 +27,10 @@ export class ErrorResource {
   public status: HttpCode;
   public data: Record<string, string>;
 
-  constructor(err: HttpError, req: Request) {
-    this.url = `${req.protocol}://${req.headers.host}${req.originalUrl}`;
-    this.path = req.path;
+  constructor(err: HttpError, req: YasuiRequest) {
+    const url = new URL(req.url);
+    this.url = req.url;
+    this.path = url.pathname;
     this.method = req.method;
     this.status = err.status || HttpCode.INTERNAL_SERVER_ERROR;
     this.statusMessage = HttpCodeMap[this.status] || '';

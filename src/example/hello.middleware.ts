@@ -11,7 +11,8 @@ export class HelloMiddleware implements IMiddleware {
     @Inject() testsService: TestsService,
     @Logger() logger: LoggerService, // each request has a dedicated timed log instance
   ): void {
-    logger.log(`Request ${req.method} ${req.path} ...`, HelloMiddleware.name);
+    const url = new URL(req.url);
+    logger.log(`Request ${req.method} ${url.pathname} ...`, HelloMiddleware.name);
     testsService.helloWorld(HelloMiddleware.name);
   }
 }

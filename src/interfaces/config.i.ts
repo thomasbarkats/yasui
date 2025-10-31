@@ -15,6 +15,33 @@ export interface YasuiSwaggerConfig extends Omit<ISwaggerConfig, 'openapi' | 'pa
   path?: string;
 }
 
+/** TLS/SSL configuration for HTTPS */
+export interface YasuiTLSConfig {
+  /** Path to certificate file or inline certificate in PEM format */
+  cert?: string;
+  /** Path to private key file or inline private key in PEM format */
+  key?: string;
+  /** Optional passphrase for the private key */
+  passphrase?: string;
+  /** Optional CA certificates */
+  ca?: string | string[];
+}
+
+/** Runtime-specific server options */
+export interface YasuiRuntimeOptions {
+  /** Node.js-specific options */
+  node?: {
+    /** Enable/disable HTTP/2 support (enabled by default in TLS mode)
+     *  @default true */
+    http2?: boolean;
+    /** Maximum header size in bytes */
+    maxHeaderSize?: number;
+    /** Use IPv6 only (disable dual-stack) */
+    ipv6Only?: boolean;
+  };
+}
+
+
 /** YasuiJS configuration */
 export interface YasuiConfig {
   controllers?: TController[];
@@ -24,12 +51,18 @@ export interface YasuiConfig {
   /** Pre-registered customs injections */
   injections?: Injection[];
   environment?: string;
+  /** The hostname (IP or resolvable host) server listener should bound to.
+  *   If not provided, server with listen to all network interfaces by default ! */
+  hostname?: string;
   /** Listening port of your server
    *  @default 3000 */
   port?: number | string;
-  /** Used for logs only for now
-   *  @default false */
+  /** @deprecated Protocol is now automatically determined from TLS configuration. */
   protocol?: 'http' | 'https';
+  /** TLS/SSL configuration for HTTPS. When provided, server will use HTTPS protocol */
+  tls?: YasuiTLSConfig;
+  /** Runtime-specific server options (Node.js, Deno, Bun) */
+  runtimeOptions?: YasuiRuntimeOptions;
   /** If true, display more logs and logs all incoming requests
    *  @default false */
   debug?: boolean;

@@ -1,5 +1,5 @@
 import kleur from 'kleur';
-import { Router, RequestHandler } from 'express';
+import { RequestHandler } from '../web.js';
 import { Core } from '../core.js';
 import { routeHandler } from '../utils/route-handler.js';
 import { ReflectMetadata, defineMetadata, getMetadata } from '../utils/reflect.js';
@@ -17,17 +17,16 @@ export function Controller(
     target.prototype.configureRoutes = (
       self: IController,
       core: Core
-    ): Router => {
+    ): void => {
       core.logger.start();
-      const router: Router = Router();
 
       /** add target instance metadata to bind his args in route function */
       defineMetadata(ReflectMetadata.SELF, self, target.prototype);
 
-      /** use other optional middlewares for all controller routes */
-      for (const Middleware of middlewares) {
-        router.use(core.useMiddleware(Middleware));
-      }
+      /** prepare controller-level middlewares */
+      const controllerMiddlewares: RequestHandler[] = middlewares.map(
+        (Middleware: TMiddleware) => core.useMiddleware(Middleware)
+      );
 
       /** add routes from object metadata */
       const routes = getMetadata(ReflectMetadata.ROUTES, target.prototype) || [];
@@ -40,12 +39,15 @@ export function Controller(
           );
         }
 
-        /** setup route and middlewares on controller router */
-
-        const middlewares: RequestHandler[] = route.middlewares.map(
+        /** prepare route-specific middlewares */
+        const routeMiddlewares: RequestHandler[] = route.middlewares.map(
           (Middleware: TMiddleware) => core.useMiddleware(Middleware)
         );
 
+        /** combine controller and route middlewares */
+        const allMiddlewares = [...controllerMiddlewares, ...routeMiddlewares];
+
+        /** prepare pipes (global, controller, route) */
         const pipes = [
           ...(core.config.globalPipes || []),
           ...(getMetadata(ReflectMetadata.PIPES, target.prototype) || []),
@@ -54,11 +56,44 @@ export function Controller(
           (Pipe: Constructible<IPipeTransform>) => core.build(Pipe)
         );
 
-        router[route.method](route.path, ...middlewares,
-          routeHandler(target, route.descriptor, route.params, pipes, false, route.defaultStatus)
+        /** create route handler */
+        const handler = routeHandler(
+          target,
+          route.descriptor,
+          route.params,
+          pipes,
+          false
+        );
+
+        /** join controller path with route path */
+        const fullPath = joinPaths(path, route.path);
+
+        /** register route with radix3 in core */
+        core.addRoute(
+          fullPath,
+          route.method,
+          handler,
+          allMiddlewares,
+          target.name,
+          route.defaultStatus
         );
       }
-      return router;
     };
   };
+}
+
+function joinPaths(base: string, path: string): string {
+  const normalizedBase = base.endsWith('/') ? base.slice(0, -1) : base;
+  const normalizedPath = path.startsWith('/') ? path : '/' + path;
+
+  if (normalizedBase === '' && normalizedPath === '/') {
+    return '/';
+  }
+  if (normalizedBase === '') {
+    return normalizedPath;
+  }
+  if (normalizedPath === '/') {
+    return normalizedBase;
+  }
+  return normalizedBase + normalizedPath;
 }

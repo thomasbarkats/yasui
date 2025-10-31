@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+/** Utility type for unknown Promise */
+export type MaybePromise<T> = T | Promise<T>;
+
 /** Utility type for an instantiable class */
 export type Constructible<T = Instance> = {
   new(...args: any[]): T;
@@ -10,7 +13,7 @@ export type Instance = {
   [index: string]: any;
 };
 
-/** Define a custom injection for the Yasui configuration - See `@Inject` and `@Injectable` */
+/** Define a custom injection for YasuiJS configuration - See `@Inject` and `@Injectable` */
 export type Injection<T = any> = {
   token: string;
   provide: T;
