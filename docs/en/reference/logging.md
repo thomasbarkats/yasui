@@ -75,11 +75,9 @@ export class UserController {
 export class RequestLoggerMiddleware {
   use(
     @Req() req: Request,
-    @Logger() logger: LoggerService,
-    @Next() next: NextFunction
+    @Logger() logger: LoggerService
   ) {
     logger.log('Incoming request', { method: req.method, path: req.path });
-    next();
   }
 }
 ```

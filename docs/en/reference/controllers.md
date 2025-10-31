@@ -6,7 +6,7 @@ Controllers are the entry points of your API. They define HTTP endpoints and han
 
 In YasuiJS, controllers are classes decorated with `@Controller()` that group related endpoints together. Each method in a controller represents an HTTP endpoint, defined using method decorators like `@Get()`, `@Post()`, etc.
 
-Controller methods can simply return any value, which will be automatically serialized to JSON with a 200 status code. For more control, you can access the Express response object directly using `@Res()` and use native Express methods like `res.json()`, `res.status()`, or `res.sendFile()`.
+Controller methods can simply return any value, which will be automatically serialized to JSON with a 200 status code. For manual response control, you can return a Web Standards Response object directly.
 
 ```typescript
 import { Controller, Get, Post } from 'yasui';
@@ -180,21 +180,15 @@ TypeScript cannot detect array item types at runtime, so you must specify `[Type
 
 ## Request Object Access
 
-- `@Req()` - Access Express Request object
-- `@Res()` - Access Express Response object
-- `@Next()` - Access Express NextFunction
+`@Req()` - Access YasuiJS Request object (Web Standards Request with Express-compatible properties)
 
 ```typescript
-import { Request, Response, NextFunction } from 'yasui';
+import { Request } from 'yasui';
 
 @Controller('/api/users')
 export class UserController {
   @Get('/')
-  getAllUsers(
-    @Req() request: Request,
-    @Res() response: Response,
-    @Next() next: NextFunction
-  ) {
+  getAllUsers(@Req() request: Request) {
     console.log(request.url);
     return { users: [] };
   }
@@ -261,20 +255,28 @@ export class UserController {
 
 ### Manual Response Handling
 
-For complete control, use the Express response object:
+For complete control, return a Web Standards Response object:
 
 ```typescript
-import { Response } from 'yasui';
-
 @Controller('/api/users')
 export class UserController {
   @Get('/custom')
-  customResponse(@Res() res: Response) {
-    res.status(418).json({
+  customResponse() {
+    return new Response(JSON.stringify({
       message: "I'm a teapot",
       custom: true
+    }), {
+      status: 418,
+      headers: { 'Content-Type': 'application/json' }
     });
-    // Don't return anything when using res directly
+  }
+
+  @Get('/text')
+  textResponse() {
+    return new Response('Plain text response', {
+      status: 200,
+      headers: { 'Content-Type': 'text/plain' }
+    });
   }
 }
 ```

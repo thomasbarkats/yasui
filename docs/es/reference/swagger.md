@@ -8,9 +8,9 @@ YasuiJS proporciona generación de documentación OpenAPI con integración opcio
 
 Habilita Swagger agregando configuración a tu aplicación. YasuiJS genera documentación a partir de tus controladores, rutas y decoradores.
 
-**Nota**: Necesitas instalar `swagger-ui-express` por separado:
+**Nota**: Necesitas instalar `swagger-ui-dist` por separado:
 ```bash
-npm install swagger-ui-express
+npm install swagger-ui-dist
 ```
 
 ```typescript
@@ -29,10 +29,10 @@ yasui.createServer({
 
 La documentación será accesible por defecto en `/api-docs` si no se especifica una ruta personalizada, y la especificación JSON en `/<path>/swagger.json`.
 
-YasuiJS genera automáticamente documentación básica a partir de tus controladores y decoradores de ruta existentes, incluso sin decoradores específicos de Swagger. El framework detecta:
+YasuiJS genera automáticamente documentación básica a partir de tus controladores existentes y decoradores de ruta, incluso sin ningún decorador específico de Swagger. El framework detecta:
 - **Parámetros**: Los parámetros de ruta, parámetros de consulta y encabezados se detectan automáticamente con tipo `string` por defecto
-- **Cuerpo de la solicitud**: Se detecta automáticamente cuando está presente con esquema `{}` por defecto
-- **Respuestas**: Solo se detecta el código de estado 200 (o el estado predeterminado si `@HttpStatus` está presente) sin información de esquema
+- **Cuerpo de solicitud**: Se detecta automáticamente cuando está presente con esquema `{}` por defecto
+- **Respuestas**: Solo se detecta el código de estado 200 (o el estado por defecto si `@HttpStatus` está presente) sin información de esquema
 
 Las siguientes secciones describen cómo mejorar esta documentación con metadatos adicionales y tipado preciso.
 
@@ -56,7 +56,7 @@ yasui.createServer({
       description: 'API completa para operaciones de gestión de usuarios',
       termsOfService: 'https://example.com/terms',
       contact: {
-        name: 'Soporte API',
+        name: 'Soporte de API',
         url: 'https://example.com/support',
         email: 'support@example.com'
       },
@@ -96,10 +96,10 @@ yasui.createServer({
     // Etiquetas Globales
     tags: [
       {
-        name: 'usuarios',
+        name: 'users',
         description: 'Operaciones de gestión de usuarios',
         externalDocs: {
-          description: 'Más información',
+          description: 'Descubre más',
           url: 'https://example.com/docs/users'
         }
       }
@@ -110,14 +110,14 @@ yasui.createServer({
 
 </details>
 
-## Definición de Esquema
+## Definición de Esquemas
 
-YasuiJS utiliza clases TypeScript con decoradores de propiedades para definir esquemas de API. Las propiedades se infieren automáticamente de los metadatos de TypeScript cuando se usan decoradores sin parámetros.
+YasuiJS utiliza clases de TypeScript con decoradores de propiedades para definir esquemas de API. Las propiedades se infieren automáticamente de los metadatos de TypeScript cuando se usan decoradores sin parámetros.
 
-Los esquemas se registran automáticamente si se utilizan en cualquier decorador.
+Los esquemas se registran automáticamente si se usan en cualquier decorador.
 
 ### `@ApiProperty(definition?)`
-Define una propiedad, requerida por defecto. Admite múltiples formatos de definición:
+Define una propiedad, requerida por defecto. Soporta múltiples formatos de definición:
 
 ```typescript
 export class CreateUserDto {
@@ -153,7 +153,7 @@ export class CreateUserDto {
 }
 ```
 
-Solo los tipos primitivos pueden ser inferidos de los metadatos de TypeScript. Los tipos complejos (incluyendo arrays) tendrán por defecto `{ type: 'object' }`. Para tipado específico, usa los formatos de definición explícitos mostrados arriba.
+Solo los tipos primitivos pueden inferirse de los metadatos de TypeScript. Los tipos complejos (incluyendo arrays) tendrán por defecto `{ type: 'object' }`. Para tipado específico, usa los formatos de definición explícitos mostrados arriba.
 
 ### `@ApiPropertyOptional(definition?)`
 Equivalente a `@ApiProperty({ required: false })`
@@ -167,7 +167,7 @@ size?: string;
 ```
 
 ### `@ApiSchema(name)`
-Define un nombre de esquema personalizado. El nombre predeterminado es el nombre de la clase. Los nombres de esquema deben ser únicos.
+Define un nombre de esquema personalizado. El nombre por defecto es el nombre de la clase. Los nombres de esquema deben ser únicos.
 
 ```typescript
 @ApiSchema('Solicitud de Crear Usuario')
@@ -184,11 +184,11 @@ export class CreateUserDto {
 ## Documentación de Endpoints
 
 ### `@ApiBody(description?, definition?, contentType?)`
-Documenta el esquema del cuerpo de la solicitud. El tipo de contenido predeterminado es `application/json`.
+Documenta el esquema del cuerpo de solicitud. El tipo de contenido por defecto es `application/json`.
 
 ```typescript
 @Post('/users')
-@ApiBody('Datos del usuario', CreateUserDto)
+@ApiBody('Datos de usuario', CreateUserDto)
 createUser(@Body() data: CreateUserDto) {}
 ```
 Todos los formatos de definición descritos para @ApiProperty (esquema OpenAPI, Array de primitivos, Array de referencias de clase, Record, Enum...) son válidos para @ApiBody. Los esquemas de cualquier clase se resolverán automáticamente.
@@ -226,20 +226,20 @@ Describe la operación del endpoint.
 getUsers() {}
 
 @Post('/users')
-@ApiOperation('Crear usuario', 'Crea una nueva cuenta de usuario', ['usuarios'])
+@ApiOperation('Crear usuario', 'Crea una nueva cuenta de usuario', ['users'])
 createUser() {}
 ```
 
 ### Documentación de Parámetros
 - `@ApiParam(name, description?, required?, definition?)` - Parámetros de ruta
-- `@ApiQuery(name, description?, required?, definition?)` - Parámetros de consulta
+- `@ApiQuery(name, description?, required?, definition?)` - Parámetros de consulta  
 - `@ApiHeader(name, description?, required?, definition?)` - Encabezados
 
-Todos los formatos de definición descritos para `@ApiProperty` y decoradores anteriores son compatibles, pero ten en cuenta que los usos complejos (objetos, arrays, referencias de clase, etc.) pueden no tener sentido según la naturaleza del decorador, aunque el esquema OpenAPI se generará correctamente.
+Todos los formatos de definición descritos para `@ApiProperty` y decoradores anteriores son compatibles, pero ten en cuenta que usos complejos (objetos, arrays, referencias de clase, etc.) pueden no tener sentido dependiendo de la naturaleza del decorador, aunque el esquema OpenAPI se generará correctamente.
 
 ```typescript
 @Get('/users/:id')
-@ApiParam('id', 'ID del usuario', true, Number)
+@ApiParam('id', 'ID de Usuario', true, Number)
 @ApiQuery('include', 'Incluir datos relacionados', false, Boolean)
 @ApiHeader('Authorization', 'Token Bearer', true) // String por defecto
 getUser(
@@ -251,7 +251,7 @@ getUser(
 ## Respuestas de Error
 
 ### `@ApiErrorResponse(statusCode, description?, ErrorDataClass?)`
-Documenta respuestas de error con el formato del envoltorio de error de YasuiJS. Este decorador incluye automáticamente la estructura completa del esquema de error del framework que envuelve todos los errores en tu aplicación.
+Documenta respuestas de error con el formato de wrapper de error de YasuiJS. Este decorador incluye automáticamente la estructura completa del esquema de error del framework que envuelve todos los errores en tu aplicación.
 
 ```typescript
 @Get('/users/:id')
@@ -260,21 +260,21 @@ Documenta respuestas de error con el formato del envoltorio de error de YasuiJS.
 getUser(@Param('id') id: string) {}
 ```
 
-Cuando tienes clases de error personalizadas que extienden `HttpError`, puedes mejorarlas con los decoradores `@ApiProperty` y `@ApiPropertyOptional` para documentar sus propiedades específicas. El esquema resultante combinará tus datos de error personalizados con el envoltorio de error estándar de YasuiJS:
+Cuando tienes clases de error personalizadas que extienden `HttpError`, puedes mejorarlas con decoradores `@ApiProperty` y `@ApiPropertyOptional` para documentar sus propiedades específicas. El esquema resultante fusionará los datos de tu error personalizado con el wrapper de error estándar de YasuiJS:
 
 ```typescript
 @Post('/users')
-@ApiErrorResponse(400, 'Fallo en la validación', ValidationErrorData)
+@ApiErrorResponse(400, 'Validación fallida', ValidationErrorData)
 createUser(@Body() data: CreateUserDto) {}
 
-// También es posible solo con referencia de clase (la descripción será el nombre del esquema)
+// También posible solo con referencia de clase (la descripción será el nombre del esquema)
 @Post('/users')
 @ApiErrorResponse(400, ValidationErrorData)
 createUser(@Body() data: CreateUserDto) {}
 ```
 
 ### Enfoque alternativo
-Si prefieres una documentación de errores más simple sin el formato completo del envoltorio, puedes continuar usando el decorador estándar `@ApiResponse` descrito anteriormente. Con `@ApiResponse`, si pasas una clase de error personalizada que extiende HttpError, solo obtendrás el esquema de esa clase específica sin heredar ninguna definición de API.
+Si prefieres documentación de errores más simple sin el formato completo de wrapper, puedes continuar usando el decorador estándar `@ApiResponse` descrito anteriormente. Con `@ApiResponse`, si pasas una clase de error personalizada que extiende HttpError, solo obtendrás el esquema de esa clase específica sin heredar ninguna definición de API.
 
 ## Funciones de Utilidad
 

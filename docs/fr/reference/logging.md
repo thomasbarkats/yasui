@@ -1,8 +1,8 @@
-# Service de journalisation
+# Service de Journalisation
 
-YasuiJS inclut un service de journalisation intégré avec des capacités de chronométrage et une sortie en couleur. Il fournit une journalisation structurée pour votre application avec un contexte spécifique aux requêtes et une surveillance des performances.
+YasuiJS inclut un service de journalisation intégré avec des capacités de chronométrage et une sortie codée par couleur. Il fournit une journalisation structurée pour votre application avec un contexte spécifique aux requêtes et une surveillance des performances.
 
-Le logger peut être injecté dans les services et les contrôleurs via l'injection par constructeur, ou accessible directement dans les paramètres de méthode en utilisant le décorateur `@Logger()`.
+Le logger peut être injecté dans les services et contrôleurs via l'injection de constructeur, ou accessible directement dans les paramètres de méthode en utilisant le décorateur `@Logger()`.
 
 ```typescript
 import { Injectable, LoggerService } from 'yasui';
@@ -22,9 +22,9 @@ export class UserService {
 
 ## Utilisation de LoggerService
 
-### Injection par constructeur
+### Injection de Constructeur
 
-Injectez le service de journalisation dans les constructeurs de vos services ou contrôleurs :
+Injectez le service de logger dans vos constructeurs de service ou contrôleur :
 
 ```typescript
 @Injectable()
@@ -50,9 +50,9 @@ export class UserController {
 }
 ```
 
-### Accès au niveau de la méthode
+### Accès au Niveau Méthode
 
-- `@Logger()` - Obtenir une instance de logger spécifique à la requête (pas de paramètres)
+- `@Logger()` - Obtenir une instance de logger spécifique à la requête (aucun paramètre)
 
 Utilisez le décorateur `@Logger()` pour obtenir une instance de logger dédiée qui est automatiquement démarrée au début de la route. Ceci est utile pour suivre le chronométrage tout au long de l'opération en mode debug. Cela fonctionne à la fois dans les méthodes de contrôleur et les méthodes de middleware.
 
@@ -63,10 +63,10 @@ import { LoggerService } from 'yasui';
 export class UserController {
   @Get('/')
   getUsers(@Logger() logger: LoggerService) {
-    logger.log('Traitement de la demande de liste d\'utilisateurs');
+    logger.log('Traitement de la requête de liste d\'utilisateurs');
     // Le logger est déjà démarré, le chronométrage est automatique
     const users = this.fetchUsers();
-    logger.success(`${users.length} utilisateurs trouvés`);
+    logger.success(`Trouvé ${users.length} utilisateurs`);
     return users;
   }
 }
@@ -75,18 +75,16 @@ export class UserController {
 export class RequestLoggerMiddleware {
   use(
     @Req() req: Request,
-    @Logger() logger: LoggerService,
-    @Next() next: NextFunction
+    @Logger() logger: LoggerService
   ) {
     logger.log('Requête entrante', { method: req.method, path: req.path });
-    next();
   }
 }
 ```
 
-## Méthodes de journalisation
+## Méthodes de Journalisation
 
-Le LoggerService fournit plusieurs méthodes pour différents niveaux de journalisation :
+Le LoggerService fournit plusieurs méthodes pour différents niveaux de log :
 
 ```typescript
 @Injectable()
@@ -94,21 +92,21 @@ export class ExampleService {
   constructor(private logger: LoggerService) {}
 
   demonstrateLogs() {
-    // Information générale
+    // Informations générales
     this.logger.log('Application démarrée');
-    // Information de débogage (détaillée)
-    this.logger.debug('Information de débogage', { details: 'données supplémentaires' });
+    // Informations de debug (détaillées)
+    this.logger.debug('Informations de debug', { details: 'données supplémentaires' });
     // Messages de succès
     this.logger.success('Opération terminée avec succès');
     // Messages d'avertissement
-    this.logger.warn('Avertissement : méthode obsolète utilisée');
+    this.logger.warn('Avertissement : méthode dépréciée utilisée');
     // Messages d'erreur
     this.logger.error('Erreur survenue', { error: 'détails' });
   }
 }
 ```
 
-## Fonctionnalité de chronométrage
+## Fonctionnalité de Chronométrage
 
 Le logger inclut des capacités de chronométrage intégrées pour la surveillance des performances :
 
@@ -142,9 +140,9 @@ export class DataService {
 }
 ```
 
-## Intégration du mode débogage
+## Intégration du Mode Debug
 
-Lorsque le mode débogage est activé dans votre configuration YasuiJS, le logger fournit une sortie plus détaillée :
+Lorsque le mode debug est activé dans votre configuration YasuiJS, le logger fournit une sortie plus verbeuse :
 
 ```typescript
 yasui.createServer({
@@ -153,7 +151,7 @@ yasui.createServer({
 });
 ```
 
-En mode débogage :
+En mode debug :
 - Toutes les requêtes entrantes sont automatiquement journalisées
-- Les messages de débogage sont affichés
-- Des informations d'erreur plus détaillées sont affichées
+- Les messages de debug sont affichés
+- Des informations d'erreur plus détaillées sont montrées

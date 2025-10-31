@@ -4,13 +4,13 @@ Middlewares process requests in a pipeline before they reach your controllers. T
 
 ## Overview
 
-YasuiJS supports two types of middlewares:
-- **Class-based middlewares** using the `@Middleware()` decorator
-- **Express RequestHandler functions** for compatibility with existing Express middlewares
+YasuiJS uses **class-based middlewares** with the `@Middleware()` decorator. Middlewares are built on Web Standards and work across all supported runtimes (Node.js, Deno, Bun).
+
+**Important**: YasuiJS 4.x uses Web Standards Request/Response instead of Express. Express-style middlewares (like `cors`, `helmet`, etc.) are **not compatible**. Use Web Standards-compatible alternatives or write native YasuiJS middlewares.
 
 Middlewares can be applied at three levels with different execution priorities:
 1. **Application level** - Applied to all requests
-2. **Controller level** - Applied to all routes in a controller  
+2. **Controller level** - Applied to all routes in a controller
 3. **Endpoint level** - Applied to specific routes
 
 ```typescript
@@ -31,25 +31,24 @@ export class LoggingMiddleware {
 The `@Middleware()` decorator marks a class as middleware. The class must implement a `use()` method. You can optionally implement the `IMiddleware` interface provided by YasuiJS to enforce the method signature.
 
 ```typescript
-import { Middleware, IMiddleware, Request, Response, Req, Res } from 'yasui';
+import { Middleware, IMiddleware, Request, Req } from 'yasui';
 
 @Middleware()
 export class AuthMiddleware implements IMiddleware {
-  use(
-    @Req() req: Request,
-    @Res() res: Response
-  ) {
+  use(@Req() req: Request) {
     const token = req.headers.authorization;
-    
+
     if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      throw new HttpError(401, 'Unauthorized');
     }
     // Validate token logic here
 
-    // Will continue to next middleware or controller logic if you return nothing/void
+    // Will continue to next middleware or controller if you return nothing/void
   }
 }
 ```
+
+**Note:** Middlewares work like controller methods - you can return values, throw errors, or return nothing to continue. Using `@Next()` is optional if you need manual control over the execution flow.
 
 ### Parameter Decorators in Middlewares
 
@@ -100,20 +99,47 @@ export class LoggingMiddleware {
 }
 ```
 
-## Express RequestHandler Middlewares
+## Writing Custom Middlewares
 
-You can use standard Express middleware functions directly:
+You can create middlewares for common use cases. Here are two patterns:
+
+### Pattern 1: Simple Validation (No @Next() needed)
 
 ```typescript
-import cors from 'cors';
-import helmet from 'helmet';
+@Middleware()
+export class ApiKeyMiddleware implements IMiddleware {
+  use(@Header('x-api-key') apiKey: string) {
+    if (!apiKey || apiKey !== 'expected-key') {
+      throw new HttpError(401, 'Invalid API key');
+    }
+    // Will continue automatically
+  }
+}
+```
 
-yasui.createServer({
-  middlewares: [
-    cors(),
-    helmet(),
-  ]
-});
+### Pattern 2: Response Modification (Using @Next())
+
+When you need to modify the response, use `@Next()`:
+
+```typescript
+@Middleware()
+export class CorsMiddleware implements IMiddleware {
+  async use(@Req() req: Request, @Next() next: NextFunction) {
+    const response = await next();
+
+    // Add CORS headers to response
+    const headers = new Headers(response.headers);
+    headers.set('Access-Control-Allow-Origin', '*');
+    headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH');
+    headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
+  }
+}
 ```
 
 ## Middleware Usage Levels

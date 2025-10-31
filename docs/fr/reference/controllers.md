@@ -1,12 +1,12 @@
 # Contrôleurs
 
-Les contrôleurs sont les points d'entrée de votre API. Ils définissent les points de terminaison HTTP et gèrent les requêtes entrantes en extrayant les données, en appelant la logique métier et en renvoyant les réponses.
+Les contrôleurs sont les points d'entrée de votre API. Ils définissent les endpoints HTTP et gèrent les requêtes entrantes en extrayant les données, appelant la logique métier et retournant les réponses.
 
 ## Vue d'ensemble
 
-Dans YasuiJS, les contrôleurs sont des classes décorées avec `@Controller()` qui regroupent les points de terminaison associés. Chaque méthode d'un contrôleur représente un point de terminaison HTTP, défini à l'aide de décorateurs de méthode comme `@Get()`, `@Post()`, etc.
+Dans YasuiJS, les contrôleurs sont des classes décorées avec `@Controller()` qui regroupent les endpoints liés ensemble. Chaque méthode dans un contrôleur représente un endpoint HTTP, défini en utilisant des décorateurs de méthode comme `@Get()`, `@Post()`, etc.
 
-Les méthodes du contrôleur peuvent simplement renvoyer n'importe quelle valeur, qui sera automatiquement sérialisée en JSON avec un code d'état 200. Pour plus de contrôle, vous pouvez accéder directement à l'objet de réponse Express en utilisant `@Res()` et utiliser les méthodes natives Express comme `res.json()`, `res.status()`, ou `res.sendFile()`.
+Les méthodes de contrôleur peuvent simplement retourner n'importe quelle valeur, qui sera automatiquement sérialisée en JSON avec un code de statut 200. Pour un contrôle manuel de la réponse, vous pouvez retourner directement un objet Response des Web Standards.
 
 ```typescript
 import { Controller, Get, Post } from 'yasui';
@@ -15,7 +15,7 @@ import { Controller, Get, Post } from 'yasui';
 export class UserController {
   @Get('/')
   getAllUsers() {
-    return { users: [] }; // Renvoie automatiquement du JSON
+    return { users: [] }; // Retourne automatiquement du JSON
   }
 }
 ```
@@ -29,7 +29,7 @@ Le décorateur `@Controller()` marque une classe comme contrôleur et définit l
 ```typescript
 @Controller('/api/users')
 export class UserController {
-  // Toutes les routes seront préfixées par /api/users
+  // Toutes les routes seront préfixées avec /api/users
 }
 ```
 
@@ -46,13 +46,13 @@ export class UserController {
 
 ## Décorateurs de méthodes HTTP
 
-YasuiJS fournit des décorateurs pour toutes les méthodes HTTP standard. Chaque décorateur prend un paramètre de chemin (obligatoire) et des paramètres middleware optionnels.
+YasuiJS fournit des décorateurs pour toutes les méthodes HTTP standard. Chaque décorateur prend un paramètre de chemin (requis) et des paramètres de middleware optionnels.
 
-- `@Get(path, ...middlewares)` - Gère les requêtes GET
-- `@Post(path, ...middlewares)` - Gère les requêtes POST
-- `@Put(path, ...middlewares)` - Gère les requêtes PUT
-- `@Delete(path, ...middlewares)` - Gère les requêtes DELETE
-- `@Patch(path, ...middlewares)` - Gère les requêtes PATCH
+- `@Get(path, ...middlewares)` - Gérer les requêtes GET
+- `@Post(path, ...middlewares)` - Gérer les requêtes POST
+- `@Put(path, ...middlewares)` - Gérer les requêtes PUT
+- `@Delete(path, ...middlewares)` - Gérer les requêtes DELETE
+- `@Patch(path, ...middlewares)` - Gérer les requêtes PATCH
 
 ### Routes de base
 
@@ -72,7 +72,7 @@ export class UserController {
   @Get('/:id')
   getUser() {
     // Utilisez les paramètres de route de style Express dans vos chemins :
-    // Route: GET /api/users/123
+    // Route : GET /api/users/123
     return { user: {} };
   }
 
@@ -90,7 +90,7 @@ export class UserController {
 
 ### Middleware au niveau des routes
 
-Appliquez un middleware à des routes spécifiques. En savoir plus dans [Middlewares](/fr/reference/middlewares).
+Appliquer un middleware à des routes spécifiques. En savoir plus dans [Middlewares](/fr/reference/middlewares).
 
 ```typescript
 @Controller('/api/users')
@@ -102,7 +102,7 @@ export class UserController {
 
 ## Décorateurs de paramètres
 
-Extrayez des données des requêtes HTTP à l'aide de décorateurs de paramètres. YasuiJS transforme automatiquement les paramètres en fonction de leurs types TypeScript pour une meilleure sécurité des types.
+Extraire des données des requêtes HTTP en utilisant des décorateurs de paramètres. YasuiJS transforme automatiquement les paramètres basés sur leurs types TypeScript pour une meilleure sécurité de type.
 
 ### Extraire le corps de la requête
 
@@ -125,13 +125,13 @@ export class UserController {
 }
 ```
 
-### Extraire les paramètres et les en-têtes
+### Extraire les paramètres et en-têtes
 
 - `@Param(name, items?)` - Extraire les paramètres de route
 - `@Query(name, items?)` - Extraire les paramètres de requête
 - `@Header(name, items?)` - Extraire les en-têtes de requête
 
-Les paramètres sont automatiquement transformés en fonction de leurs types TypeScript. Pour les tableaux avec des types non-string, vous devez spécifier le type d'élément comme second paramètre :
+Les paramètres sont automatiquement transformés basés sur leurs types TypeScript. Pour les tableaux avec des types non-string, vous devez spécifier le type d'élément comme second paramètre :
 
 ```typescript
 @Controller('/api/users')
@@ -147,8 +147,8 @@ export class UserController {
     @Query('settings') settings: { theme: string } | null,
   ) {
     // version: number (en-tête converti en nombre)
-    // filters: boolean[] (depuis ?filters=true&filters=false&filters=1)
-    // settings: object (depuis ?settings={"theme":"dark"} - JSON analysé, null si échec)
+    // filters: boolean[] (de ?filters=true&filters=false&filters=1)
+    // settings: object (de ?settings={"theme":"dark"} - JSON parsé, null si échec)
     return { page, active, tags, priorities };
   }
 }
@@ -156,22 +156,22 @@ export class UserController {
 
 ## Conversion automatique des types de paramètres
 
-YasuiJS convertit automatiquement les paramètres en fonction des types TypeScript :
+YasuiJS convertit automatiquement les paramètres basés sur les types TypeScript :
 
 ### Types de base
-- **string** - Pas de conversion (par défaut)
-- **number** - Convertit en nombre, renvoie NaN si invalide
+- **string** - Aucune conversion (par défaut)
+- **number** - Convertit en nombre, retourne NaN si invalide
 - **boolean** - Convertit "true"/"1" en true, tout le reste en false
-- **Date** - Convertit en objet Date, renvoie Invalid Date si invalide
-- **object** - Analyse les chaînes JSON pour les requêtes comme `?data={"key":"value"}`, renvoie `null` en cas d'échec
+- **Date** - Convertit en objet Date, retourne Invalid Date si invalide
+- **object** - Parse les chaînes JSON pour les requêtes comme `?data={"key":"value"}`, retourne `null` si échec
 
 ### Types de tableaux
-TypeScript ne peut pas détecter les types d'éléments de tableau à l'exécution, vous devez donc spécifier `[Type]` pour les tableaux non-string :
+TypeScript ne peut pas détecter les types d'éléments de tableau à l'exécution, donc vous devez spécifier `[Type]` pour les tableaux non-string :
 
-- **string[]** - Pas de configuration supplémentaire nécessaire (comportement par défaut)
+- **string[]** - Aucune configuration supplémentaire nécessaire (comportement par défaut)
 - **tableaux number, boolean, ou Date** - Doit spécifier le type d'élément en utilisant le second paramètre
 
-**Syntaxe des tableaux typés :**
+**Syntaxe de tableau typé :**
 ```typescript
 @Query('paramName', [Type]) paramName: Type[]
 @Param('paramName', [Type]) paramName: Type[]  
@@ -180,21 +180,15 @@ TypeScript ne peut pas détecter les types d'éléments de tableau à l'exécuti
 
 ## Accès à l'objet Request
 
-- `@Req()` - Accéder à l'objet Request Express
-- `@Res()` - Accéder à l'objet Response Express
-- `@Next()` - Accéder à la fonction NextFunction Express
+`@Req()` - Accéder à l'objet Request YasuiJS (Web Standards Request avec propriétés compatibles Express)
 
 ```typescript
-import { Request, Response, NextFunction } from 'yasui';
+import { Request } from 'yasui';
 
 @Controller('/api/users')
 export class UserController {
   @Get('/')
-  getAllUsers(
-    @Req() request: Request,
-    @Res() response: Response,
-    @Next() next: NextFunction
-  ) {
+  getAllUsers(@Req() request: Request) {
     console.log(request.url);
     return { users: [] };
   }
@@ -203,40 +197,40 @@ export class UserController {
 
 ## Gestion des réponses
 
-YasuiJS gère automatiquement la sérialisation des réponses et les codes d'état.
+YasuiJS gère automatiquement la sérialisation des réponses et les codes de statut.
 
 ### Réponses JSON automatiques
 
-Renvoyez n'importe quelles données et elles seront automatiquement sérialisées en JSON :
+Retournez n'importe quelle donnée et elle sera automatiquement sérialisée en JSON :
 
 ```typescript
 @Controller('/api/users')
 export class UserController {
   @Get('/')
   getUsers() {
-    // Renvoie automatiquement du JSON avec le statut 200
+    // Retourne automatiquement du JSON avec le statut 200
     return { users: ['John', 'Jane'] };
   }
 
   @Get('/string')
   getString() {
-    // Renvoie une chaîne en JSON
-    return 'Bonjour le monde';
+    // Retourne la chaîne comme JSON
+    return 'Hello World';
   }
 
   @Get('/number')
   getNumber() {
-    // Renvoie un nombre en JSON
+    // Retourne le nombre comme JSON
     return 42;
   }
 }
 ```
 
-### Codes d'état personnalisés
+### Codes de statut personnalisés
 
-`@HttpStatus(code)` - Définir un code d'état HTTP personnalisé
+`@HttpStatus(code)` - Définir un code de statut HTTP personnalisé
 
-Utilisez le décorateur `@HttpStatus()` pour définir des codes d'état personnalisés :
+Utilisez le décorateur `@HttpStatus()` pour définir des codes de statut personnalisés :
 
 ```typescript
 import { HttpStatus, HttpCode } from 'yasui';
@@ -244,41 +238,49 @@ import { HttpStatus, HttpCode } from 'yasui';
 @Controller('/api/users')
 export class UserController {
   @Post('/alt')
-  @HttpStatus(201) // Utilisation d'un nombre
+  @HttpStatus(201) // Utilisant un nombre
   createUserAlt(@Body() userData: any) {
-    // Renvoie avec le statut 201 Created
+    // Retourne avec le statut 201 Created
     return { created: userData };
   }
 
   @Delete('/:id')
-  @HttpStatus(HttpCode.NO_CONTENT) // Utilisation de l'énumération HttpCode
+  @HttpStatus(HttpCode.NO_CONTENT) // Utilisant l'énumération HttpCode
   deleteUser(@Param('id') id: string) {
-    // Renvoie avec le statut 204 No Content
-    // Peut ne rien renvoyer pour 204
+    // Retourne avec le statut 204 No Content
+    // Peut ne rien retourner pour 204
   }
 }
 ```
 
 ### Gestion manuelle des réponses
 
-Pour un contrôle complet, utilisez l'objet de réponse Express :
+Pour un contrôle complet, retournez un objet Response des Web Standards :
 
 ```typescript
-import { Response } from 'yasui';
-
 @Controller('/api/users')
 export class UserController {
   @Get('/custom')
-  customResponse(@Res() res: Response) {
-    res.status(418).json({
+  customResponse() {
+    return new Response(JSON.stringify({
       message: "Je suis une théière",
       custom: true
+    }), {
+      status: 418,
+      headers: { 'Content-Type': 'application/json' }
     });
-    // Ne rien renvoyer lors de l'utilisation directe de res
+  }
+
+  @Get('/text')
+  textResponse() {
+    return new Response('Réponse en texte brut', {
+      status: 200,
+      headers: { 'Content-Type': 'text/plain' }
+    });
   }
 }
 ```
 
 ## Gestion des erreurs
 
-Laissez le framework gérer automatiquement les erreurs ou lancez des erreurs personnalisées. Pour plus de détails sur la gestion des erreurs, voir [Gestion des erreurs](/fr/reference/error-handling).
+Laissez le framework gérer les erreurs automatiquement ou lancez des erreurs personnalisées. Pour les détails complets de gestion des erreurs, voir [Gestion des erreurs](/fr/reference/error-handling).

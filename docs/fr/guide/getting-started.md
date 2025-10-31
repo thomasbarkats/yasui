@@ -1,4 +1,4 @@
-# Démarrage
+# Commencer
 
 Ce guide vous permettra de créer votre première API en quelques minutes seulement.
 
@@ -6,16 +6,23 @@ Ce guide vous permettra de créer votre première API en quelques minutes seulem
 
 Avant de commencer, assurez-vous d'avoir :
 
-- **Node.js** (version 18 ou supérieure) - [Télécharger ici](https://nodejs.org/)
-- Gestionnaire de paquets **npm** ou **yarn**
-- Connaissances de base en **TypeScript**
+- **Node.js** (version 18 ou supérieure), **Deno**, ou **Bun** - YasuiJS fonctionne sur tous les environnements d'exécution
+- **npm**, **pnpm**, **yarn**, ou votre gestionnaire de paquets préféré
+- Connaissances de base de **TypeScript**
 
-Vous pouvez vérifier votre version de Node.js avec :
+Vous pouvez vérifier la version de votre environnement d'exécution avec :
 ```bash
-node --version
+node --version  # Node.js
+deno --version  # Deno
+bun --version   # Bun
 ```
 
-## Démarrage rapide
+Ce guide utilise Node.js, mais le même code fonctionne sur :
+- Environnements d'exécution traditionnels : Node.js, Deno, Bun
+- Environnements d'exécution edge : Cloudflare Workers, Vercel Edge, Netlify Edge, Deno Deploy
+- Serverless : AWS Lambda, Vercel Functions, Netlify Functions
+
+## Démarrage Rapide
 
 Créons votre première API YasuiJS en 3 étapes simples.
 
@@ -48,7 +55,7 @@ Créez un fichier `tsconfig.json` :
 }
 ```
 
-### Étape 3 : Créer votre première API
+### Étape 3 : Créer Votre Première API
 
 Créez `app.ts` :
 
@@ -68,7 +75,7 @@ yasui.createServer({
 });
 ```
 
-### Étape 4 : Exécuter votre API
+### Étape 4 : Exécuter Votre API
 
 Ajoutez des scripts à votre `package.json` :
 
@@ -95,7 +102,7 @@ Visitez `http://localhost:3000` et vous verrez :
 
 Félicitations ! Vous avez une API YasuiJS fonctionnelle.
 
-## Besoin d'aide ?
+## Besoin d'Aide ?
 
 Si vous rencontrez des problèmes :
 

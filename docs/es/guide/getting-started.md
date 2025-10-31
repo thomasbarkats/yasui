@@ -2,22 +2,29 @@
 
 Esta guía te ayudará a poner en marcha tu primera API en solo unos minutos.
 
-## Requisitos Previos
+## Prerrequisitos
 
 Antes de comenzar, asegúrate de tener:
 
-- **Node.js** (versión 18 o superior) - [Descargar aquí](https://nodejs.org/)
-- Gestor de paquetes **npm** o **yarn**
+- **Node.js** (versión 18 o superior), **Deno**, o **Bun** - YasuiJS funciona en todos los runtimes
+- **npm**, **pnpm**, **yarn**, o tu gestor de paquetes preferido
 - Conocimientos básicos de **TypeScript**
 
-Puedes verificar tu versión de Node.js con:
+Puedes verificar la versión de tu runtime con:
 ```bash
-node --version
+node --version  # Node.js
+deno --version  # Deno
+bun --version   # Bun
 ```
+
+Esta guía usa Node.js, pero el mismo código funciona en:
+- Runtimes tradicionales: Node.js, Deno, Bun
+- Runtimes edge: Cloudflare Workers, Vercel Edge, Netlify Edge, Deno Deploy
+- Serverless: AWS Lambda, Vercel Functions, Netlify Functions
 
 ## Inicio Rápido
 
-Vamos a crear tu primera API YasuiJS en 3 simples pasos.
+Vamos a crear tu primera API de YasuiJS en 3 simples pasos.
 
 ### Paso 1: Instalar YasuiJS
 
@@ -70,7 +77,7 @@ yasui.createServer({
 
 ### Paso 4: Ejecutar Tu API
 
-Agrega scripts a tu `package.json`:
+Añade scripts a tu `package.json`:
 
 ```json
 {
@@ -82,7 +89,7 @@ Agrega scripts a tu `package.json`:
 }
 ```
 
-Compila y ejecuta tu API:
+Construye y ejecuta tu API:
 
 ```bash
 npm run dev
@@ -93,13 +100,13 @@ Visita `http://localhost:3000` y verás:
 { "message": "Hello World!" }
 ```
 
-¡Felicitaciones! Tienes una API YasuiJS funcionando.
+¡Felicitaciones! Tienes una API de YasuiJS funcionando.
 
 ## ¿Necesitas Ayuda?
 
 Si encuentras algún problema:
 
 1. Asegúrate de que tu `tsconfig.json` tenga `experimentalDecorators: true`
-2. Verifica que estés usando la sintaxis correcta de importación
-3. Comprueba tus versiones de TypeScript y Node.js
+2. Verifica que estés usando la sintaxis de importación correcta
+3. Confirma las versiones de TypeScript y Node.js
 4. Revisa la salida de la consola para mensajes de error detallados

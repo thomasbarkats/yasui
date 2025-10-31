@@ -1,16 +1,16 @@
-# API文档（Swagger）
+# API 文档 (Swagger)
 
-YasuiJS提供OpenAPI文档生成功能，可选集成Swagger UI。它会自动从现有的装饰器生成文档，并允许你通过额外的元数据来增强它。
+YasuiJS 提供 OpenAPI 文档生成功能，可选择集成 Swagger UI。它会自动从现有的装饰器生成文档，并允许您通过额外的元数据来增强文档。
 
 ## 配置
 
 ### 基本设置
 
-通过在应用中添加配置来启用Swagger。YasuiJS从你的控制器、路由和装饰器生成文档。
+通过向应用添加配置来启用 Swagger。YasuiJS 会从您的控制器、路由和装饰器生成文档。
 
-**注意**：你需要单独安装`swagger-ui-express`：
+**注意**：您需要单独安装 `swagger-ui-dist`：
 ```bash
-npm install swagger-ui-express
+npm install swagger-ui-dist
 ```
 
 ```typescript
@@ -27,18 +27,18 @@ yasui.createServer({
 });
 ```
 
-如果未指定自定义路径，文档默认可在`/api-docs`访问，JSON规范在`/<path>/swagger.json`。
+如果未指定自定义路径，文档默认可在 `/api-docs` 访问，JSON 规范在 `/<path>/swagger.json` 访问。
 
-即使没有任何Swagger特定的装饰器，YasuiJS也会自动从你现有的控制器和路由装饰器生成基本文档。框架会检测：
-- **参数**：路径参数、查询参数和请求头会被自动检测，默认类型为`string`
-- **请求体**：当存在时自动检测，默认schema为`{}`
-- **响应**：仅检测200状态码（或如果存在`@HttpStatus`则为默认状态），不含schema信息
+YasuiJS 会自动从现有的控制器和路由装饰器生成基本文档，即使没有任何 Swagger 特定的装饰器。框架会检测：
+- **参数**：路径参数、查询参数和请求头会自动检测，默认类型为 `string`
+- **请求体**：存在时会自动检测，默认模式为 `{}`
+- **响应**：仅检测 200 状态码（如果存在 `@HttpStatus` 则为默认状态），不包含模式信息
 
-以下部分描述如何通过额外的元数据和精确类型增强此文档。
+以下部分描述如何通过额外的元数据和精确类型来增强此文档。
 
 ### 完整配置
 
-支持所有标准OpenAPI 3.0规范属性，且都是可选的。框架会根据你的装饰器自动处理`openapi`、`paths`和`components`的生成。
+支持所有标准 OpenAPI 3.0 规范属性，且都是可选的。框架会根据您的装饰器自动处理 `openapi`、`paths` 和 `components` 的生成。
 
 <details>
 <summary>查看包含所有配置选项的完整示例</summary>
@@ -49,14 +49,14 @@ yasui.createServer({
   swagger: {
     generate: true,
     path: '/docs',
-    // OpenAPI Info对象
+    // OpenAPI Info 对象
     info: {
-      title: '用户管理API',
+      title: 'User Management API',
       version: '2.1.0',
-      description: '完整的用户管理操作API',
+      description: 'Complete API for user management operations',
       termsOfService: 'https://example.com/terms',
       contact: {
-        name: 'API支持',
+        name: 'API Support',
         url: 'https://example.com/support',
         email: 'support@example.com'
       },
@@ -67,25 +67,25 @@ yasui.createServer({
     },
     // 外部文档
     externalDocs: {
-      description: '在此处查找更多信息',
+      description: 'Find more info here',
       url: 'https://example.com/docs'
     },
     // 服务器信息
     servers: [
       {
         url: 'https://api.example.com/v1',
-        description: '生产服务器',
+        description: 'Production server',
         variables: {
           version: {
             default: 'v1',
             enum: ['v1', 'v2'],
-            description: 'API版本'
+            description: 'API version'
           }
         }
       },
       {
         url: 'https://staging.example.com/v1',
-        description: '预发布服务器'
+        description: 'Staging server'
       }
     ],
     // 全局安全要求
@@ -97,9 +97,9 @@ yasui.createServer({
     tags: [
       {
         name: 'users',
-        description: '用户管理操作',
+        description: 'User management operations',
         externalDocs: {
-          description: '了解更多',
+          description: 'Find out more',
           url: 'https://example.com/docs/users'
         }
       }
@@ -110,18 +110,18 @@ yasui.createServer({
 
 </details>
 
-## Schema定义
+## 模式定义
 
-YasuiJS使用带有属性装饰器的TypeScript类来定义API schema。当装饰器不带参数使用时，属性会自动从TypeScript元数据中推断。
+YasuiJS 使用带有属性装饰器的 TypeScript 类来定义 API 模式。当装饰器不带参数使用时，属性会自动从 TypeScript 元数据推断。
 
-如果在任何装饰器中使用了Schema，它们会被自动注册。
+如果模式在任何装饰器中使用，它们会自动注册。
 
 ### `@ApiProperty(definition?)`
-定义一个属性，默认必需。支持多种定义格式：
+定义属性，默认为必需。支持多种定义格式：
 
 ```typescript
 export class CreateUserDto {
-  @ApiProperty() // 从TypeScript推断类型
+  @ApiProperty() // 类型从 TypeScript 推断
   name: string;
 
   @ApiProperty([String]) // 基本类型数组
@@ -136,10 +136,10 @@ export class CreateUserDto {
   @ApiProperty({ enum: ['admin', 'user'] }) // 枚举值
   role: string;
 
-  @ApiProperty({ enum: UserStatus }) // TypeScript枚举
+  @ApiProperty({ enum: UserStatus }) // TypeScript 枚举
   status: UserStatus;
 
-  // OpenAPI schema，完全自定义
+  // OpenAPI 模式，完全自定义
   @ApiProperty({ type: 'string', format: 'email' }) 
   username: string;
 
@@ -148,15 +148,15 @@ export class CreateUserDto {
     preferences: PreferencesDto,
     categories: [String],
     addresses: [AddressDto]
-  }) // 前面列出用法的记录
+  }) // 之前列出的用法记录
   settings: any;
 }
 ```
 
-只有基本类型可以从TypeScript元数据推断。复杂类型（包括数组）将默认为`{ type: 'object' }`。对于特定类型，请使用上面显示的显式定义格式。
+只有基本类型可以从 TypeScript 元数据推断。复杂类型（包括数组）将默认为 `{ type: 'object' }`。对于特定类型，请使用上面显示的显式定义格式。
 
 ### `@ApiPropertyOptional(definition?)`
-等同于`@ApiProperty({ required: false })`
+等同于 `@ApiProperty({ required: false })`
 
 ```typescript
 @ApiPropertyOptional()
@@ -167,10 +167,10 @@ size?: string;
 ```
 
 ### `@ApiSchema(name)`
-定义自定义schema名称。默认名称是类名。Schema名称必须唯一。
+定义自定义模式名称。默认名称是类名。模式名称必须唯一。
 
 ```typescript
-@ApiSchema('创建用户请求')
+@ApiSchema('Create User Request')
 export class CreateUserDto {
   @ApiProperty()
   name: string;
@@ -178,22 +178,22 @@ export class CreateUserDto {
 ```
 
 ### 别名
-- `@AP()` - `@ApiProperty()`的别名
-- `@APO()` - `@ApiPropertyOptional()`的别名
+- `@AP()` - `@ApiProperty()` 的别名
+- `@APO()` - `@ApiPropertyOptional()` 的别名
 
 ## 端点文档
 
 ### `@ApiBody(description?, definition?, contentType?)`
-记录请求体schema。默认内容类型是`application/json`。
+记录请求体模式。默认内容类型为 `application/json`。
 
 ```typescript
 @Post('/users')
-@ApiBody('用户数据', CreateUserDto)
+@ApiBody('User data', CreateUserDto)
 createUser(@Body() data: CreateUserDto) {}
 ```
-@ApiProperty描述的所有定义格式（OpenAPI schema、基本类型数组、类引用数组、记录、枚举...）对@ApiBody都有效。任何类的Schema都会被自动解析。
+@ApiProperty 描述的所有定义格式（OpenAPI 模式、基本类型数组、类引用数组、记录、枚举...）对 @ApiBody 都有效。任何类的模式都会自动解析。
 
-也可以只使用类引用而不带描述（在这种情况下将使用schema名称）。
+也可以仅使用类引用而不带描述来使用 @ApiBody（在这种情况下将是模式名称）。
 ```ts
 @Post('/users')
 @ApiBody(CreateUserDto)
@@ -205,12 +205,12 @@ createUser(@Body() data: CreateUserDto) {}
 
 ```typescript
 @Get('/users')
-@ApiResponse(200, '用户列表', [UserDto])
+@ApiResponse(200, 'Users', [UserDto])
 getUsers() {}
 ```
-@ApiProperty描述的所有定义格式（OpenAPI schema、基本类型数组、类引用数组、记录、枚举...）对@ApiResponse都有效。任何类的Schema都会被自动解析。
+@ApiProperty 描述的所有定义格式（OpenAPI 模式、基本类型数组、类引用数组、记录、枚举...）对 @ApiResponse 都有效。任何类的模式都会自动解析。
 
-也可以只使用类引用而不带描述（在这种情况下将使用schema名称）。
+也可以仅使用类引用而不带描述来使用 @ApiResponse（在这种情况下将是模式名称）。
 ```typescript
 @Get('/users/:id')
 @ApiResponse(200, UserDto)
@@ -222,26 +222,26 @@ getUser(@Param('id') id: string) {}
 
 ```typescript
 @Get('/users')
-@ApiOperation('获取所有用户')
+@ApiOperation('Get all users')
 getUsers() {}
 
 @Post('/users')
-@ApiOperation('创建用户', '创建新用户账户', ['users'])
+@ApiOperation('Create user', 'Creates a new user account', ['users'])
 createUser() {}
 ```
 
 ### 参数文档
 - `@ApiParam(name, description?, required?, definition?)` - 路径参数
-- `@ApiQuery(name, description?, required?, definition?)` - 查询参数
+- `@ApiQuery(name, description?, required?, definition?)` - 查询参数  
 - `@ApiHeader(name, description?, required?, definition?)` - 请求头
 
-支持为`@ApiProperty`和前面装饰器描述的所有定义格式，但要注意，复杂用法（对象、数组、类引用等）可能根据装饰器的性质不太合适，即使OpenAPI schema会被正确生成。
+支持 `@ApiProperty` 和之前装饰器描述的所有定义格式，但请注意，复杂用法（对象、数组、类引用等）根据装饰器的性质可能没有意义，即使 OpenAPI 模式会正确生成。
 
 ```typescript
 @Get('/users/:id')
-@ApiParam('id', '用户ID', true, Number)
-@ApiQuery('include', '包含相关数据', false, Boolean)
-@ApiHeader('Authorization', 'Bearer令牌', true) // 默认为String
+@ApiParam('id', 'User ID', true, Number)
+@ApiQuery('include', 'Include related data', false, Boolean)
+@ApiHeader('Authorization', 'Bearer token', true) // 默认为 String
 getUser(
   @Param('id') id: number,
   @Query('include') include?: boolean
@@ -251,35 +251,35 @@ getUser(
 ## 错误响应
 
 ### `@ApiErrorResponse(statusCode, description?, ErrorDataClass?)`
-使用YasuiJS错误包装格式记录错误响应。此装饰器自动包含框架的完整错误schema结构，该结构包装了应用程序中的所有错误。
+使用 YasuiJS 错误包装器格式记录错误响应。此装饰器会自动包含框架的完整错误模式结构，该结构包装应用程序中的所有错误。
 
 ```typescript
 @Get('/users/:id')
-@ApiErrorResponse(404, '未找到用户')
-@ApiErrorResponse(500, '内部服务器错误')
+@ApiErrorResponse(404, 'User not found')
+@ApiErrorResponse(500, 'Internal server error')
 getUser(@Param('id') id: string) {}
 ```
 
-当你有扩展`HttpError`的自定义错误类时，可以使用`@ApiProperty`和`@ApiPropertyOptional`装饰器来记录它们的特定属性。生成的schema将把你的自定义错误数据与YasuiJS的标准错误包装合并：
+当您有扩展 `HttpError` 的自定义错误类时，可以使用 `@ApiProperty` 和 `@ApiPropertyOptional` 装饰器来增强它们，以记录其特定属性。生成的模式将把您的自定义错误数据与 YasuiJS 的标准错误包装器合并：
 
 ```typescript
 @Post('/users')
-@ApiErrorResponse(400, '验证失败', ValidationErrorData)
+@ApiErrorResponse(400, 'Validation failed', ValidationErrorData)
 createUser(@Body() data: CreateUserDto) {}
 
-// 也可以只使用类引用（描述将是schema名称）
+// 也可以仅使用类引用（描述将是模式名称）
 @Post('/users')
 @ApiErrorResponse(400, ValidationErrorData)
 createUser(@Body() data: CreateUserDto) {}
 ```
 
 ### 替代方法
-如果你更喜欢不带完整包装格式的简单错误文档，可以继续使用前面描述的标准`@ApiResponse`装饰器。使用`@ApiResponse`时，如果传递扩展HttpError的自定义错误类，你将只获得该特定类的schema，而不会继承任何API定义。
+如果您希望更简单的错误文档而不使用完整的包装器格式，可以继续使用前面描述的标准 `@ApiResponse` 装饰器。使用 `@ApiResponse` 时，如果您传递扩展 HttpError 的自定义错误类，您只会获得该特定类的模式，而不会继承任何 API 定义。
 
 ## 实用函数
 
 ### `resolveSchema(schema: ApiPropertyDefinition): OpenAPISchema`
-手动将任何schema定义（参见@ApiProperty部分描述的格式）解析为OpenAPI格式。用于特定用例。
+手动将任何模式定义（参见 @ApiProperty 部分描述的格式）解析为 OpenAPI 格式。对特定用例很有用。
 
 ```typescript
 import { resolveSchema } from 'yasui';

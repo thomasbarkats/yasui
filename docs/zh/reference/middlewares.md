@@ -1,12 +1,12 @@
 # 中间件
 
-中间件在请求到达控制器之前以管道方式处理请求。它们处理诸如身份验证、日志记录、验证和请求转换等横切关注点。
+中间件在请求到达控制器之前在管道中处理请求。它们处理横切关注点，如身份验证、日志记录、验证和请求转换。
 
 ## 概述
 
-YasuiJS 支持两种类型的中间件：
-- **基于类的中间件**使用 `@Middleware()` 装饰器
-- **Express RequestHandler 函数**用于与现有 Express 中间件兼容
+YasuiJS 使用带有 `@Middleware()` 装饰器的**基于类的中间件**。中间件基于 Web 标准构建，可在所有支持的运行时（Node.js、Deno、Bun）中工作。
+
+**重要提示**：YasuiJS 4.x 使用 Web 标准 Request/Response 而不是 Express。Express 风格的中间件（如 `cors`、`helmet` 等）**不兼容**。请使用与 Web 标准兼容的替代方案或编写原生 YasuiJS 中间件。
 
 中间件可以在三个级别应用，具有不同的执行优先级：
 1. **应用程序级别** - 应用于所有请求
@@ -31,29 +31,28 @@ export class LoggingMiddleware {
 `@Middleware()` 装饰器将类标记为中间件。该类必须实现 `use()` 方法。您可以选择实现 YasuiJS 提供的 `IMiddleware` 接口来强制执行方法签名。
 
 ```typescript
-import { Middleware, IMiddleware, Request, Response, Req, Res } from 'yasui';
+import { Middleware, IMiddleware, Request, Req } from 'yasui';
 
 @Middleware()
 export class AuthMiddleware implements IMiddleware {
-  use(
-    @Req() req: Request,
-    @Res() res: Response
-  ) {
+  use(@Req() req: Request) {
     const token = req.headers.authorization;
-    
+
     if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      throw new HttpError(401, 'Unauthorized');
     }
     // 在此处验证令牌逻辑
 
-    // 如果返回 nothing/void 将继续执行下一个中间件或控制器逻辑
+    // 如果返回 nothing/void，将继续到下一个中间件或控制器
   }
 }
 ```
 
+**注意：** 中间件的工作方式类似于控制器方法 - 您可以返回值、抛出错误或不返回任何内容以继续执行。如果您需要手动控制执行流程，使用 `@Next()` 是可选的。
+
 ### 中间件中的参数装饰器
 
-中间件可以使用与控制器相同的参数装饰器，并且也能受益于自动错误捕获：
+中间件可以使用与控制器相同的参数装饰器，并且也受益于自动错误捕获：
 
 ```typescript
 @Middleware()
@@ -75,11 +74,11 @@ export class ValidationMiddleware {
 }
 ```
 
-**自动类型转换：** 中间件中的所有参数装饰器都享有与控制器相同的自动类型转换。参数在中间件执行前被转换为其指定类型。
+**自动类型转换：** 中间件中的所有参数装饰器都受益于与控制器相同的自动类型转换。参数在中间件执行之前会转换为其指定的类型。
 
 ### 依赖注入
 
-由于中间件类的行为类似于控制器，它们也以相同的方式允许依赖注入：
+由于中间件类的行为类似于控制器，它们也允许以相同的方式进行依赖注入：
 
 ```typescript
 @Middleware()
@@ -91,7 +90,7 @@ export class LoggingMiddleware {
 
   use(
     @Body() body: any,
-    @Inject() anotherService: AnotherService, // 方法级别相同
+    @Inject() anotherService: AnotherService, // 在方法级别相同
   ) {
     if (!this.validationService.isValid(body)) {
       throw new HttpError(400, 'Invalid request data');
@@ -100,20 +99,47 @@ export class LoggingMiddleware {
 }
 ```
 
-## Express RequestHandler 中间件
+## 编写自定义中间件
 
-您可以直接使用标准的 Express 中间件函数：
+您可以为常见用例创建中间件。以下是两种模式：
+
+### 模式 1：简单验证（不需要 @Next()）
 
 ```typescript
-import cors from 'cors';
-import helmet from 'helmet';
+@Middleware()
+export class ApiKeyMiddleware implements IMiddleware {
+  use(@Header('x-api-key') apiKey: string) {
+    if (!apiKey || apiKey !== 'expected-key') {
+      throw new HttpError(401, 'Invalid API key');
+    }
+    // 将自动继续
+  }
+}
+```
 
-yasui.createServer({
-  middlewares: [
-    cors(),
-    helmet(),
-  ]
-});
+### 模式 2：响应修改（使用 @Next()）
+
+当您需要修改响应时，使用 `@Next()`：
+
+```typescript
+@Middleware()
+export class CorsMiddleware implements IMiddleware {
+  async use(@Req() req: Request, @Next() next: NextFunction) {
+    const response = await next();
+
+    // 向响应添加 CORS 头
+    const headers = new Headers(response.headers);
+    headers.set('Access-Control-Allow-Origin', '*');
+    headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH');
+    headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
+  }
+}
 ```
 
 ## 中间件使用级别
@@ -131,7 +157,7 @@ yasui.createServer({
 
 ### 控制器级别
 
-应用于特定控制器中的所有路由：
+应用于特定控制器内的所有路由：
 
 ```typescript
 // 单个中间件
@@ -143,7 +169,7 @@ export class UserController {
 // 多个中间件
 @Controller('/api/admin', AuthMiddleware, ValidationMiddleware)
 export class AdminController {
-  // 所有路由都有身份验证和验证
+  // 所有路由都有身份验证 + 验证
 }
 ```
 
@@ -166,7 +192,7 @@ export class UserController {
   
   @Delete('/:id', AuthMiddleware, ValidationMiddleware)
   deleteUser() {
-    // 同时使用身份验证和验证中间件
+    // 身份验证和验证中间件
   }
 }
 ```
@@ -183,12 +209,12 @@ export class UserController {
 ```typescript
 // 执行顺序示例：
 yasui.createServer({
-  middlewares: [GlobalMiddleware] // 1. 首先
+  middlewares: [GlobalMiddleware] // 1. 第一个
 });
 
-@Controller('/users', ControllerMiddleware) // 2. 其次
+@Controller('/users', ControllerMiddleware) // 2. 第二个
 export class UserController {
-  @Post('/', EndpointMiddleware) // 3. 第三
+  @Post('/', EndpointMiddleware) // 3. 第三个
   createUser() {
     // 4. 最后是控制器方法
   }

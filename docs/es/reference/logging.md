@@ -1,8 +1,8 @@
-# Servicio de Registro
+# Servicio de Logging
 
-YasuiJS incluye un servicio de registro incorporado con capacidades de temporización y salida codificada por colores. Proporciona registro estructurado para su aplicación con contexto específico de solicitud y monitoreo de rendimiento.
+YasuiJS incluye un servicio de logging integrado con capacidades de cronometraje y salida codificada por colores. Proporciona logging estructurado para tu aplicación con contexto específico de solicitud y monitoreo de rendimiento.
 
-El registrador puede ser inyectado en servicios y controladores mediante inyección de constructor, o accedido directamente en parámetros de método usando el decorador `@Logger()`.
+El logger puede ser inyectado en servicios y controladores a través de inyección de constructor, o accedido directamente en parámetros de método usando el decorador `@Logger()`.
 
 ```typescript
 import { Injectable, LoggerService } from 'yasui';
@@ -12,7 +12,7 @@ export class UserService {
   constructor(private readonly logger: LoggerService) {}
 
   getUser(id: string) {
-    this.logger.log('Buscando usuario', { userId: id });
+    this.logger.log('Obteniendo usuario', { userId: id });
     const user = this.findUser(id);
     this.logger.success('Usuario encontrado exitosamente');
     return user;
@@ -24,7 +24,7 @@ export class UserService {
 
 ### Inyección de Constructor
 
-Inyecte el servicio de registro en los constructores de su servicio o controlador:
+Inyecta el servicio de logger en los constructores de tus servicios o controladores:
 
 ```typescript
 @Injectable()
@@ -52,9 +52,9 @@ export class UserController {
 
 ### Acceso a Nivel de Método
 
-- `@Logger()` - Obtener instancia de registro específica de solicitud (sin parámetros)
+- `@Logger()` - Obtener instancia de logger específica de solicitud (sin parámetros)
 
-Use el decorador `@Logger()` para obtener una instancia de registro dedicada que se inicia automáticamente al comienzo de la ruta. Esto es útil para rastrear el tiempo durante la operación en modo de depuración. Esto funciona tanto en métodos de controlador como en métodos de middleware.
+Usa el decorador `@Logger()` para obtener una instancia de logger dedicada que se inicia automáticamente al comienzo de la ruta. Esto es útil para rastrear el cronometraje a lo largo de la operación en modo debug. Esto funciona tanto en métodos de controlador como en métodos de middleware.
 
 ```typescript
 import { LoggerService } from 'yasui';
@@ -64,7 +64,7 @@ export class UserController {
   @Get('/')
   getUsers(@Logger() logger: LoggerService) {
     logger.log('Procesando solicitud de lista de usuarios');
-    // El registrador ya está iniciado, el tiempo es automático
+    // El logger ya está iniciado, el cronometraje es automático
     const users = this.fetchUsers();
     logger.success(`Se encontraron ${users.length} usuarios`);
     return users;
@@ -75,18 +75,16 @@ export class UserController {
 export class RequestLoggerMiddleware {
   use(
     @Req() req: Request,
-    @Logger() logger: LoggerService,
-    @Next() next: NextFunction
+    @Logger() logger: LoggerService
   ) {
     logger.log('Solicitud entrante', { method: req.method, path: req.path });
-    next();
   }
 }
 ```
 
-## Métodos de Registro
+## Métodos de Logging
 
-El LoggerService proporciona varios métodos para diferentes niveles de registro:
+El LoggerService proporciona varios métodos para diferentes niveles de log:
 
 ```typescript
 @Injectable()
@@ -96,21 +94,21 @@ export class ExampleService {
   demonstrateLogs() {
     // Información general
     this.logger.log('Aplicación iniciada');
-    // Información de depuración (detallada)
-    this.logger.debug('Información de depuración', { details: 'datos extra' });
+    // Información de debug (detallada)
+    this.logger.debug('Información de debug', { details: 'datos extra' });
     // Mensajes de éxito
     this.logger.success('Operación completada exitosamente');
     // Mensajes de advertencia
-    this.logger.warn('Advertencia: método obsoleto utilizado');
+    this.logger.warn('Advertencia: método obsoleto usado');
     // Mensajes de error
-    this.logger.error('Error ocurrido', { error: 'detalles' });
+    this.logger.error('Ocurrió un error', { error: 'detalles' });
   }
 }
 ```
 
-## Funcionalidad de Temporización
+## Funcionalidad de Cronometraje
 
-El registrador incluye capacidades de temporización incorporadas para monitoreo de rendimiento:
+El logger incluye capacidades de cronometraje integradas para monitoreo de rendimiento:
 
 ```typescript
 @Injectable()
@@ -118,7 +116,7 @@ export class DataService {
   constructor(private logger: LoggerService) {}
 
   processData() {
-    this.logger.start(); // Iniciar temporizador
+    this.logger.start(); // Iniciar cronómetro
     
     const data = this.fetchData();
     const elapsed = this.logger.stop(); // Detener y obtener tiempo transcurrido
@@ -132,7 +130,7 @@ export class DataService {
     
     for (const item of items) {
       this.processItem(item);
-      this.logger.reset(); // Reiniciar temporizador para siguiente elemento
+      this.logger.reset(); // Reiniciar cronómetro para el siguiente elemento
     }
     
     // Obtener tiempo transcurrido actual sin detener
@@ -142,18 +140,18 @@ export class DataService {
 }
 ```
 
-## Integración del Modo de Depuración
+## Integración con Modo Debug
 
-Cuando el modo de depuración está habilitado en su configuración de YasuiJS, el registrador proporciona una salida más detallada:
+Cuando el modo debug está habilitado en tu configuración de YasuiJS, el logger proporciona salida más detallada:
 
 ```typescript
 yasui.createServer({
   controllers: [UserController],
-  debug: true // Habilita registro detallado
+  debug: true // Habilita logging detallado
 });
 ```
 
-En modo de depuración:
+En modo debug:
 - Todas las solicitudes entrantes se registran automáticamente
-- Se muestran los mensajes de depuración
+- Los mensajes de debug se muestran
 - Se muestra información de error más detallada

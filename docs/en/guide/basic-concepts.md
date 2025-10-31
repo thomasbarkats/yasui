@@ -156,16 +156,18 @@ Middleware functions run in sequence, each deciding whether to continue to the n
 ```typescript
 @Middleware()
 export class AuthMiddleware {
-  use(@Req() req: Request, @Next() next: NextFunction) {
+  use(@Req() req: Request) {
     // Check authentication
-    if (req.headers.authorization) {
-      next(); // Continue to next middleware or controller
-    } else {
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
       throw new Error('Unauthorized'); // Stop here
     }
+    // Continue automatically to next middleware or controller
   }
 }
 ```
+
+Middlewares work like controller methods - you can return values, throw errors, or return nothing to continue. Using `@Next()` is only needed if you want to modify the response.
 
 ### Middleware Levels
 
@@ -203,9 +205,12 @@ These concepts combine to create a clean architecture:
 // 1. Middleware processes the request
 @Middleware()
 export class AuthMiddleware {
-  use(@Req() req: Request, @Next() next: NextFunction) {
+  use(@Req() req: Request) {
     // Authenticate request
-    next();
+    if (!req.headers.get('authorization')) {
+      throw new HttpError(401, 'Unauthorized');
+    }
+    // Continue automatically
   }
 }
 

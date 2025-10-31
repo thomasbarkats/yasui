@@ -9,8 +9,7 @@ export default {
     nav: [
       { text: '首页', link: '/zh/' },
       { text: '指南', link: '/zh/guide/what-is-yasuijs' },
-      { text: '参考', link: '/zh/reference/config' },
-      { text: '团队', link: '/zh/team' },
+      { text: '参考', link: '/zh/reference/config' }
     ],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/thomasbarkats/yasui' },
@@ -23,7 +22,9 @@ export default {
         items: [
           { text: '什么是YasuiJS？', link: '/zh/guide/what-is-yasuijs' },
           { text: '快速开始', link: '/zh/guide/getting-started' },
-          { text: '基本概念', link: '/zh/guide/basic-concepts' }
+          { text: '基本概念', link: '/zh/guide/basic-concepts' },
+          { text: '比较', link: '/zh/guide/comparisons' },
+          { text: '迁移 v4.x', link: '/zh/guide/migration-v4' }
         ]
       },
       {

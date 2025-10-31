@@ -4,14 +4,14 @@ Les middlewares traitent les requêtes dans un pipeline avant qu'elles n'atteign
 
 ## Vue d'ensemble
 
-YasuiJS prend en charge deux types de middlewares :
-- **Middlewares basés sur des classes** utilisant le décorateur `@Middleware()`
-- **Fonctions RequestHandler Express** pour la compatibilité avec les middlewares Express existants
+YasuiJS utilise des **middlewares basés sur des classes** avec le décorateur `@Middleware()`. Les middlewares sont construits sur les standards Web et fonctionnent sur tous les runtimes supportés (Node.js, Deno, Bun).
+
+**Important** : YasuiJS 4.x utilise les Request/Response des standards Web au lieu d'Express. Les middlewares de style Express (comme `cors`, `helmet`, etc.) ne sont **pas compatibles**. Utilisez des alternatives compatibles avec les standards Web ou écrivez des middlewares YasuiJS natifs.
 
 Les middlewares peuvent être appliqués à trois niveaux avec différentes priorités d'exécution :
 1. **Niveau application** - Appliqué à toutes les requêtes
 2. **Niveau contrôleur** - Appliqué à toutes les routes d'un contrôleur
-3. **Niveau point de terminaison** - Appliqué à des routes spécifiques
+3. **Niveau endpoint** - Appliqué à des routes spécifiques
 
 ```typescript
 import { Middleware } from 'yasui';
@@ -19,7 +19,7 @@ import { Middleware } from 'yasui';
 @Middleware()
 export class LoggingMiddleware {
   use() {
-    console.log('Requête reçue');
+    console.log('Request received');
   }
 }
 ```
@@ -28,32 +28,31 @@ export class LoggingMiddleware {
 
 ### Décorateur Middleware
 
-Le décorateur `@Middleware()` marque une classe comme middleware. La classe doit implémenter une méthode `use()`. Vous pouvez optionnellement implémenter l'interface `IMiddleware` fournie par YasuiJS pour imposer la signature de la méthode.
+Le décorateur `@Middleware()` marque une classe comme middleware. La classe doit implémenter une méthode `use()`. Vous pouvez optionnellement implémenter l'interface `IMiddleware` fournie par YasuiJS pour imposer la signature de méthode.
 
 ```typescript
-import { Middleware, IMiddleware, Request, Response, Req, Res } from 'yasui';
+import { Middleware, IMiddleware, Request, Req } from 'yasui';
 
 @Middleware()
 export class AuthMiddleware implements IMiddleware {
-  use(
-    @Req() req: Request,
-    @Res() res: Response
-  ) {
+  use(@Req() req: Request) {
     const token = req.headers.authorization;
-    
+
     if (!token) {
-      return res.status(401).json({ error: 'Non autorisé' });
+      throw new HttpError(401, 'Unauthorized');
     }
     // Logique de validation du token ici
 
-    // Continuera vers le prochain middleware ou la logique du contrôleur si vous ne retournez rien/void
+    // Continuera vers le middleware suivant ou le contrôleur si vous ne retournez rien/void
   }
 }
 ```
 
-### Décorateurs de paramètres dans les Middlewares
+**Note :** Les middlewares fonctionnent comme les méthodes de contrôleur - vous pouvez retourner des valeurs, lever des erreurs, ou ne rien retourner pour continuer. Utiliser `@Next()` est optionnel si vous avez besoin d'un contrôle manuel sur le flux d'exécution.
 
-Les middlewares peuvent utiliser les mêmes décorateurs de paramètres que les contrôleurs et bénéficier également de la capture automatique des erreurs :
+### Décorateurs de paramètres dans les middlewares
+
+Les middlewares peuvent utiliser les mêmes décorateurs de paramètres que les contrôleurs et bénéficient également de la capture automatique d'erreurs :
 
 ```typescript
 @Middleware()
@@ -64,7 +63,7 @@ export class ValidationMiddleware {
     @Header('content-type') contentType: string
   ) {
     if (shouldValidate && !this.isValid(body)) {
-      throw new HttpError(400, 'Données de requête invalides');
+      throw new HttpError(400, 'Invalid request data');
     }
   }
 
@@ -75,11 +74,11 @@ export class ValidationMiddleware {
 }
 ```
 
-**Conversion automatique des types :** Tous les décorateurs de paramètres dans les middlewares bénéficient de la même conversion automatique des types que les contrôleurs. Les paramètres sont convertis vers leurs types spécifiés avant l'exécution du middleware.
+**Conversion automatique de type :** Tous les décorateurs de paramètres dans les middlewares bénéficient de la même conversion automatique de type que les contrôleurs. Les paramètres sont convertis vers leurs types spécifiés avant l'exécution du middleware.
 
 ### Injection de dépendances
 
-Comme les classes Middleware agissent comme des Contrôleurs, elles permettent également l'injection de dépendances de la même manière :
+Comme les classes Middleware agissent comme des contrôleurs, elles permettent également l'injection de dépendances de la même manière :
 
 ```typescript
 @Middleware()
@@ -91,36 +90,63 @@ export class LoggingMiddleware {
 
   use(
     @Body() body: any,
-    @Inject() anotherService: AnotherService, // Pareil au niveau méthode
+    @Inject() anotherService: AnotherService, // Même chose au niveau de la méthode
   ) {
     if (!this.validationService.isValid(body)) {
-      throw new HttpError(400, 'Données de requête invalides');
+      throw new HttpError(400, 'Invalid request data');
     }
   }
 }
 ```
 
-## Middlewares RequestHandler Express
+## Écriture de middlewares personnalisés
 
-Vous pouvez utiliser directement les fonctions middleware Express standard :
+Vous pouvez créer des middlewares pour des cas d'usage courants. Voici deux modèles :
+
+### Modèle 1 : Validation simple (Pas besoin de @Next())
 
 ```typescript
-import cors from 'cors';
-import helmet from 'helmet';
-
-yasui.createServer({
-  middlewares: [
-    cors(),
-    helmet(),
-  ]
-});
+@Middleware()
+export class ApiKeyMiddleware implements IMiddleware {
+  use(@Header('x-api-key') apiKey: string) {
+    if (!apiKey || apiKey !== 'expected-key') {
+      throw new HttpError(401, 'Invalid API key');
+    }
+    // Continuera automatiquement
+  }
+}
 ```
 
-## Niveaux d'utilisation des Middlewares
+### Modèle 2 : Modification de réponse (Utilisant @Next())
 
-### Niveau Application
+Quand vous devez modifier la réponse, utilisez `@Next()` :
 
-Appliqué à toutes les requêtes dans votre application :
+```typescript
+@Middleware()
+export class CorsMiddleware implements IMiddleware {
+  async use(@Req() req: Request, @Next() next: NextFunction) {
+    const response = await next();
+
+    // Ajouter les en-têtes CORS à la réponse
+    const headers = new Headers(response.headers);
+    headers.set('Access-Control-Allow-Origin', '*');
+    headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH');
+    headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
+  }
+}
+```
+
+## Niveaux d'utilisation des middlewares
+
+### Niveau application
+
+Appliqué à toutes les requêtes dans toute votre application :
 
 ```typescript
 yasui.createServer({
@@ -129,9 +155,9 @@ yasui.createServer({
 });
 ```
 
-### Niveau Contrôleur
+### Niveau contrôleur
 
-Appliqué à toutes les routes d'un contrôleur spécifique :
+Appliqué à toutes les routes dans un contrôleur spécifique :
 
 ```typescript
 // Middleware unique
@@ -140,14 +166,14 @@ export class UserController {
   // Toutes les routes nécessitent une authentification
 }
 
-// Plusieurs middlewares
+// Middlewares multiples
 @Controller('/api/admin', AuthMiddleware, ValidationMiddleware)
 export class AdminController {
   // Toutes les routes ont auth + validation
 }
 ```
 
-### Niveau Point de terminaison
+### Niveau endpoint
 
 Appliqué uniquement à des routes spécifiques :
 
@@ -161,7 +187,7 @@ export class UserController {
   
   @Post('/', ValidationMiddleware)
   createUser() {
-    // Uniquement middleware de validation
+    // Seulement le middleware de validation
   }
   
   @Delete('/:id', AuthMiddleware, ValidationMiddleware)
@@ -177,8 +203,8 @@ Les middlewares s'exécutent dans cet ordre :
 
 1. **Middlewares d'application** (dans l'ordre d'enregistrement)
 2. **Middlewares de contrôleur** (dans l'ordre de déclaration)
-3. **Middlewares de point de terminaison** (dans l'ordre de déclaration)
-4. **Méthode du contrôleur**
+3. **Middlewares d'endpoint** (dans l'ordre de déclaration)
+4. **Méthode de contrôleur**
 
 ```typescript
 // Exemple d'ordre d'exécution :
