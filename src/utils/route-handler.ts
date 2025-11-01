@@ -14,22 +14,24 @@ export function routeHandler(
 ): RequestHandler {
   const routeFunction: Function = descriptor.value;
 
+  // Cache metadata lookups at route registration time (not per-request)
+  const self = getMetadata(ReflectMetadata.SELF, target.prototype) || {};
+  const methodDeps: Record<number, unknown> =
+    getMetadata(ReflectMetadata.RESOLVED_METHOD_DEPS, self, String(descriptor.value.name)) || {};
+
+  // Pre-calculate max index for argument array allocation
+  const allIndexes = [
+    ...params.map(p => p.index),
+    ...Object.keys(methodDeps).map(k => parseInt(k))
+  ];
+  const maxIndex = allIndexes.length > 0 ? Math.max(...allIndexes) : -1;
+
   return async (
     req: YasuiRequest,
     next?: NextFunction,
   ): Promise<unknown> => {
     req.source = target.name;
 
-    const self = getMetadata(ReflectMetadata.SELF, target.prototype) || {};
-
-    const methodDeps: Record<number, unknown> =
-      getMetadata(ReflectMetadata.RESOLVED_METHOD_DEPS, self, String(descriptor.value.name)) || {};
-
-    const allIndexes = [
-      ...params.map(p => p.index),
-      ...Object.keys(methodDeps).map(k => parseInt(k))
-    ];
-    const maxIndex = allIndexes.length > 0 ? Math.max(...allIndexes) : -1;
     const args: unknown[] = new Array(maxIndex + 1);
 
     // Parse body if needed (only for non-GET requests with JSON content-type)
