@@ -213,6 +213,21 @@ npm install yasui@latest
 pnpm update yasui
 ```
 
+**Cambio de Paquete Swagger UI:**
+
+Si estás usando Swagger UI, reemplaza `swagger-ui-express` con `swagger-ui-dist`:
+
+```bash
+npm uninstall swagger-ui-express
+npm install swagger-ui-dist
+
+# o
+pnpm remove swagger-ui-express
+pnpm add swagger-ui-dist
+```
+
+**No se necesitan cambios de código** - YasuiJS usa `swagger-ui-dist` internamente. Esta es puramente una actualización de dependencia de paquete.
+
 ### Paso 2: Eliminar Middlewares de Express
 
 Identifica todos los middlewares de Express en tu código:
