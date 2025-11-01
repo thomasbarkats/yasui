@@ -213,6 +213,21 @@ npm install yasui@latest
 pnpm update yasui
 ```
 
+**Swagger UI 包更改：**
+
+如果您使用 Swagger UI，请将 `swagger-ui-express` 替换为 `swagger-ui-dist`：
+
+```bash
+npm uninstall swagger-ui-express
+npm install swagger-ui-dist
+
+# 或
+pnpm remove swagger-ui-express
+pnpm add swagger-ui-dist
+```
+
+**无需更改代码** - YasuiJS 内部使用 `swagger-ui-dist`。这只是包依赖项更新。
+
 ### 步骤 2：移除 Express 中间件
 
 识别代码库中的所有 Express 中间件：

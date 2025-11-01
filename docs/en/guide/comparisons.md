@@ -1,14 +1,52 @@
 # Framework Comparisons
 
-YasuiJS provides a modern, lightweight alternative to existing frameworks. This page compares YasuiJS with NestJS and Express across common use cases.
+Love NestJS's decorator-driven architecture but building REST APIs? **YasuiJS gives you the same elegant DX—25.9% faster, with zero bloat, on modern Web Standards.**
 
-## Philosophy
+## Why YasuiJS over NestJS?
 
-**YasuiJS**: Decorator-driven, class-based architecture with minimal dependencies. **Built on Web Standards with [SRVX](https://srvx.h3.dev)** for true multi-runtime support (Node.js, Deno, Bun) and edge deployment compatibility.
+Most backends are REST APIs. You don't need GraphQL, WebSockets, or microservices features—**you need clean controllers, DI, and speed.** That's exactly what YasuiJS delivers.
 
-**NestJS**: Enterprise-grade framework with extensive features, Angular-inspired architecture. **Built on Express** (Node.js-only, traditional HTTP architecture).
+YasuiJS **keeps all the good parts from NestJS:**
 
-**Express**: Minimalist, functional approach. Unopinionated and flexible, but requires more boilerplate for structured applications.
+**Familiar patterns:**
+- ✅ Decorators: `@Controller`, `@Get`, `@Post`, `@Injectable`, `@Inject`
+- ✅ Dependency Injection with automatic resolution
+- ✅ Class-based architecture with TypeScript-first design
+- ✅ Swagger/OpenAPI auto-generation
+
+**But refined:**
+- 🎯 **No module boilerplate** - Just controllers and services
+- 🎯 **Automatic type casting** - Works everywhere, zero config
+- 🎯 **Consistent patterns** - Same decorators in controllers and middleware
+- 🎯 **Multi-runtime** - Node.js, Deno, Bun, Cloudflare Workers, Vercel Edge
+
+### Web Standards: The Modern Choice
+
+**YasuiJS** is built on **Web Standards (SRVX)**:
+- Deploy to Node.js, Deno, Bun, edge runtimes
+- Uses Fetch API, native Request/Response
+- Edge-ready for serverless and distributed computing
+- Future-proof architecture that evolves with the platform
+
+**NestJS** is built on **Express** (2010 Node.js HTTP):
+- Node.js-only, can't run on Deno, Bun, or edge
+- Legacy HTTP architecture, incompatible with modern runtimes
+- Abstraction layers add weight and latency
+
+### The Performance Advantage
+
+**YasuiJS is 25.9% faster than NestJS.**
+
+| Aspect | YasuiJS | NestJS |
+|--------|---------|--------|
+| **Focus** | REST APIs (mastered) | Everything (comprehensive) |
+| **Philosophy** | Minimalist, sharp | Batteries-included |
+| **Bundle Size** | Lightweight | Feature-rich |
+| **Cold Start** | Fast (serverless-optimized) | Slower (more features to load) |
+| **Runtime** | Multi-runtime (Node, Deno, Bun, edge) | Node.js focus |
+| **Foundation** | Web Standards (modern) | Express (legacy) |
+
+When you only ship what you need, everything gets faster. **YasuiJS doesn't include GraphQL, WebSockets, or CQRS**—and if you don't need them, **why pay the performance cost?**
 
 ## Code Examples
 
@@ -534,37 +572,21 @@ Node.js v22 with Windows 11. All frameworks implement identical functionality.
 A realistic REST API with:
 - **3 Controllers**: User, Product, Order
 - **9 Endpoints**: List resources, get by ID, filter by category/user/status
-- **Global Middleware**: Logging middleware on all routes
 - **Dependency Injection**: Services injected into controllers
 - **Load Test**: 10 concurrent connections, 10 seconds per endpoint
 
-### Bundle Size Comparison
-
-Total footprint including node_modules and production build:
-
-| Framework | node_modules | Production Build | Total |
-|-----------|--------------|------------------|-------|
-| **YasuiJS** 🏆 | **25.02 MB** | **5.99 KB** | **25.03 MB** |
-| Express | 27.04 MB | 2.87 KB | 27.04 MB |
-| NestJS | 34.88 MB | 7.07 KB | 34.88 MB |
-
-**YasuiJS is 7.4% smaller than Express and 28.2% smaller than NestJS.**
-
 ### Runtime Performance
 
-| Metric | YasuiJS | NestJS | Express |
-|--------|---------|--------|---------|
-| **Requests/sec** 🚀 | **5,157** 🏆 | 4,508 | 4,920 |
-| **Avg Latency** | **1.45ms** 🏆 | 1.72ms | 1.51ms |
-| **Cold Start** | 472ms | 915ms | 252ms 🏆 |
-| **Memory Usage** | **10.66 MB** 🏆 | 16.48 MB | 12.68 MB |
+| Metric | YasuiJS | Express | NestJS |
+|--------|---------|---------|--------|
+| **Requests/sec** 🚀 | **6,850** 🏆 | 5,505 | 5,442 |
+| **Avg Latency** | **0.98ms** 🏆 | 1.31ms | 1.31ms |
+| **Cold Start** | 247ms | 15ms 🏆 | 582ms |
 
 ### Key Findings
 
-- ✅ **YasuiJS is 4.8% faster than Express**
-- ✅ **YasuiJS is 14.4% faster than NestJS** across all endpoints
-- ✅ **YasuiJS uses 16% less memory than Express**
-- ✅ **YasuiJS uses 35% less memory than NestJS**
+- ✅ **YasuiJS is 24.4% faster than Express**
+- ✅ **YasuiJS is 25.9% faster than NestJS** across all endpoints
 
 **Why YasuiJS Scales Better:**
 - **Radix3 Router**: Efficient route matching for multiple endpoints
@@ -572,52 +594,65 @@ Total footprint including node_modules and production build:
 - **Decorator Metadata**: Pre-computed at startup, not per-request
 - **Optimized Middleware**: Promise-based pipeline with minimal overhead
 
-The more complex your API becomes, the more YasuiJS's architecture advantages shine.
+## Decision Guide: Which Framework?
 
-::: details Detailed Endpoint Performance
+### ✅ Choose YasuiJS if:
 
-#### GET /users (List all users)
-| Framework | Requests/sec | Avg Latency | P99 Latency |
-|-----------|--------------|-------------|-------------|
-| **YasuiJS** | **5,084** 🏆 | 1.47ms | 8ms |
-| NestJS | 4,603 | 1.63ms | 8ms |
-| Express | 4,401 | 1.75ms | 10ms |
+**You're building REST APIs only**
+- You don't need GraphQL, WebSockets, or microservices features
+- You want the decorator/DI pattern without the enterprise complexity
+- You value simplicity and performance over comprehensive features
 
-#### GET /products/:id (Get by ID with type casting)
-| Framework | Requests/sec | Avg Latency | P99 Latency |
-|-----------|--------------|-------------|-------------|
-| **YasuiJS** | **5,352** 🏆 | 1.10ms | 6ms |
-| NestJS | 4,643 | 1.31ms | 7ms |
-| Express | 4,954 | 1.18ms | 9ms |
+**You want minimal dependencies**
+- Small bundle size matters (serverless, edge deployments)
+- Fast cold starts are critical
+- You prefer integrating libraries yourself vs. framework-provided solutions
 
-#### GET /orders/user/:userId (Nested routes)
-| Framework | Requests/sec | Avg Latency | P99 Latency |
-|-----------|--------------|-------------|-------------|
-| **YasuiJS** | **5,389** 🏆 | 1.08ms | 6ms |
-| NestJS | 4,011 | 1.89ms | 9ms |
-| Express | 4,968 | 1.23ms | 8ms |
+**You need multi-runtime support**
+- Deploy to Node.js, Deno, Bun, or edge runtimes (Cloudflare Workers, Vercel Edge)
+- Future-proof architecture based on Web Standards
+- Not locked into Node.js ecosystem
 
-:::
+**You like NestJS DX but find it too heavy**
+- You appreciate decorators, DI, and class-based patterns
+- You don't need all the built-in features NestJS provides
+- You prefer "bring your own libraries" over opinionated integrations
 
-## When should you choose YasuiJS?
+**Perfect for:**
+- Simple to medium REST APIs
+- Serverless/edge-deployed APIs
+- New projects that may need to run on multiple runtimes
+- Teams that value simplicity and control over convenience
+- Performance-critical applications where every millisecond counts
 
-**🏆 Choose YasuiJS** if you want:
-- **Best runtime performance**
-- **Smallest bundle size**
-- **Lowest memory footprint**
-- Modern decorator-driven DX like NestJS
-- Lightweight installation and fast cold starts
-- Multi-runtime deployment (Node.js, Deno, Bun, edge runtimes)
-- Automatic type casting without pipes or configuration
-- Consistent patterns across controllers, middleware, and services
+---
 
-**Choose NestJS** if you need:
-- GraphQL, microservices, WebSockets out-of-the-box
-- Extensive plugin ecosystem (Passport, TypeORM, etc.)
-- Battle-tested enterprise features
-- Large community and extensive documentation
+### ✅ Choose NestJS if:
 
-**Choose Express** if you prefer:
-- Functional programming style over class-based
-- Existing large Express ecosystem and middleware
-- Minimal abstraction over Node.js HTTP
+**You need more than REST APIs**
+- GraphQL, WebSockets, microservices, Server-Sent Events
+- CQRS, Event Sourcing, message queues
+- Multiple transport layers (TCP, gRPC, MQTT, etc.)
+
+**You want batteries-included**
+- Pre-built integrations: Passport, TypeORM, Prisma, Bull, Redis
+- Opinionated structure for large teams and complex applications
+- Less decision-making about architecture and libraries
+
+**You need enterprise features**
+- Established patterns for monolithic applications
+- Extensive documentation and learning resources
+- Large community (100k+ developers) and commercial support
+- Proven in production at scale
+
+**You're building complex applications**
+- Multiple interconnected services
+- Need for advanced patterns (interceptors, guards, pipes, filters)
+- Large teams requiring strict architectural guidelines
+
+**Perfect for:**
+- Enterprise applications with many moving parts
+- Full-featured backends with diverse transport protocols
+- Teams that prefer framework-provided solutions
+- Projects where time-to-market matters more than bundle size
+- Organizations requiring mature, battle-tested solutions

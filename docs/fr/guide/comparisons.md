@@ -1,14 +1,52 @@
 # Comparaisons de Frameworks
 
-YasuiJS fournit une alternative moderne et légère aux frameworks existants. Cette page compare YasuiJS avec NestJS et Express à travers des cas d'usage courants.
+Vous aimez l'architecture pilotée par les décorateurs de NestJS mais construisez des API REST ? **YasuiJS vous offre la même expérience élégante—25,9% plus rapide, sans bloat, sur les Standards Web modernes.**
 
-## Philosophie
+## Pourquoi YasuiJS plutôt que NestJS ?
 
-**YasuiJS** : Architecture basée sur les classes et pilotée par les décorateurs avec des dépendances minimales. **Construit sur les Standards Web avec [SRVX](https://srvx.h3.dev)** pour un véritable support multi-runtime (Node.js, Deno, Bun) et une compatibilité de déploiement edge.
+La plupart des backends sont des API REST. Vous n'avez pas besoin de GraphQL, WebSockets ou de fonctionnalités microservices—**vous avez besoin de contrôleurs propres, d'injection de dépendances et de rapidité.** C'est exactement ce que YasuiJS offre.
 
-**NestJS** : Framework de niveau entreprise avec des fonctionnalités étendues, architecture inspirée d'Angular. **Construit sur Express** (Node.js uniquement, architecture HTTP traditionnelle).
+YasuiJS **conserve toutes les bonnes parties de NestJS :**
 
-**Express** : Approche minimaliste et fonctionnelle. Sans opinion et flexible, mais nécessite plus de code standard pour les applications structurées.
+**Patterns familiers :**
+- ✅ Décorateurs : `@Controller`, `@Get`, `@Post`, `@Injectable`, `@Inject`
+- ✅ Injection de dépendances avec résolution automatique
+- ✅ Architecture basée sur les classes avec TypeScript en priorité
+- ✅ Génération automatique Swagger/OpenAPI
+
+**Mais raffiné :**
+- 🎯 **Pas de boilerplate de modules** - Juste des contrôleurs et des services
+- 🎯 **Conversion de type automatique** - Fonctionne partout, zéro configuration
+- 🎯 **Patterns cohérents** - Mêmes décorateurs dans les contrôleurs et middlewares
+- 🎯 **Multi-runtime** - Node.js, Deno, Bun, Cloudflare Workers, Vercel Edge
+
+### Standards Web : Le Choix Moderne
+
+**YasuiJS** est construit sur les **Standards Web (SRVX)** :
+- Déployez sur Node.js, Deno, Bun, runtimes edge
+- Utilise Fetch API, Request/Response natifs
+- Prêt pour l'edge pour le serverless et le computing distribué
+- Architecture future-proof qui évolue avec la plateforme
+
+**NestJS** est construit sur **Express** (HTTP Node.js 2010) :
+- Node.js uniquement, ne peut pas fonctionner sur Deno, Bun ou edge
+- Architecture HTTP legacy, incompatible avec les runtimes modernes
+- Les couches d'abstraction ajoutent du poids et de la latence
+
+### L'Avantage Performance
+
+**YasuiJS est 25,9% plus rapide que NestJS.**
+
+| Aspect | YasuiJS | NestJS |
+|--------|---------|--------|
+| **Focus** | API REST (maîtrisé) | Tout (compréhensif) |
+| **Philosophie** | Minimaliste, précis | Batteries incluses |
+| **Taille du Bundle** | Léger | Riche en fonctionnalités |
+| **Démarrage à Froid** | Rapide (optimisé serverless) | Plus lent (plus de fonctionnalités à charger) |
+| **Runtime** | Multi-runtime (Node, Deno, Bun, edge) | Focus Node.js |
+| **Fondation** | Standards Web (moderne) | Express (legacy) |
+
+Quand vous ne livrez que ce dont vous avez besoin, tout devient plus rapide. **YasuiJS n'inclut pas GraphQL, WebSockets ou CQRS**—et si vous n'en avez pas besoin, **pourquoi payer le coût performance ?**
 
 ## Exemples de Code
 
@@ -599,25 +637,97 @@ Plus votre API devient complexe, plus les avantages architecturaux de YasuiJS br
 
 :::
 
-## Quand devriez-vous choisir YasuiJS ?
+## Guide de Décision : Quel Framework ?
 
-**🏆 Choisissez YasuiJS** si vous voulez :
-- **Meilleure performance d'exécution**
-- **Plus petite taille de bundle**
-- **Empreinte mémoire la plus faible**
-- DX moderne pilotée par les décorateurs comme NestJS
-- Installation légère et démarrages à froid rapides
-- Déploiement multi-runtime (Node.js, Deno, Bun, runtimes edge)
-- Conversion de type automatique sans pipes ou configuration
-- Modèles cohérents à travers les contrôleurs, middlewares et services
+### ✅ Choisissez YasuiJS si :
 
-**Choisissez NestJS** si vous avez besoin :
-- GraphQL, microservices, WebSockets prêts à l'emploi
-- Écosystème de plugins étendu (Passport, TypeORM, etc.)
-- Fonctionnalités d'entreprise éprouvées au combat
-- Grande communauté et documentation extensive
+**Vous construisez uniquement des API REST**
+- Vous n'avez pas besoin de GraphQL, WebSockets ou fonctionnalités microservices
+- Vous voulez le pattern décorateur/DI sans la complexité enterprise
+- Vous valorisez la simplicité et la performance plutôt que les fonctionnalités complètes
 
-**Choisissez Express** si vous préférez :
-- Style de programmation fonctionnelle plutôt que basé sur les classes
-- Écosystème Express existant et middleware
-- Abstraction minimale sur Node.js HTTP
+**Vous voulez des dépendances minimales**
+- La taille du bundle compte (déploiements serverless, edge)
+- Les démarrages à froid rapides sont critiques
+- Vous préférez intégrer les bibliothèques vous-même plutôt que les solutions fournies par le framework
+
+**Vous avez besoin du support multi-runtime**
+- Déployer sur Node.js, Deno, Bun ou runtimes edge (Cloudflare Workers, Vercel Edge)
+- Architecture future-proof basée sur les Standards Web
+- Pas enfermé dans l'écosystème Node.js
+
+**Vous aimez la DX de NestJS mais le trouvez trop lourd**
+- Vous appréciez les décorateurs, DI et patterns basés sur les classes
+- Vous n'avez pas besoin de toutes les fonctionnalités intégrées que NestJS fournit
+- Vous préférez "apportez vos propres bibliothèques" plutôt que des intégrations opinionnées
+
+**Parfait pour :**
+- API REST simples à moyennes
+- API déployées serverless/edge
+- Nouveaux projets pouvant nécessiter de fonctionner sur plusieurs runtimes
+- Équipes valorisant la simplicité et le contrôle plutôt que la commodité
+- Applications critiques en performance où chaque milliseconde compte
+
+---
+
+### ✅ Choisissez NestJS si :
+
+**Vous avez besoin de plus que des API REST**
+- GraphQL, WebSockets, microservices, Server-Sent Events
+- CQRS, Event Sourcing, files de messages
+- Plusieurs couches de transport (TCP, gRPC, MQTT, etc.)
+
+**Vous voulez batteries incluses**
+- Intégrations pré-construites : Passport, TypeORM, Prisma, Bull, Redis
+- Structure opinionnée pour grandes équipes et applications complexes
+- Moins de décisions à prendre sur l'architecture et les bibliothèques
+
+**Vous avez besoin de fonctionnalités enterprise**
+- Patterns établis pour applications monolithiques
+- Documentation extensive et ressources d'apprentissage
+- Grande communauté (100k+ développeurs) et support commercial
+- Prouvé en production à l'échelle
+
+**Vous construisez des applications complexes**
+- Plusieurs services interconnectés
+- Besoin de patterns avancés (interceptors, guards, pipes, filters)
+- Grandes équipes nécessitant des directives architecturales strictes
+
+**Parfait pour :**
+- Applications enterprise avec de nombreuses parties mobiles
+- Backends complets avec divers protocoles de transport
+- Équipes préférant les solutions fournies par le framework
+- Projets où le time-to-market compte plus que la taille du bundle
+- Organisations nécessitant des solutions matures et éprouvées
+
+---
+
+### 🤔 Choisissez Express si :
+
+**Vous voulez le contrôle complet**
+- Framework minimal, flexibilité maximale
+- Construisez votre propre architecture from scratch
+- Pas de décorateurs, pas de DI, pur JavaScript/TypeScript fonctionnel
+
+**Vous avez des middlewares existants**
+- Large écosystème de middlewares Express (bien que beaucoup ne fonctionneront pas dans les runtimes edge)
+- Patterns matures et bien compris
+- Communauté énorme et ressources
+
+**Parfait pour :**
+- API simples ou microservices
+- Équipes à l'aise avec les patterns fonctionnels
+- Projets nécessitant une flexibilité maximale
+- Quand vous voulez apprendre les fondamentaux HTTP
+
+---
+
+### 💡 La Vérité
+
+**YasuiJS est un outil focalisé pour les API REST.** Nous n'essayons pas d'être tout pour tout le monde.
+
+- Si vous avez besoin **uniquement d'API REST** → YasuiJS vous offre une excellente DX avec un poids minimal
+- Si vous avez besoin de **GraphQL, WebSockets, microservices** → Utilisez NestJS
+- Si vous avez besoin de **flexibilité maximale** → Utilisez Express
+
+**Il n'y a pas de "gagnant"** - juste différents outils pour différents jobs. Choisissez en fonction de ce que vous construisez réellement.
