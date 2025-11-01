@@ -30,6 +30,9 @@ export class YasuiRequest extends Request {
   /** Cached parsed cookies */
   private _cookies?: Record<string, string>;
 
+  /** Cached parsed URL object to avoid re-parsing */
+  private _parsedUrl?: URL;
+
   constructor(input: globalThis.RequestInfo | URL, init?: globalThis.RequestInit) {
     super(input, init);
   }
@@ -57,7 +60,7 @@ export class YasuiRequest extends Request {
 
   /** Get the pathname of the URL - without query string (Express-compatible property) */
   get path(): string {
-    return new URL(this.url).pathname;
+    return this.parsedUrl.pathname;
   }
 
   /** Get hostname from the Host header (Express-compatible property) */
@@ -75,7 +78,7 @@ export class YasuiRequest extends Request {
       return forwarded.split(',')[0].trim();
     }
     // Parse from URL
-    return new URL(this.url).protocol.replace(':', '');
+    return this.parsedUrl.protocol.replace(':', '');
   }
 
   /**
@@ -100,8 +103,7 @@ export class YasuiRequest extends Request {
   /** Get parsed query string as object (Express-compatible property) */
   get query(): Record<string, string> {
     if (!this._query) {
-      const url = new URL(this.url);
-      this._query = Object.fromEntries(url.searchParams);
+      this._query = Object.fromEntries(this.parsedUrl.searchParams);
     }
     return this._query;
   }
@@ -121,6 +123,14 @@ export class YasuiRequest extends Request {
       }
     }
     return this._cookies;
+  }
+
+  /** Get parsed URL object (cached) */
+  private get parsedUrl(): URL {
+    if (!this._parsedUrl) {
+      this._parsedUrl = new URL(this.url);
+    }
+    return this._parsedUrl;
   }
 
   /**

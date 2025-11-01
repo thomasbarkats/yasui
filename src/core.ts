@@ -102,8 +102,7 @@ export class Core {
       try {
         const req = new YasuiRequest(standardReq);
 
-        const url = new URL(req.url);
-        const routeKey = `${req.method}:${url.pathname}`;
+        const routeKey = `${req.method}:${req.path}`;
         const match = this.router.lookup(routeKey);
 
         if (!match) {

@@ -8,9 +8,12 @@ import { MaybePromise, YasuiConfig } from '../interfaces/index.js';
 
 export class AppService {
   private logger: LoggerService;
+  private errorRegex: RegExp;
 
   constructor(private readonly appConfig: YasuiConfig) {
     this.logger = new LoggerService();
+    // Compile regex once at initialization instead of per-error
+    this.errorRegex = new RegExp(`${process.cwd()}\\/(?!node_modules\\/)([\\/\\w-_\\.]+\\.js):(\\d*):(\\d*)`);
   }
 
 
@@ -23,8 +26,7 @@ export class AppService {
     if (apiKey === this.appConfig.apiKey && next) {
       return next();
     }
-    const url = new URL(req.url);
-    this.logger.error(`Access denied (query attempt on ${kleur.italic(`${req.method} ${url.pathname}`)})`);
+    this.logger.error(`Access denied (query attempt on ${kleur.italic(`${req.method} ${req.path}`)})`);
     return new Response(null, { status: HttpCode.FORBIDDEN });
   }
 
@@ -33,8 +35,7 @@ export class AppService {
     next?: NextFunction
   ): MaybePromise<Response> {
     const logger: LoggerService = req.logger || this.logger;
-    const url = new URL(req.url);
-    logger.debug(`request ${kleur.italic(`${req.method} ${url.pathname}`)}`);
+    logger.debug(`request ${kleur.italic(`${req.method} ${req.path}`)}`);
     return next ? next() : new Response(null, { status: 200 });
   }
 
@@ -42,8 +43,7 @@ export class AppService {
   public handleNotFound(
     req: YasuiRequest,
   ): Response {
-    const url = new URL(req.url);
-    this.logger.error(`Cannot resolve ${req.method} ${url.pathname}`);
+    this.logger.error(`Cannot resolve ${req.method} ${req.path}`);
     return new Response(null, { status: HttpCode.NOT_FOUND });
   }
 
@@ -52,9 +52,8 @@ export class AppService {
     err: HttpError | Error,
     req: YasuiRequest,
   ): Response {
-    const regEx = new RegExp(`${process.cwd()}\\/(?!node_modules\\/)([\\/\\w-_\\.]+\\.js):(\\d*):(\\d*)`);
     const stack: string = err.stack || '';
-    const [, filename, line, column] = stack.match(regEx) || Array(0);
+    const [, filename, line, column] = stack.match(this.errorRegex) || Array(0);
 
     const errResource = new ErrorResource(err, req);
 

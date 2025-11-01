@@ -13,7 +13,7 @@ export class LoggerService {
   public endTime: number | undefined;
 
   public start(): this {
-    this.startTime = new Date().getTime();
+    this.startTime = Date.now();
     this.lastTime = this.startTime;
     return this;
   }
@@ -28,7 +28,7 @@ export class LoggerService {
   /** Returns elapsed time in milliseconds */
   public stop(): number {
     if (this.startTime) {
-      this.endTime = new Date().getTime();
+      this.endTime = Date.now();
       return this.endTime - this.startTime;
     }
     throw new Error('No timers started');
@@ -37,7 +37,7 @@ export class LoggerService {
   /** Returns current elapsed time without stopping the timer */
   public getTime(): number {
     if (this.lastTime) {
-      const currentTime: number = new Date().getTime();
+      const currentTime: number = Date.now();
       const timeDiff: number = currentTime - this.lastTime;
       this.lastTime = currentTime;
       return timeDiff;

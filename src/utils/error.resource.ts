@@ -28,9 +28,8 @@ export class ErrorResource {
   public data: Record<string, string>;
 
   constructor(err: HttpError, req: YasuiRequest) {
-    const url = new URL(req.url);
     this.url = req.url;
-    this.path = url.pathname;
+    this.path = req.path;
     this.method = req.method;
     this.status = err.status || HttpCode.INTERNAL_SERVER_ERROR;
     this.statusMessage = HttpCodeMap[this.status] || '';
