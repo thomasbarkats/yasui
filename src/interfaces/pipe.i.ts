@@ -19,6 +19,5 @@ export interface IPipeTransform extends Instance {
    * @param metadata - Parameter metadata (type, source, property name)
    * @returns Transformed/validated value
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  transform: (value: any, metadata: IParamMetadata) => Promise<any> | any;
+  transform: (value: unknown, metadata: IParamMetadata) => Promise<unknown> | unknown;
 }

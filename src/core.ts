@@ -5,6 +5,7 @@ import { YasuiRequest, RequestHandler, NextFunction, FetchHandler } from './web.
 import { Injector } from './injector.js';
 import { LoggerService } from './services/index.js';
 import { AppService } from './utils/app.service.js';
+import { ConfigValidator } from './utils/config-validator.js';
 import { DecoratorValidator } from './utils/decorator-validator.js';
 import { SwaggerService } from './utils/swagger.service.js';
 import { setupSwaggerUI } from './utils/swagger.js';
@@ -14,6 +15,7 @@ import {
   IController,
   IDMiddleware,
   Instance,
+  JsonValue,
   TMiddleware,
   YasuiConfig,
 } from './interfaces/index.js';
@@ -45,6 +47,8 @@ export class Core {
   private globalMiddlewares: RequestHandler[] = [];
 
   constructor(conf: YasuiConfig) {
+    ConfigValidator.validate(conf);
+
     this.config = conf;
     if (conf.enableDecoratorValidation === undefined) {
       this.config.enableDecoratorValidation = true;
@@ -159,6 +163,17 @@ export class Core {
   }
 
 
+  private convertToResponse(result: Response | JsonValue | void, defaultStatus?: HttpCode): Response {
+    if (result instanceof globalThis.Response) {
+      return result;
+    }
+    if (result === undefined || result === null) {
+      return new Response(null, { status: 204 });
+    }
+    const status = defaultStatus || HttpCode.OK;
+    return Response.json(result, { status });
+  }
+
   private async executeChain(
     req: YasuiRequest,
     routeData: RouteData & { params?: Record<string, unknown> }
@@ -169,18 +184,11 @@ export class Core {
     const next: NextFunction = async (): Promise<Response> => {
       if (index < allMiddlewares.length) {
         const middleware = allMiddlewares[index++];
-        return middleware(req, next);
+        const result = await middleware(req, next);
+        return this.convertToResponse(result);
       }
       const result = await routeData.handler(req);
-
-      if (result instanceof globalThis.Response) {
-        return result;
-      }
-      if (result === undefined || result === null) {
-        return new Response(null, { status: 204 });
-      }
-      const status = routeData.defaultStatus || HttpCode.OK;
-      return Response.json(result, { status });
+      return this.convertToResponse(result, routeData.defaultStatus);
     };
 
     try {
