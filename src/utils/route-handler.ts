@@ -31,11 +31,10 @@ export function routeHandler(
     next?: NextFunction,
   ): Promise<unknown> => {
     req.source = target.name;
-
     const args: unknown[] = new Array(maxIndex + 1);
 
-    // Parse body if needed (only for non-GET requests with JSON content-type)
-    if (req.method !== 'GET' && req.headers['content-type']?.includes('application/json')) {
+    const needsBody = params.some(p => p.path[1] === 'body');
+    if (needsBody && req.method !== 'GET' && req.headers['content-type']?.includes('application/json')) {
       try {
         await req.json();
       } catch {
@@ -85,7 +84,6 @@ export function routeHandler(
     if (isMiddleware && result === undefined && next) {
       return next();
     }
-
     return result;
   };
 }
