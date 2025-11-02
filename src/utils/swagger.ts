@@ -1,5 +1,4 @@
 import kleur from 'kleur';
-import { createRequire } from 'module';
 import { HttpCode } from '../enums/index.js';
 import { ReflectMetadata } from '../utils/reflect.js';
 import { HttpError, ErrorResourceSchema } from './error.resource.js';
@@ -55,7 +54,7 @@ export function mapTypeToSchema(type: Function): OpenAPISchema {
 
 export function overloadCustomErrorDefinition<T extends HttpError>(
   statusCode: HttpCode = 500,
-  ErrorDataClass: Constructible<T>,
+  ErrorDataClass: Constructible<T>
 ): Constructible<T> {
   const errorDataClassDefinition = getMetadata(ReflectMetadata.SWAGGER_SCHEMA_DEFINITION, ErrorDataClass.prototype);
   const errorDataClassSchema: Record<string, OpenAPISchema> = {};
@@ -75,89 +74,50 @@ export function overloadCustomErrorDefinition<T extends HttpError>(
   return ErrorDataClass;
 }
 
-/** Setup Swagger UI routes and static assets */
+/** Setup Swagger UI routes using CDN assets (works on all runtimes) */
 export function setupSwaggerUI(
   addRoute: (path: string, method: string, handler: RequestHandler, middlewares: RequestHandler[]) => void,
   swaggerConfig: ISwaggerConfig,
   swaggerPath: string,
   logger: LoggerService,
-  debug: boolean
+  cdnUrl?: string
 ): void {
-  try {
-    const require = createRequire(import.meta.url);
-    const fs = require('fs');
-    const path = require('path');
-
-    let swaggerDistPath: string = path.dirname(require.resolve('swagger-ui-dist/package.json'));
-
-    // Normalize swagger path
-    if (!swaggerPath.startsWith('/')) {
-      swaggerPath = '/' + swaggerPath;
-    }
-
-    // Serve swagger.json
-    const swaggerJsonPath = `${swaggerPath}/swagger.json`;
-    addRoute(swaggerJsonPath, 'GET', () => Response.json(swaggerConfig), []);
-
-    // Generate Swagger UI HTML
-    const swaggerHtml = generateSwaggerHTML(swaggerPath, swaggerJsonPath, swaggerConfig);
-    addRoute(swaggerPath, 'GET', () =>
-      new Response(swaggerHtml, {
-        headers: { 'content-type': 'text/html' }
-      }), []);
-
-    // Serve Swagger UI static assets
-    const staticFiles = [
-      'swagger-ui.css',
-      'swagger-ui-bundle.js',
-      'swagger-ui-standalone-preset.js',
-      'favicon-16x16.png',
-      'favicon-32x32.png',
-    ];
-
-    for (const file of staticFiles) {
-      const filePath = path.join(swaggerDistPath, file);
-      addRoute(`${swaggerPath}/${file}`, 'GET', () => {
-        const content = fs.readFileSync(filePath);
-        const ext = path.extname(file);
-        const contentType =
-          ext === '.css' ? 'text/css' :
-            ext === '.js' ? 'application/javascript' :
-              ext === '.png' ? 'image/png' : 'text/plain';
-
-        return new Response(content, {
-          headers: { 'content-type': contentType }
-        });
-      }, []);
-    }
-
-    logger.success(`${kleur.italic(`${swaggerPath}`)} swagger documentation loaded`);
-
-  } catch (err) {
-    logger.warn(
-      'swagger-ui-dist not found.\n' +
-      'Install it to enable swagger documentation: npm install swagger-ui-dist.'
-    );
-    if (debug) {
-      logger.error(`swagger setup error: ${err}`);
-    }
+  // Normalize swagger path
+  if (!swaggerPath.startsWith('/')) {
+    swaggerPath = '/' + swaggerPath;
   }
+
+  // Serve swagger.json
+  const swaggerJsonPath = `${swaggerPath}/swagger.json`;
+  addRoute(swaggerJsonPath, 'GET', () => Response.json(swaggerConfig), []);
+
+  // Generate Swagger UI HTML with CDN assets
+  const swaggerHtml = generateSwaggerHTML(swaggerJsonPath, swaggerConfig, cdnUrl);
+  addRoute(swaggerPath, 'GET', () =>
+    new Response(swaggerHtml, {
+      headers: { 'content-type': 'text/html' }
+    }), []);
+
+  logger.success(`${kleur.italic(`${swaggerPath}`)} swagger documentation loaded`);
 }
 
-/** Generate the Swagger UI HTML page */
+/** Generate the Swagger UI HTML page with CDN assets */
 function generateSwaggerHTML(
-  swaggerPath: string,
   swaggerJsonPath: string,
-  swaggerConfig: ISwaggerConfig
+  swaggerConfig: ISwaggerConfig,
+  cdnUrl?: string
 ): string {
+  // Use custom CDN or default to jsDelivr (reliable and fast)
+  const CDN_BASE = cdnUrl || 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5';
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>${swaggerConfig.info?.title || 'API Documentation'}</title>
-  <link rel="stylesheet" type="text/css" href="${swaggerPath}/swagger-ui.css" />
-  <link rel="icon" type="image/png" href="${swaggerPath}/favicon-32x32.png" sizes="32x32" />
-  <link rel="icon" type="image/png" href="${swaggerPath}/favicon-16x16.png" sizes="16x16" />
+  <link rel="stylesheet" type="text/css" href="${CDN_BASE}/swagger-ui.css" />
+  <link rel="icon" type="image/png" href="${CDN_BASE}/favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="${CDN_BASE}/favicon-16x16.png" sizes="16x16" />
   <style>
     html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
     *, *:before, *:after { box-sizing: inherit; }
@@ -166,8 +126,8 @@ function generateSwaggerHTML(
 </head>
 <body>
   <div id="swagger-ui"></div>
-  <script src="${swaggerPath}/swagger-ui-bundle.js" charset="UTF-8"></script>
-  <script src="${swaggerPath}/swagger-ui-standalone-preset.js" charset="UTF-8"></script>
+  <script src="${CDN_BASE}/swagger-ui-bundle.js" charset="UTF-8"></script>
+  <script src="${CDN_BASE}/swagger-ui-standalone-preset.js" charset="UTF-8"></script>
   <script>
     window.onload = function() {
       window.ui = SwaggerUIBundle({
