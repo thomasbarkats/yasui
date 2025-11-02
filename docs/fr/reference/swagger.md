@@ -8,10 +8,7 @@ YasuiJS fournit la génération de documentation OpenAPI avec une intégration o
 
 Activez Swagger en ajoutant la configuration à votre application. YasuiJS génère la documentation à partir de vos contrôleurs, routes et décorateurs.
 
-**Note** : Vous devez installer `swagger-ui-dist` séparément :
-```bash
-npm install swagger-ui-dist
-```
+Les assets Swagger UI sont servis depuis un CDN par défaut - **aucun package supplémentaire nécessaire**.
 
 ```typescript
 yasui.createServer({
@@ -28,6 +25,49 @@ yasui.createServer({
 ```
 
 La documentation sera accessible par défaut à `/api-docs` si aucun chemin personnalisé n'est spécifié, et la spécification JSON à `/<path>/swagger.json`.
+
+### Configuration CDN
+
+Par défaut, YasuiJS charge les assets Swagger UI depuis le CDN jsDelivr (`https://cdn.jsdelivr.net/npm/swagger-ui-dist@5`). Vous pouvez personnaliser la source CDN ou utiliser des assets auto-hébergés :
+
+```typescript
+yasui.createServer({
+  controllers: [UserController],
+  swagger: {
+    generate: true,
+    path: '/docs',
+
+    // Utiliser un CDN alternatif (unpkg)
+    cdn: 'https://unpkg.com/swagger-ui-dist@5',
+
+    // Ou épingler à une version spécifique
+    // cdn: 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.11.0',
+
+    // Ou utiliser des assets auto-hébergés
+    // cdn: '/swagger-ui',
+
+    info: {
+      title: 'Mon API',
+      version: '1.0.0',
+    },
+  }
+});
+```
+
+**Avantages du CDN :**
+- ✅ Zéro installation - fonctionne immédiatement
+- ✅ Fonctionne sur tous les runtimes (Node.js, Deno, Bun, environnements edge)
+- ✅ Aucune dépendance au système de fichiers
+- ✅ Toujours à jour avec la dernière version de Swagger UI
+
+**Cas d'usage CDN personnalisé :**
+- **CDN alternatif** : Utiliser unpkg ou d'autres fournisseurs CDN
+- **Version spécifique** : Épingler à une version particulière de Swagger UI
+- **CDN régional** : Utiliser un CDN plus rapide pour votre région
+- **Auto-hébergé** : Servir les assets depuis votre propre serveur ou CDN
+- **Hors ligne/air-gapped** : Déployer avec des assets locaux dans des environnements restreints
+
+### Documentation auto-générée
 
 YasuiJS génère automatiquement une documentation de base à partir de vos contrôleurs existants et des décorateurs de route, même sans aucun décorateur spécifique à Swagger. Le framework détecte :
 - **Paramètres** : Les paramètres de chemin, paramètres de requête et en-têtes sont automatiquement détectés avec le type `string` par défaut

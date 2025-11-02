@@ -213,20 +213,19 @@ npm install yasui@latest
 pnpm update yasui
 ```
 
-**Swagger UI 包更改：**
+**Swagger UI 更改：**
 
-如果您使用 Swagger UI，请将 `swagger-ui-express` 替换为 `swagger-ui-dist`：
+YasuiJS v4 默认从 CDN 提供 Swagger UI 资源 - **无需额外的包**。
+
+如果您在 v3 中使用 `swagger-ui-express`：
 
 ```bash
 npm uninstall swagger-ui-express
-npm install swagger-ui-dist
-
 # 或
 pnpm remove swagger-ui-express
-pnpm add swagger-ui-dist
 ```
 
-**无需更改代码** - YasuiJS 内部使用 `swagger-ui-dist`。这只是包依赖项更新。
+**无需更改代码** - Swagger UI 开箱即用，无需配置。CDN 方式还使 Swagger UI 能够在所有运行时（包括边缘环境）上工作。
 
 ### 步骤 2：移除 Express 中间件
 

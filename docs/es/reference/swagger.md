@@ -8,10 +8,7 @@ YasuiJS proporciona generación de documentación OpenAPI con integración opcio
 
 Habilita Swagger agregando configuración a tu aplicación. YasuiJS genera documentación a partir de tus controladores, rutas y decoradores.
 
-**Nota**: Necesitas instalar `swagger-ui-dist` por separado:
-```bash
-npm install swagger-ui-dist
-```
+Los assets de Swagger UI se sirven desde CDN por defecto - **no se necesitan paquetes adicionales**.
 
 ```typescript
 yasui.createServer({
@@ -28,6 +25,49 @@ yasui.createServer({
 ```
 
 La documentación será accesible por defecto en `/api-docs` si no se especifica una ruta personalizada, y la especificación JSON en `/<path>/swagger.json`.
+
+### Configuración de CDN
+
+Por defecto, YasuiJS carga los assets de Swagger UI desde el CDN jsDelivr (`https://cdn.jsdelivr.net/npm/swagger-ui-dist@5`). Puedes personalizar la fuente CDN o usar assets auto-alojados:
+
+```typescript
+yasui.createServer({
+  controllers: [UserController],
+  swagger: {
+    generate: true,
+    path: '/docs',
+
+    // Usar CDN alternativo (unpkg)
+    cdn: 'https://unpkg.com/swagger-ui-dist@5',
+
+    // O fijar a una versión específica
+    // cdn: 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.11.0',
+
+    // O usar assets auto-alojados
+    // cdn: '/swagger-ui',
+
+    info: {
+      title: 'Mi API',
+      version: '1.0.0',
+    },
+  }
+});
+```
+
+**Beneficios del CDN:**
+- ✅ Cero instalación - funciona inmediatamente
+- ✅ Funciona en todos los runtimes (Node.js, Deno, Bun, entornos edge)
+- ✅ Sin dependencias del sistema de archivos
+- ✅ Siempre actualizado con la última versión de Swagger UI
+
+**Casos de uso de CDN personalizado:**
+- **CDN alternativo**: Usar unpkg u otros proveedores de CDN
+- **Versión específica**: Fijar a una versión particular de Swagger UI
+- **CDN regional**: Usar un CDN más rápido para tu región
+- **Auto-alojado**: Servir assets desde tu propio servidor o CDN
+- **Offline/air-gapped**: Desplegar con assets locales en entornos restringidos
+
+### Documentación Auto-Generada
 
 YasuiJS genera automáticamente documentación básica a partir de tus controladores existentes y decoradores de ruta, incluso sin ningún decorador específico de Swagger. El framework detecta:
 - **Parámetros**: Los parámetros de ruta, parámetros de consulta y encabezados se detectan automáticamente con tipo `string` por defecto
