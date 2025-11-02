@@ -12,8 +12,12 @@ export class AppService {
 
   constructor(private readonly appConfig: YasuiConfig) {
     this.logger = new LoggerService();
-    // Compile regex once at initialization instead of per-error
-    this.errorRegex = new RegExp(`${process.cwd()}\\/(?!node_modules\\/)([\\/\\w-_\\.]+\\.js):(\\d*):(\\d*)`);
+
+    // Compile regex once at initialization & cross-platform compatibility
+    const cwd = process.cwd().replace(/\\/g, '[\\\\/]');
+    this.errorRegex = new RegExp(
+      `${cwd}[\\\\/](?!node_modules[\\\\/])([\\\\/\\w-_\\.]+\\.[mc]?[jt]s):(\\d+):(\\d+)`
+    );
   }
 
 

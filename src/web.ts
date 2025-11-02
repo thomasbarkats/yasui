@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { MaybePromise } from './interfaces/utils.i.js';
+import { MaybePromise, JsonValue } from './interfaces/utils.i.js';
 import { LoggerService } from './services/logger.service.js';
 
 
@@ -157,7 +157,7 @@ export type NextFunction = () => Promise<Response> | Response;
 export type RequestHandler = (
   req: YasuiRequest,
   next?: NextFunction
-) => MaybePromise<Response> | any | Promise<any>;
+) => MaybePromise<Response | JsonValue | void>;
 
 /** Fetch handler type for yasui apps */
 export type FetchHandler = {

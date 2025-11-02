@@ -3,6 +3,15 @@
 /** Utility type for unknown Promise */
 export type MaybePromise<T> = T | Promise<T>;
 
+/** Valid JSON values for API responses */
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
 /** Utility type for an instantiable class */
 export type Constructible<T = Instance> = {
   new(...args: any[]): T;

@@ -1,7 +1,7 @@
 import { RequestHandler, NextFunction, YasuiRequest } from '../web.js';
 import { ReflectMetadata, getMetadata } from './reflect.js';
 import { RouteRequestParamTypes } from '../enums/index.js';
-import { IRouteParam, IPipeTransform, IParamMetadata, ArrayItem } from '../interfaces/index.js';
+import { IRouteParam, IPipeTransform, IParamMetadata, ArrayItem, JsonValue } from '../interfaces/index.js';
 
 
 /** Create yasui route handler from controller/middleware method */
@@ -29,7 +29,7 @@ export function routeHandler(
   return async (
     req: YasuiRequest,
     next?: NextFunction,
-  ): Promise<unknown> => {
+  ): Promise<void | Response | JsonValue> => {
     req.source = target.name;
     const args: unknown[] = new Array(maxIndex + 1);
 
@@ -79,7 +79,7 @@ export function routeHandler(
       args[index] = methodDeps[index];
     }
 
-    const result: unknown = await routeFunction.apply(self, args);
+    const result = await routeFunction.apply(self, args);
 
     if (isMiddleware && result === undefined && next) {
       return next();
