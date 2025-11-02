@@ -8,10 +8,7 @@ YasuiJS provides OpenAPI documentation generation with optional Swagger UI integ
 
 Enable Swagger by adding configuration to your app. YasuiJS generates documentation from your controllers, routes, and decorators.
 
-**Note**: You need to install `swagger-ui-dist` separately:
-```bash
-npm install swagger-ui-dist
-```
+Swagger UI assets are served from CDN by default - **no additional packages needed**.
 
 ```typescript
 yasui.createServer({
@@ -28,6 +25,49 @@ yasui.createServer({
 ```
 
 Documentation will be accessible by default at `/api-docs` if no custom path specified, and JSON specification at `/<path>/swagger.json`.
+
+### CDN Configuration
+
+By default, YasuiJS loads Swagger UI assets from jsDelivr CDN (`https://cdn.jsdelivr.net/npm/swagger-ui-dist@5`). You can customize the CDN source or use self-hosted assets:
+
+```typescript
+yasui.createServer({
+  controllers: [UserController],
+  swagger: {
+    generate: true,
+    path: '/docs',
+
+    // Use alternative CDN (unpkg)
+    cdn: 'https://unpkg.com/swagger-ui-dist@5',
+
+    // Or pin to specific version
+    // cdn: 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.11.0',
+
+    // Or use self-hosted assets
+    // cdn: '/swagger-ui',
+
+    info: {
+      title: 'My API',
+      version: '1.0.0',
+    },
+  }
+});
+```
+
+**CDN Benefits:**
+- ✅ Zero installation - works out of the box
+- ✅ Works on all runtimes (Node.js, Deno, Bun, edge environments)
+- ✅ No file system dependencies
+- ✅ Always up-to-date with latest Swagger UI
+
+**Custom CDN Use Cases:**
+- **Alternative CDN**: Use unpkg or other CDN providers
+- **Specific version**: Pin to a particular Swagger UI version
+- **Regional CDN**: Use faster CDN for your region
+- **Self-hosted**: Serve assets from your own server or CDN
+- **Offline/air-gapped**: Deploy with local assets in restricted environments
+
+### Auto-Generated Documentation
 
 YasuiJS automatically generates basic documentation from your existing controllers and route decorators, even without any Swagger-specific decorators. The framework detects:
 - **Parameters**: Path parameters, query parameters, and headers are automatically detected with `string` type by default
