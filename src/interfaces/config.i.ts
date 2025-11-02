@@ -13,6 +13,11 @@ export interface YasuiSwaggerConfig extends Omit<ISwaggerConfig, 'openapi' | 'pa
   /** Output path for generated swagger documentation
    *  @default /api-docs */
   path?: string;
+  /** CDN base URL for Swagger UI assets (CSS, JS, icons)
+   *  @default https://cdn.jsdelivr.net/npm/swagger-ui-dist@5
+   *  @example https://unpkg.com/swagger-ui-dist@5
+   *  @example /swagger-ui (for local self-hosted assets) */
+  cdn?: string;
 }
 
 /** TLS/SSL configuration for HTTPS */

@@ -4,6 +4,7 @@ import { ErrorResource, HttpError } from './error.resource.js';
 import { HttpCode } from '../enums/index.js';
 import { LoggerService } from '../services/index.js';
 import { MaybePromise, YasuiConfig } from '../interfaces/index.js';
+import { getCwd } from './runtime.js';
 
 
 export class AppService {
@@ -14,7 +15,7 @@ export class AppService {
     this.logger = new LoggerService();
 
     // Compile regex once at initialization & cross-platform compatibility
-    const cwd = process.cwd().replace(/\\/g, '[\\\\/]');
+    const cwd = getCwd().replace(/\\/g, '[\\\\/]');
     this.errorRegex = new RegExp(
       `${cwd}[\\\\/](?!node_modules[\\\\/])([\\\\/\\w-_\\.]+\\.[mc]?[jt]s):(\\d+):(\\d+)`
     );

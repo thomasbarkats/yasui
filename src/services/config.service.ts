@@ -1,3 +1,5 @@
+import { getEnv } from '../utils/runtime.js';
+
 /** Configuration utility service */
 export abstract class ConfigService {
 
@@ -7,6 +9,6 @@ export abstract class ConfigService {
    * @param back optional default / fallback value
    */
   public static get(name: string, back = ''): string {
-    return process.env[name] || back;
+    return getEnv(name, back);
   }
 }

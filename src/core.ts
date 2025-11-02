@@ -241,7 +241,7 @@ export class Core {
       swaggerConfig,
       swaggerPath,
       this.logger,
-      !!this.config.debug
+      this.config.swagger.cdn
     );
   }
 
