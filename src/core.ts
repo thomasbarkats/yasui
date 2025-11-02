@@ -151,7 +151,7 @@ export class Core {
     const routeKey = `${method.toUpperCase()}:${path}`;
     this.router.insert(routeKey, {
       handler,
-      middlewares,
+      middlewares: [...this.globalMiddlewares, ...middlewares],
       method: method.toUpperCase(),
       source,
       defaultStatus,
@@ -163,10 +163,7 @@ export class Core {
     req: YasuiRequest,
     routeData: RouteData & { params?: Record<string, unknown> }
   ): Promise<Response> {
-    const allMiddlewares: RequestHandler[] = [
-      ...this.globalMiddlewares,
-      ...(routeData.middlewares || [])
-    ];
+    const allMiddlewares = routeData.middlewares || [];
     let index = 0;
 
     const next: NextFunction = async (): Promise<Response> => {
