@@ -11,29 +11,17 @@ export default defineConfig({
   head: [
     ['link', { rel: 'dns-prefetch', href: '//raw.githubusercontent.com' }],
     ['link', { rel: 'preconnect', href: 'https://raw.githubusercontent.com' }],
-    ['link', { 
-      rel: 'icon', 
-      href: 'https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot.ico' 
+    ['link', {
+      rel: 'icon',
+      href: 'https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot.ico'
     }],
-    ['link', { 
-      rel: 'preload', 
-      href: 'https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot-opt.svg', 
+    ['link', {
+      rel: 'preload',
+      href: 'https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot-opt.svg',
       as: 'image',
       type: 'image/svg+xml',
       fetchpriority: 'high'
     }],
-    ['link', { 
-      rel: 'preload', 
-      href: 'https://www.github.com/thomasbarkats.png', 
-      as: 'image',
-      fetchpriority: 'low'
-    }],
-    ['link', { 
-      rel: 'preload', 
-      href: 'https://www.github.com/alexandre-hallaine.png', 
-      as: 'image',
-      fetchpriority: 'low'
-    }]
   ],
   rewrites: {
     'en/(.*)': '(.*)'
