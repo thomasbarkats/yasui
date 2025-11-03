@@ -18,21 +18,21 @@ hero:
 
 features:
   - icon: ⚡
-    title: Léger & Rapide
-    details: Construit sur Express avec un minimum de dépendances. Concentré sur l'essentiel sans superflu.
-  - icon: 🛡️
-    title: Gestion Complète des Erreurs
-    details: Middlewares, services, contrôleurs - tout peut lancer des erreurs sans try/catch. Gestion automatique des erreurs partout.
-  - icon: 🔧
-    title: Conversion Automatique des Types
-    details: Paramètres de requête automatiquement convertis aux types appropriés. Même dans les middlewares.
+    title: Léger, Multi-Runtime
+    details: Dépendances minimales, basé sur les Web Standards. Fonctionne sur Node.js, Deno, Bun, ou déployez sur des runtimes edge. Prêt pour la production sans superflu.
+  - icon: 🎯
+    title: Basé sur les Décorateurs
+    details: Développement d'API déclaratif avec les décorateurs TypeScript. Architecture propre et scalable basée sur les classes.
   - icon: 🧩
     title: Système d'Injection de Dépendances Flexible
-    details: Injection au niveau du constructeur et des méthodes avec des portées configurables pour un meilleur contrôle.
+    details: Injection au niveau du constructeur et des méthodes avec 3 portées configurables. Simple mais puissant, aucun système de modules complexe requis.
   - icon: 📦
-    title: Middlewares Simples
-    details: Application au niveau global, du contrôleur ou de la route. Utilisez les mêmes décorateurs que les contrôleurs.
+    title: Patterns d'API Cohérents
+    details: Les middlewares fonctionnent comme les contrôleurs. Mêmes décorateurs, même DI, même extraction de paramètres partout.
   - icon: 📚
     title: Génération Swagger Complète
-    details: Décorateurs flexibles pour les énumérations, tableaux, classes, schémas OpenAPI. Générés à partir de votre code existant.
+    details: Documentation OpenAPI générée depuis votre code existant. Décorateurs flexibles pour les énumérations, tableaux, classes et schémas complexes.
+  - icon: 🛡️
+    title: Prêt pour la Production
+    details: Gestion complète des erreurs, logging, gestion de configuration, support TLS/HTTPS, HTTP/2. Tout ce dont vous avez besoin pour déployer en toute confiance.
 ---

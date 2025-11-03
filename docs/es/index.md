@@ -18,21 +18,21 @@ hero:
 
 features:
   - icon: ⚡
-    title: Ligero y Rápido
-    details: Construido sobre Express con dependencias mínimas. Enfocado en lo esencial sin excesos.
-  - icon: 🛡️
-    title: Manejo Completo de Errores
-    details: Middlewares, servicios, controladores - todo puede lanzar errores sin try/catch. Manejo automático de errores en todas partes.
-  - icon: 🔧
-    title: Conversión Automática de Tipos
-    details: Parámetros de consulta convertidos automáticamente a tipos apropiados. Incluso en middlewares.
+    title: Ligero, Multi-Runtime
+    details: Dependencias mínimas, basado en Web Standards. Ejecuta en Node.js, Deno, Bun, o despliega en runtimes edge. Listo para producción sin excesos.
+  - icon: 🎯
+    title: Basado en Decoradores
+    details: Desarrollo de API declarativo con decoradores TypeScript. Arquitectura limpia y escalable basada en clases.
   - icon: 🧩
     title: Sistema DI Flexible
-    details: Inyección a nivel de constructor y método con ámbitos configurables para mejor control.
+    details: Inyección a nivel de constructor y método con 3 ámbitos configurables. Simple pero poderoso, sin sistema de módulos complejo requerido.
   - icon: 📦
-    title: Middlewares Simples
-    details: Aplícalos a nivel global, controlador o ruta. Usa los mismos decoradores que los controladores.
+    title: Patrones de API Consistentes
+    details: Los middlewares funcionan como los controladores. Mismos decoradores, mismo DI, misma extracción de parámetros en todas partes.
   - icon: 📚
     title: Generación Rica de Swagger
-    details: Decoradores flexibles para enums, arrays, clases, esquemas OpenAPI. Generado desde tu código existente.
+    details: Documentación OpenAPI generada desde tu código existente. Decoradores flexibles para enums, arrays, clases y esquemas complejos.
+  - icon: 🛡️
+    title: Listo para Producción
+    details: Manejo completo de errores, logging, gestión de configuración, soporte TLS/HTTPS, HTTP/2. Todo lo que necesitas para desplegar con confianza.
 ---
