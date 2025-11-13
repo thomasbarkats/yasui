@@ -120,7 +120,7 @@ export class UserService {
 
 ## Registros de errores
 
-En modo debug (opción `debug` en la configuración de Yasui), todos los errores devueltos por los endpoints serán registrados. En producción, solo los errores 500 (Error Interno del Servidor) serán registrados, considerando que son inesperados y no son usualmente errores de negocio.
+Los errores inesperados (cualquier error no capturado que no sea HttpError) se registran en la consola. Las instancias de HttpError no se registran ya que representan errores de negocio intencionales con códigos de estado esperados, y se formatean y devuelven como una respuesta JSON.
 
 ## Validación de Decoradores
 

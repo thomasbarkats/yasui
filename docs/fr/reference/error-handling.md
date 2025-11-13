@@ -120,7 +120,7 @@ export class UserService {
 
 ## Journaux d'erreurs
 
-En mode debug (option `debug` dans la configuration Yasui), toutes les erreurs renvoyées par les points de terminaison seront journalisées. En production, seules les erreurs 500 (Erreur Interne du Serveur) seront journalisées, considérant qu'elles sont inattendues et ne sont généralement pas des erreurs métier.
+Les erreurs inattendues (toute erreur non capturée qui n'est pas HttpError) sont journalisées dans la console. Les instances HttpError ne sont pas journalisées car elles représentent des erreurs métier intentionnelles avec des codes de statut attendus, et sont formatées et renvoyées comme une réponse JSON.
 
 ## Validation des Décorateurs
 

@@ -120,7 +120,7 @@ export class UserService {
 
 ## Error Logs
 
-In debug mode (`debug` option in Yasui configuration), all errors returned by endpoints will be logged. In production, only 500 errors (Internal Server Error) will be logged, considering that they are unexpected and are not usually business errors.
+Unexpected errors (any uncaught non-HttpError error) are logged to the console. HttpError instances are not logged as they represent intentional business errors with expected status codes, and are formatted and returned as a JSON response.
 
 ## Decorator Validation
 

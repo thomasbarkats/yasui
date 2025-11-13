@@ -46,10 +46,12 @@ export class AppService {
 
   /** log and client response for 404 error */
   public handleNotFound(
-    req: YasuiRequest,
+    req: YasuiRequest
   ): Response {
     this.logger.error(`Cannot resolve ${req.method} ${req.path}`);
-    return new Response(null, { status: HttpCode.NOT_FOUND });
+    const err = new HttpError(HttpCode.NOT_FOUND, `Cannot ${req.method} ${req.path}`);
+    const errResource = new ErrorResource(err, req);
+    return Response.json(errResource, { status: HttpCode.NOT_FOUND });
   }
 
   /** pretty logs and client responses for errors */
@@ -57,18 +59,17 @@ export class AppService {
     err: HttpError | Error,
     req: YasuiRequest,
   ): Response {
-    const stack: string = err.stack || '';
-    const [, filename, line, column] = stack.match(this.errorRegex) || Array(0);
-
+    const isHttpError = err instanceof HttpError;
     const errResource = new ErrorResource(err, req);
 
-    const isInternalServerError = errResource.status === HttpCode.INTERNAL_SERVER_ERROR;
+    if (!isHttpError) {
+      const stack: string = err.stack || '';
+      const [, filename, line, column] = stack.match(this.errorRegex) || Array(0);
 
-    if (this.appConfig.debug || isInternalServerError) {
       const logger: LoggerService = req.logger || this.logger;
       logger.error(
-        (isInternalServerError ? 'Unexpected ' : '') + err.constructor.name,
-        req.source + (this.appConfig.debug ? '(debug)' : '')
+        'Unexpected ' + err.constructor.name,
+        req.source || 'unknown'
       );
       console.error(kleur.red(
         `source: ${filename ? `${filename} ${line}:${column}` : 'undefined'}\n` +
