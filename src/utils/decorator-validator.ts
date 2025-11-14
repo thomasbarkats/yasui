@@ -6,7 +6,6 @@ import {
   Constructible,
   IController,
   IControllerRoute,
-  Injection,
   YasuiConfig,
 } from '../interfaces/index.js';
 
@@ -111,7 +110,7 @@ export class DecoratorValidator {
         );
 
       } else if (preInjectedDeps[idx]) {
-        this.validateInjectionTokenRegistration(callerName, preInjectedDeps[idx]);
+        this.validateInjectionToken(callerName, preInjectedDeps[idx], Dep, idx);
 
       } else if (!getMetadata(ReflectMetadata.INJECTABLE, Dep)) {
         this.addError(
@@ -125,16 +124,27 @@ export class DecoratorValidator {
     this.throwError(callerName);
   }
 
-  public validateInjectionTokenRegistration(
+  public validateInjectionToken(
     callerName: string,
-    token: string
+    tokenReg: string,
+    paramType: Function | undefined,
+    paramIndex: number,
   ): void {
-    if (!this.appConfig.injections?.find((inj: Injection<unknown>) => inj.token === token)) {
+    const injection = this.appConfig.injections?.find(({ token }) => token === tokenReg);
+    if (!injection) {
       this.addError(
         callerName,
-        `Injection token '${token}' is not registered`,
-        `Register token in your app config: \`{ ..., injections: [..., { token: '${token}', provide: <any> }] }\``
+        `Injection token '${tokenReg}' is not registered`,
+        `Register token in your app config: \`{ ..., injections: [..., { token: '${tokenReg}', provide: <any> }] }\``
       );
+    } else if ('factory' in injection && injection.deferred) {
+      if (paramType?.name !== 'Object') {
+        this.addError(
+          callerName,
+          `Deferred async injection '${tokenReg}' at parameter ${paramIndex} must be typed as nullable`,
+          `Add a null union type: \`@Inject('${tokenReg}') param: ${paramType?.name} | null\``
+        );
+      }
     }
   }
 

@@ -70,12 +70,13 @@ export class Core {
   }
 
 
-  public createApp(): FetchHandler {
+  public async createApp(): Promise<FetchHandler> {
     this.logger.start();
 
-    /** register custom injections */
-    for (const injection of this.config.injections || []) {
-      this.injector.register(injection.token, injection.provide);
+    /** debug logging middleware */
+    if (this.config.debug) {
+      this.logger.warn('debug mode is enabled');
+      this.globalMiddlewares.push(this.appService.logRequest.bind(this.appService));
     }
 
     /** client authentication middleware */
@@ -83,11 +84,8 @@ export class Core {
       this.globalMiddlewares.push(this.appService.auth.bind(this.appService));
     }
 
-    /** debug logging middleware */
-    if (this.config.debug) {
-      this.logger.warn('debug mode is enabled');
-      this.globalMiddlewares.push(this.appService.logRequest.bind(this.appService));
-    }
+    /** register custom injections */
+    await this.registerInjections();
 
     /** load other optional middlewares */
     this.loadMiddlewares();
@@ -195,6 +193,21 @@ export class Core {
       return await next();
     } catch (error) {
       return this.appService.handleErrors(<Error>error, req);
+    }
+  }
+
+  private async registerInjections(): Promise<void> {
+    for (const injection of this.config.injections || []) {
+      if ('factory' in injection) {
+        if (injection.deferred) {
+          this.injector.deferred(injection.token, injection.factory);
+        } else {
+          const instance = await injection.factory();
+          this.injector.register(injection.token, instance);
+        }
+      } else {
+        this.injector.register(injection.token, injection.provide);
+      }
     }
   }
 

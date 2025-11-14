@@ -43,6 +43,43 @@ export class Injector {
     }
   }
 
+  public deferred<T extends Instance>(
+    token: string,
+    factory: () => Promise<T>
+  ): void {
+    let resolvedInstance: T | null = null;
+
+    factory()
+      .then((instance) => {
+        if (!instance || typeof instance !== 'object') {
+          throw new Error(`Deferred injection '${token}' must return an object, got ${typeof instance}`);
+        }
+        if (this.debug) {
+          this.logger.debug(`deferred injection ${token} ready`);
+        }
+        resolvedInstance = instance;
+        return instance;
+      })
+      .catch((err) => {
+        this.logger.error(`failed to resolve deferred injection '${token}':\n${err}`);
+      });
+
+    /** create a proxy that returns null while not ready */
+    const proxy = new Proxy({}, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      get: (target, prop): any => {
+        if (resolvedInstance) {
+          const value = resolvedInstance[prop];
+          return typeof value === 'function' ? value.bind(resolvedInstance) : value;
+        }
+        return null;
+      }
+    });
+
+    /** register the proxy immediately (synchronous) */
+    this.register(token, proxy as T);
+  }
+
   /** instantiates constructible by deeply binding dependencies */
   public build<T extends Instance>(
     Provided: Constructible<T>,
@@ -86,7 +123,7 @@ export class Injector {
     return deps.map((Dep: Function, idx: number) => {
 
       if (preInjectedDeps[idx]) {
-        this.decoratorValidator?.validateInjectionTokenRegistration(Provided.name, preInjectedDeps[idx]);
+        this.decoratorValidator?.validateInjectionToken(Provided.name, preInjectedDeps[idx], Dep, idx);
         return this.get(preInjectedDeps[idx]);
       }
 
@@ -126,13 +163,14 @@ export class Injector {
     scope: Scopes
   ): Record<number, Instance> {
     const depScopes = getMetadata(ReflectMetadata.DEP_SCOPES, Provided.prototype, methodName) || {};
+    const paramTypes = getMetadata(ReflectMetadata.DESIGN_PARAM_TYPES, Provided.prototype, methodName) || [];
     const methodDeps: Record<number, Instance> = {};
 
     for (const paramIndex in injections) {
       const Dep: Function | string = injections[paramIndex];
 
       if (typeof Dep === 'string') {
-        this.decoratorValidator?.validateInjectionTokenRegistration(Provided.name, Dep);
+        this.decoratorValidator?.validateInjectionToken(Provided.name, Dep, paramTypes[paramIndex], Number(paramIndex));
         methodDeps[paramIndex] = this.get(Dep);
         continue;
       }

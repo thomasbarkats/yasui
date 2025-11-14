@@ -19,11 +19,11 @@ export type Constructible<T = Instance> = {
 
 /** Generic type for a class instance */
 export type Instance = {
-  [index: string]: any;
+  [index: string | symbol]: any;
 };
 
-/** Define a custom injection for YasuiJS configuration - See `@Inject` and `@Injectable` */
-export type Injection<T = any> = {
-  token: string;
-  provide: T;
-};
+/** Define a custom injection for YasuiJS configuration - See `@Inject` and `@Injectable`
+ *  @param deferred non-blocking, supports only objects/classes (no primitive types) */
+export type Injection<T = any> =
+  | { token: string; provide: T }
+  | { token: string; factory: () => Promise<T>; deferred?: boolean };

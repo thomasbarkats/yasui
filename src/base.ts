@@ -6,7 +6,7 @@ import { FetchHandler } from './web.js';
 
 
 /** Create a server with Yasui's configuration and defined routes, and start listening */
-export function createServer(conf: YasuiConfig): Server {
+export async function createServer(conf: YasuiConfig): Promise<Server> {
   const core: Core = new Core(conf);
 
   console.clear();
@@ -16,7 +16,7 @@ export function createServer(conf: YasuiConfig): Server {
     core.logger.log(`run as ${conf.environment} environment`, 'app', kleur.blue);
   }
 
-  const app: FetchHandler = core.createApp();
+  const app: FetchHandler = await core.createApp();
 
   // Determine protocol: support deprecated 'protocol' field for backward compatibility
   const hasTLS = conf.tls && (conf.tls.cert || conf.tls.key);
@@ -83,9 +83,9 @@ export function createServer(conf: YasuiConfig): Server {
 }
 
 /** Create only a fetch handler with Yasui's configuration and defined routes (without starting server) */
-export function createApp(conf: YasuiConfig): FetchHandler {
+export async function createApp(conf: YasuiConfig): Promise<FetchHandler> {
   const core: Core = new Core(conf);
-  const app: FetchHandler = core.createApp();
+  const app: FetchHandler = await core.createApp();
   core.decoratorValidator?.outputErrors();
   core.decoratorValidator = null;
   return app;
