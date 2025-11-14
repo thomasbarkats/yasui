@@ -18,6 +18,7 @@ YasuiJS **mantiene todas las buenas partes de NestJS:**
 - 🎯 **Sin boilerplate de módulos** - Solo controladores y servicios
 - 🎯 **Conversión de tipos automática** - Funciona en todas partes, cero configuración
 - 🎯 **Patrones consistentes** - Mismos decoradores en controladores y middlewares
+- 🎯 **DI Flexible** - Permite inyecciones asíncronas diferidas
 - 🎯 **Multi-runtime** - Node.js, Deno, Bun, Cloudflare Workers, Vercel Edge
 
 ### Estándares Web: La Elección Moderna
@@ -429,6 +430,16 @@ app.use((err, req, res, next) => {
 - **YasuiJS**: Captura automática de errores en todas partes, formato de error consistente
 - **NestJS**: Captura automática de errores, enfoque similar a YasuiJS
 - **Express**: Try-catch manual, debe pasar errores a next(), necesita manejador de errores personalizado
+
+---
+
+### Inicialización Diferida de Dependencias
+
+YasuiJS permite inyecciones asíncronas no bloqueantes con `deferred: true` si es necesario. La dependencia se inicializa en segundo plano y, por lo tanto, puede ser null. Puede manejar errores en la fábrica (por ejemplo, enviar una alerta interna) y proporcionar comportamiento de respaldo en los servicios que usan la dependencia.
+
+NestJS no permite esto.
+
+Vea un ejemplo completo en la documentación de [Inyección de Dependencias](/reference/dependency-injection#deferred-deps).
 
 ---
 

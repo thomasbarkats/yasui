@@ -153,7 +153,7 @@ export class RequiredPipe implements IPipeTransform {
 YasuiJS pipes can work seamlessly with class-validator and class-transformer:
 
 <details>
-<summary>See the complete example</summary>
+<summary>Click to see the full example</summary>
 
 ```typescript
 import { validate, IsEmail, IsString, MinLength  } from 'class-validator';

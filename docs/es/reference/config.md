@@ -94,13 +94,40 @@ Habilitar modo debug con logging adicional y rastreo de solicitudes.
 
 #### `injections`
 Tokens de inyección personalizados para inyección de dependencias. Ver [Inyección de Dependencias](/es/reference/dependency-injection) para detalles.
-- **Tipo:** `Array<{ token: string, provide: any }>`
+- **Tipo:** `Array<Injection>`
 - **Por defecto:** `[]`
-- **Valor de ejemplo:**
+
+Donde `Injection` es:
+```typescript
+{ token: string; provide: any } | // Valor directo
+{ token: string; factory: () => Promise<any>; deferred?: boolean } // Factory
+```
+
+- **Valores de ejemplo:**
 ```typescript
 [
-  { token: 'DATABASE_URL', provide: 'postgresql://localhost:5432/mydb' },
-  { token: 'CONFIG', provide: { apiKey: 'secret' } }
+  // Valor directo
+  { token: 'CONFIG', provide: 'value' },
+
+  // Factory asíncrona (construida antes de que el servidor inicie)
+  {
+    token: 'DATABASE',
+    factory: async () => {
+      const db = new Database();
+      await db.connect();
+      return db;
+    }
+  },
+  // Factory no bloqueante (el servidor inicia sin ella y acepta errores)
+  {
+    token: 'ANALYTICS',
+    deferred: true,
+    factory: async () => {
+      const analytics = new AnalyticsClient();
+      await analytics.connect();
+      return analytics;
+    },
+  }
 ]
 ```
 

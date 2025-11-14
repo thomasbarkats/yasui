@@ -18,6 +18,7 @@ YasuiJS **keeps all the good parts from NestJS:**
 - 🎯 **No module boilerplate** - Just controllers and services
 - 🎯 **Automatic type casting** - Works everywhere, zero config
 - 🎯 **Consistent patterns** - Same decorators in controllers and middleware
+- 🎯 **Flexible DI** - Allows deferred asynchronous injections
 - 🎯 **Multi-runtime** - Node.js, Deno, Bun, Cloudflare Workers, Vercel Edge
 
 ### Web Standards: The Modern Choice
@@ -429,6 +430,16 @@ app.use((err, req, res, next) => {
 - **YasuiJS**: Automatic error catching everywhere, consistent error format
 - **NestJS**: Automatic error catching, similar approach to YasuiJS
 - **Express**: Manual try-catch, must pass errors to next(), custom error handler needed
+
+---
+
+### Deferred Dependency Initialization
+
+YasuiJS allows non-blocking asynchronous injections with `deferred: true` if necessary. Dependency is initialized in the background, and may therefore be null. You can handle errors in the factory (e.g., send an internal alert), and provide fallback behavior in services that use the dependency.
+
+NestJS does not allow this.
+
+See a complete example in the [Dependency Injection](/reference/dependency-injection#deferred-deps) documentation.
 
 ---
 

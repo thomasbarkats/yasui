@@ -153,7 +153,7 @@ export class RequiredPipe implements IPipeTransform {
 YasuiJS 管道可以与 class-validator 和 class-transformer 无缝协作:
 
 <details>
-<summary>查看完整示例</summary>
+<summary>点击查看完整示例</summary>
 
 ```typescript
 import { validate, IsEmail, IsString, MinLength  } from 'class-validator';

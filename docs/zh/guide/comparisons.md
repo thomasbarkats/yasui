@@ -18,6 +18,7 @@ YasuiJS **保留了 NestJS 的所有优点：**
 - 🎯 **无模块样板** - 只需控制器和服务
 - 🎯 **自动类型转换** - 随处可用，零配置
 - 🎯 **一致的模式** - 控制器和中间件使用相同的装饰器
+- 🎯 **灵活的 DI** - 允许延迟异步注入
 - 🎯 **多运行时** - Node.js、Deno、Bun、Cloudflare Workers、Vercel Edge
 
 ### Web 标准：现代选择
@@ -429,6 +430,16 @@ app.use((err, req, res, next) => {
 - **YasuiJS**：任何地方自动错误捕获，一致的错误格式
 - **NestJS**：自动错误捕获，与 YasuiJS 类似的方法
 - **Express**：手动 try-catch，必须将错误传递给 next()，需要自定义错误处理器
+
+---
+
+### 延迟依赖初始化
+
+YasuiJS 允许在必要时使用 `deferred: true` 进行非阻塞异步注入。依赖项在后台初始化，因此可能为 null。您可以在工厂中处理错误（例如，发送内部警报），并在使用依赖项的服务中提供后备行为。
+
+NestJS 不允许这样做。
+
+请参阅[依赖注入](/reference/dependency-injection#deferred-deps)文档中的完整示例。
 
 ---
 

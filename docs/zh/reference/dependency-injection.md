@@ -190,28 +190,101 @@ export class UserController {
 
 ### 注册自定义令牌
 
-在应用程序配置中注册自定义令牌：
+在应用程序配置中注册自定义令牌，使用 `provide` 提供直接值或使用 `factory` 提供计算值：
 
 ```typescript
-interface AppConfig {
-  apiKey: string;
-  timeout: number;
-}
-
 yasui.createServer({
   controllers: [UserController],
   injections: [
-    { token: 'DATABASE_URL', provide: 'postgresql://localhost:5432/mydb' },
-    { token: 'API_VERSION', provide: 'v1.0.0' },
-    { 
-      token: 'CONFIG', 
-      provide: { 
-        apiKey: process.env.API_KEY, 
-        timeout: 5000 
-      } as AppConfig
+    // 直接值
+    { token: 'API_KEY', provide: process.env.API_KEY },
+    // 异步工厂函数
+    {
+      token: 'DATABASE',
+      factory: async () => {
+        const db = new Database();
+        await db.connect();
+        return db;
+      }
     }
   ]
 });
+```
+
+默认情况下，所有工厂注入都会在服务器启动前解析。
+
+### 延迟异步注入 {#deferred-deps}
+
+对于不应阻塞服务器启动且接受其暂时缺失或错误的依赖项，使用 `deferred: true`。服务器立即启动，同时依赖项在后台初始化。
+
+**工作原理：**
+
+- 服务器立即启动（非阻塞）
+- 服务在工厂函数解析前为 `null`
+- **开发者处理 null 状态**（返回 503、跳过操作、使用后备方案等）
+- 初始化后，服务正常工作
+- 如果初始化失败，服务保持 `null`
+
+<details>
+<summary>点击查看完整示例</summary>
+
+```typescript
+import { Inject, HttpError } from 'yasui';
+
+yasui.createServer({
+  controllers: [AnalyticsController],
+  injections: [{
+    token: 'ANALYTICS',
+    deferred: true,
+    factory: async () => {
+      try {
+        const analytics = new AnalyticsClient();
+        await analytics.connect();
+        return analytics;
+      } catch (err) {
+        // 做一些事情，比如发送警报。
+        throw err; // 服务将保持 null
+      }
+    },
+  }]
+});
+
+export class AnalyticsController {
+  // YasuiJS 会强制你使用 null 联合类型
+  constructor(
+    @Inject('ANALYTICS') private analytics: AnalyticsService | null
+  ) { }
+
+  @Get('/events')
+  getEvents() {
+    // 处理未就绪/失败状态：
+    if (!this.analytics) {
+      throw new HttpError(503, 'Analytics not ready');   // 例如返回 503
+      // 或：return { events: [] };                      // 后备值
+      // 或：this.logger.warn('Analytics unavailable');  // 跳过操作
+      //     return ;
+    }
+    return this.analytics.track('page_view');
+  }
+}
+```
+</details>
+
+**重要的类型要求：**
+
+YasuiJS 验证延迟注入是否使用 `| null` 类型标注，**仅适用于类类型**。这是由于 TypeScript 反射元数据的限制。
+
+✅ **有效**（类类型）：
+
+如果缺少 `| null`，YasuiJS 启动时会引发装饰器验证错误：
+```typescript
+@Inject('TOKEN') service: MyService | null // ✅ 已验证
+```
+
+❌ **未验证**（可以编译但不会检查）：
+```typescript
+@Inject('TOKEN') config: object | null         // ⚠️ 未验证（字面类型）
+@Inject('TOKEN') data: { foo: string } | null  // ⚠️ 未验证（内联类型）
 ```
 
 ### 循环依赖

@@ -94,13 +94,40 @@ Enable debug mode with additional logging and request tracing.
 
 #### `injections`
 Custom injection tokens for dependency injection. See [Dependency Injection](/reference/dependency-injection) for details.
-- **Type:** `Array<{ token: string, provide: any }>`
+- **Type:** `Array<Injection>`
 - **Default:** `[]`
-- **Example value:**
+
+Where `Injection` is:
+```typescript
+{ token: string; provide: any } | // Direct value
+{ token: string; factory: () => Promise<any>; deferred?: boolean } // Factory
+```
+
+- **Example values:**
 ```typescript
 [
-  { token: 'DATABASE_URL', provide: 'postgresql://localhost:5432/mydb' },
-  { token: 'CONFIG', provide: { apiKey: 'secret' } }
+  // Direct value
+  { token: 'CONFIG', provide: 'value' },
+
+  // Async factory (built before the server starts)
+  {
+    token: 'DATABASE',
+    factory: async () => {
+      const db = new Database();
+      await db.connect();
+      return db;
+    }
+  },
+  // Non-blocking factory (server starts without it and accepts errors)
+  {
+    token: 'ANALYTICS',
+    deferred: true,
+    factory: async () => {
+      const analytics = new AnalyticsClient();
+      await analytics.connect();
+      return analytics;
+    },
+  }
 ]
 ```
 

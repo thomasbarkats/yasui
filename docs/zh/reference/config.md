@@ -94,13 +94,40 @@ TLS/HTTPS 配置。提供时，服务器自动使用 HTTPS。
 
 #### `injections`
 依赖注入的自定义注入令牌。详情请参见[依赖注入](/zh/reference/dependency-injection)。
-- **类型：** `Array<{ token: string, provide: any }>`
+- **类型：** `Array<Injection>`
 - **默认值：** `[]`
+
+其中 `Injection` 是：
+```typescript
+{ token: string; provide: any } | // 直接值
+{ token: string; factory: () => Promise<any>; deferred?: boolean } // 工厂函数
+```
+
 - **示例值：**
 ```typescript
 [
-  { token: 'DATABASE_URL', provide: 'postgresql://localhost:5432/mydb' },
-  { token: 'CONFIG', provide: { apiKey: 'secret' } }
+  // 直接值
+  { token: 'CONFIG', provide: 'value' },
+
+  // 异步工厂函数（在服务器启动前构建）
+  {
+    token: 'DATABASE',
+    factory: async () => {
+      const db = new Database();
+      await db.connect();
+      return db;
+    }
+  },
+  // 非阻塞工厂函数（服务器启动时不等待它并接受错误）
+  {
+    token: 'ANALYTICS',
+    deferred: true,
+    factory: async () => {
+      const analytics = new AnalyticsClient();
+      await analytics.connect();
+      return analytics;
+    },
+  }
 ]
 ```
 

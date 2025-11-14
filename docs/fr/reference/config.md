@@ -94,13 +94,40 @@ Activer le mode debug avec journalisation supplémentaire et traçage des requê
 
 #### `injections`
 Jetons d'injection personnalisés pour l'injection de dépendances. Voir [Injection de Dépendances](/fr/reference/dependency-injection) pour plus de détails.
-- **Type :** `Array<{ token: string, provide: any }>`
+- **Type :** `Array<Injection>`
 - **Défaut :** `[]`
-- **Valeur d'exemple :**
+
+Où `Injection` est :
+```typescript
+{ token: string; provide: any } | // Valeur directe
+{ token: string; factory: () => Promise<any>; deferred?: boolean } // Factory
+```
+
+- **Valeurs d'exemple :**
 ```typescript
 [
-  { token: 'DATABASE_URL', provide: 'postgresql://localhost:5432/mydb' },
-  { token: 'CONFIG', provide: { apiKey: 'secret' } }
+  // Valeur directe
+  { token: 'CONFIG', provide: 'value' },
+
+  // Factory asynchrone (construite avant le démarrage du serveur)
+  {
+    token: 'DATABASE',
+    factory: async () => {
+      const db = new Database();
+      await db.connect();
+      return db;
+    }
+  },
+  // Factory non bloquante (le serveur démarre sans elle et accepte les erreurs)
+  {
+    token: 'ANALYTICS',
+    deferred: true,
+    factory: async () => {
+      const analytics = new AnalyticsClient();
+      await analytics.connect();
+      return analytics;
+    },
+  }
 ]
 ```
 

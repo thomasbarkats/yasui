@@ -190,28 +190,101 @@ export class UserController {
 
 ### Registering Custom Tokens
 
-Register custom tokens in your app configuration:
+Register custom tokens in your app configuration using `provide` for direct values or `factory` for computed values:
 
 ```typescript
-interface AppConfig {
-  apiKey: string;
-  timeout: number;
-}
-
 yasui.createServer({
   controllers: [UserController],
   injections: [
-    { token: 'DATABASE_URL', provide: 'postgresql://localhost:5432/mydb' },
-    { token: 'API_VERSION', provide: 'v1.0.0' },
-    { 
-      token: 'CONFIG', 
-      provide: { 
-        apiKey: process.env.API_KEY, 
-        timeout: 5000 
-      } as AppConfig
+    // Direct value
+    { token: 'API_KEY', provide: process.env.API_KEY },
+    // Async factory
+    {
+      token: 'DATABASE',
+      factory: async () => {
+        const db = new Database();
+        await db.connect();
+        return db;
+      }
     }
   ]
 });
+```
+
+By default, all factory injections are resolved before the server starts.
+
+### Deferred Async Injections {#deferred-deps}
+
+Use `deferred: true` for dependencies that shouldn't block server startup and whose temporary absence or error is accepted. The server starts immediately while the dependency initializes in the background.
+
+**How it works:**
+
+- Server starts immediately (non-blocking)
+- Service is `null` until factory resolves
+- **Developer handles null state** (return 503, skip operation, use fallback, etc.)
+- Once initialized, service works normally
+- If initialization fails, service remains `null`
+
+<details>
+<summary>Click to see the full example</summary>
+
+```typescript
+import { Inject, HttpError } from 'yasui';
+
+yasui.createServer({
+  controllers: [AnalyticsController],
+  injections: [{
+    token: 'ANALYTICS',
+    deferred: true,
+    factory: async () => {
+      try {
+        const analytics = new AnalyticsClient();
+        await analytics.connect();
+        return analytics;
+      } catch (err) {
+        // Do something, such as send out an alert.
+        throw err; // Service will remain null
+      }
+    },
+  }]
+});
+
+export class AnalyticsController {
+  // YasuiJS will constrain you to type with null union
+  constructor(
+    @Inject('ANALYTICS') private analytics: AnalyticsService | null
+  ) { }
+
+  @Get('/events')
+  getEvents() {
+    // Handle non-ready/failed state:
+    if (!this.analytics) {
+      throw new HttpError(503, 'Analytics not ready');   // eg. return 503
+      // OR: return { events: [] };                      // Fallback value
+      // OR: this.logger.warn('Analytics unavailable');  // Skip operation
+      //     return ;
+    }
+    return this.analytics.track('page_view');
+  }
+}
+```
+</details>
+
+**Important typing requirements:**
+
+YasuiJS validates that deferred injections are typed with `| null` **only for Class types**. This is due to TypeScript's reflection metadata limitations.
+
+✅ **Works** (Class types):
+
+A decorator validation error will be raised when YasuiJS starts up if `| null` is missing:
+```typescript
+@Inject('TOKEN') service: MyService | null // ✅ Validated
+```
+
+❌ **Not validated** (will compile but won't be checked):
+```typescript
+@Inject('TOKEN') config: object | null         // ⚠️ Not validated (literal type)
+@Inject('TOKEN') data: { foo: string } | null  // ⚠️ Not validated (inline type)
 ```
 
 ### Circular Dependencies

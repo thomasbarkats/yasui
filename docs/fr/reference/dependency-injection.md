@@ -190,28 +190,101 @@ export class UserController {
 
 ### Enregistrement des Tokens Personnalisés
 
-Enregistrez les tokens personnalisés dans votre configuration d'application :
+Enregistrez les tokens personnalisés dans votre configuration d'application en utilisant `provide` pour les valeurs directes ou `factory` pour les valeurs calculées :
 
 ```typescript
-interface AppConfig {
-  apiKey: string;
-  timeout: number;
-}
-
 yasui.createServer({
   controllers: [UserController],
   injections: [
-    { token: 'DATABASE_URL', provide: 'postgresql://localhost:5432/mydb' },
-    { token: 'API_VERSION', provide: 'v1.0.0' },
-    { 
-      token: 'CONFIG', 
-      provide: { 
-        apiKey: process.env.API_KEY, 
-        timeout: 5000 
-      } as AppConfig
+    // Valeur directe
+    { token: 'API_KEY', provide: process.env.API_KEY },
+    // Factory asynchrone
+    {
+      token: 'DATABASE',
+      factory: async () => {
+        const db = new Database();
+        await db.connect();
+        return db;
+      }
     }
   ]
 });
+```
+
+Par défaut, toutes les injections de factory sont résolues avant le démarrage du serveur.
+
+### Injections Asynchrones Différées {#deferred-deps}
+
+Utilisez `deferred: true` pour les dépendances qui ne doivent pas bloquer le démarrage du serveur et dont l'absence temporaire ou l'erreur est acceptée. Le serveur démarre immédiatement pendant que la dépendance s'initialise en arrière-plan.
+
+**Comment ça fonctionne :**
+
+- Le serveur démarre immédiatement (non bloquant)
+- Le service est `null` jusqu'à ce que la factory se résolve
+- **Le développeur gère l'état null** (retourner 503, ignorer l'opération, utiliser un repli, etc.)
+- Une fois initialisé, le service fonctionne normalement
+- Si l'initialisation échoue, le service reste `null`
+
+<details>
+<summary>Cliquez pour voir l'exemple complet</summary>
+
+```typescript
+import { Inject, HttpError } from 'yasui';
+
+yasui.createServer({
+  controllers: [AnalyticsController],
+  injections: [{
+    token: 'ANALYTICS',
+    deferred: true,
+    factory: async () => {
+      try {
+        const analytics = new AnalyticsClient();
+        await analytics.connect();
+        return analytics;
+      } catch (err) {
+        // Faire quelque chose, comme envoyer une alerte.
+        throw err; // Le service restera null
+      }
+    },
+  }]
+});
+
+export class AnalyticsController {
+  // YasuiJS vous oblige à typer avec union null
+  constructor(
+    @Inject('ANALYTICS') private analytics: AnalyticsService | null
+  ) { }
+
+  @Get('/events')
+  getEvents() {
+    // Gérer l'état non prêt/échoué :
+    if (!this.analytics) {
+      throw new HttpError(503, 'Analytics not ready');   // ex. retourner 503
+      // OU : return { events: [] };                     // Valeur de repli
+      // OU : this.logger.warn('Analytics unavailable'); // Ignorer l'opération
+      //     return ;
+    }
+    return this.analytics.track('page_view');
+  }
+}
+```
+</details>
+
+**Exigences importantes de typage :**
+
+YasuiJS valide que les injections différées sont typées avec `| null` **uniquement pour les types Classe**. Ceci est dû aux limitations des métadonnées de réflexion TypeScript.
+
+✅ **Fonctionne** (types Classe) :
+
+Une erreur de validation de décorateur sera générée au démarrage de YasuiJS si `| null` est manquant :
+```typescript
+@Inject('TOKEN') service: MyService | null // ✅ Validé
+```
+
+❌ **Non validé** (compilera mais ne sera pas vérifié) :
+```typescript
+@Inject('TOKEN') config: object | null         // ⚠️ Non validé (type littéral)
+@Inject('TOKEN') data: { foo: string } | null  // ⚠️ Non validé (type en ligne)
 ```
 
 ### Dépendances Circulaires
