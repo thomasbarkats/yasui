@@ -58,6 +58,15 @@ export class YasuiRequest extends Request {
     return this._headersObj;
   }
 
+  /**
+   * Get native Headers object for performance-critical operations
+   * Use this when you only need to check one or two headers via .get()
+   * to avoid converting all headers to a plain object
+   */
+  get rawHeaders(): Headers {
+    return super.headers;
+  }
+
   /** Get the pathname of the URL - without query string (Express-compatible property) */
   get path(): string {
     return this.parsedUrl.pathname;

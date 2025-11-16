@@ -34,7 +34,11 @@ export function routeHandler(
     const args: unknown[] = new Array(maxIndex + 1);
 
     const needsBody = params.some(p => p.path[1] === 'body');
-    if (needsBody && req.method !== 'GET' && req.headers['content-type']?.includes('application/json')) {
+    if (
+      needsBody &&
+      req.method !== 'GET' &&
+      req.rawHeaders.get('content-type')?.includes('application/json')
+    ) {
       try {
         await req.json();
       } catch {
@@ -48,6 +52,9 @@ export function routeHandler(
 
       if (param.path[0] === 'next') {
         value = next;
+      } else if (param.path[0] === 'req' && param.path[1] === 'headers' && param.path.length === 3) {
+        // Optimize single header access to avoid Object.fromEntries() conversion
+        value = req.rawHeaders.get(param.path[2]) ?? null;
       } else {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         value = param.path.slice(1).reduce((prev: any, curr: string) => prev?.[curr] ?? null, req);

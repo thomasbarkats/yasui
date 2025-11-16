@@ -195,6 +195,74 @@ export class UserController {
 }
 ```
 
+**Available request properties:**
+- `url` - Full request URL
+- `method` - HTTP method (GET, POST, etc.)
+- `headers` / `rawHeaders` - Request headers (see [Headers Access](#headers-access))
+- `params` - Route parameters
+- `query` - Query string parameters
+- `cookies` - Parsed cookies
+- `body` - Parsed request body
+- `path` - Request pathname
+- `hostname` - Request hostname
+- `protocol` - Request protocol (http/https)
+- `ip` - Client IP address
+
+### Headers Access
+
+YasuiJS provides two ways to access headers:
+
+**Express-style (plain object)**
+
+For compatibility by avoiding a breaking change since v3.
+```typescript
+@Get('/')
+getUsers(@Req() req: Request) {
+  const auth = req.headers.authorization;        // Dot notation
+  const type = req.headers['content-type'];      // Bracket notation
+}
+```
+
+**Native Web Standards (Headers object):**
+```typescript
+@Get('/')
+getUsers(@Req() req: Request) {
+  const auth = req.rawHeaders.get('authorization');
+  const type = req.rawHeaders.get('content-type');
+}
+```
+
+**When to use:**
+- `req.headers` - When accessing multiple headers or prefer Express-style syntax
+- `req.rawHeaders` - Best for single header checks, better performance (no object conversion)
+
+### Creating Custom Request Decorators
+
+You can create your own decorators to extract specific properties from the request object using `routeRequestParamDecorator`.
+
+```typescript
+import { routeRequestParamDecorator } from 'yasui';
+
+// Create custom decorator for request IP
+export const Ip = routeRequestParamDecorator('ip');
+
+// Use in controller
+@Controller('/api/users')
+export class UserController {
+  @Get('/')
+  getUsers(@Ip() ip: string) {
+    console.log(`Request from ${ip}`);
+    return { users: [] };
+  }
+}
+```
+
+This approach is preferred over using `@Req()` for single property access, as it:
+- Improves code readability
+- Enables type safety
+
+See [Request Object Access](#request-object-access) for the full list of available request properties.
+
 ## Response Handling
 
 YasuiJS automatically handles response serialization and status codes.

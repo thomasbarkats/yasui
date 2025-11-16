@@ -158,7 +158,7 @@ Middleware functions run in sequence, each deciding whether to continue to the n
 export class AuthMiddleware {
   use(@Req() req: Request) {
     // Check authentication
-    const authHeader = req.headers.get('authorization');
+    const authHeader = req.rawHeaders.get('authorization');
     if (!authHeader) {
       throw new Error('Unauthorized'); // Stop here
     }
@@ -207,7 +207,7 @@ These concepts combine to create a clean architecture:
 export class AuthMiddleware {
   use(@Req() req: Request) {
     // Authenticate request
-    if (!req.headers.get('authorization')) {
+    if (!req.rawHeaders.get('authorization')) {
       throw new HttpError(401, 'Unauthorized');
     }
     // Continue automatically

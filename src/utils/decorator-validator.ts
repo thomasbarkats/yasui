@@ -19,9 +19,11 @@ interface ValidationError {
 
 export class DecoratorValidator {
   private errors: Record<string, ValidationError[]>;
+  private paramRegex: RegExp;
 
   constructor(private readonly appConfig: YasuiConfig) {
     this.errors = {};
+    this.paramRegex = /\(([^)]*)\)/;
   }
 
   public outputErrors(): void {
@@ -193,7 +195,7 @@ export class DecoratorValidator {
 
   private getParameterNames(func: Function): string[] {
     const funcStr: string = func.toString();
-    const match: RegExpMatchArray | null = funcStr.match(/\(([^)]*)\)/);
+    const match: RegExpMatchArray | null = funcStr.match(this.paramRegex);
     if (!match || !match[1]) {
       return [];
     };

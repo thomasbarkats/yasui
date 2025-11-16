@@ -31,6 +31,9 @@ export function Controller(
       /** add routes from object metadata */
       const routes = getMetadata(ReflectMetadata.ROUTES, target.prototype) || [];
 
+      /** get controller-level pipes once (same for all routes) */
+      const controllerPipes = getMetadata(ReflectMetadata.PIPES, target.prototype) || [];
+
       for (const route of routes) {
         if (core.config.debug) {
           core.logger.debug(
@@ -50,7 +53,7 @@ export function Controller(
         /** prepare pipes (global, controller, route) */
         const pipes = [
           ...(core.config.globalPipes || []),
-          ...(getMetadata(ReflectMetadata.PIPES, target.prototype) || []),
+          ...controllerPipes,
           ...(getMetadata(ReflectMetadata.PIPES, target.prototype, route.methodName) || [])
         ].map(
           (Pipe: Constructible<IPipeTransform>) => core.build(Pipe)

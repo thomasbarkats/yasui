@@ -80,7 +80,7 @@ export class AuthMiddleware {
 @Middleware()
 export class AuthMiddleware {
   use(@Req() req: Request) {
-    if (!req.headers.get('authorization')) {
+    if (!req.headers.authorization) {
       // Throw errors or return Response objects
       throw new HttpError(401, 'Unauthorized');
     }
@@ -108,7 +108,7 @@ export class AuthMiddleware {
 @Get('/users')
 getUsers(@Req() req: Request) {
   // Headers via .get() on native Headers object
-  const auth = req.headers.get('authorization');
+  const auth = req.rawHeaders.get('authorization');
 
   // Express-compatible properties still work
   const auth = req.headers.authorization;
@@ -261,17 +261,8 @@ export class CorsMiddleware implements IMiddleware {
   }
 }
 
-// Create native logging middleware
-@Middleware()
-export class LoggingMiddleware implements IMiddleware {
-  async use(@Req() req: Request, @Logger() logger: LoggerService, @Next() next: NextFunction) {
-    logger.log(`${req.method} ${req.path}`);
-    return await next();
-  }
-}
-
 yasui.createServer({
-  middlewares: [CorsMiddleware, LoggingMiddleware]  // ✅ Works
+  middlewares: [CorsMiddleware]  // ✅ Works
 });
 ```
 
