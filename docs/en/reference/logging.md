@@ -50,11 +50,9 @@ export class UserController {
 }
 ```
 
-### Method-Level Access
+### Request-Level Logger
 
-- `@Logger()` - Get request-specific logger instance (no parameters)
-
-Use the `@Logger()` decorator to get a dedicated logger instance that is automatically started at the beginning of the route. This is useful for tracking timing throughout the operation in debug mode. This works in both controller methods and middleware methods.
+Use the `@Logger()` decorator to get a **dedicated, per-request logger instance**. Each request gets its own isolated logger that is automatically started for timing tracking. Logger is started when the request begins.
 
 ```typescript
 import { LoggerService } from 'yasui';
@@ -81,6 +79,36 @@ export class RequestLoggerMiddleware {
   }
 }
 ```
+
+A logger instance is only created per request when the `@Logger` decorator is used. The logger is not accessible via `req.logger` - use the `@Logger()` decorator to access it. This ensures optimal performance by only creating logger instances when explicitly needed.
+
+**Constructor vs Request-Level Logger:**
+
+```typescript
+@Controller('/api/users')
+export class UserController {
+  // Constructor injection: Shared across all requests
+  // Use `@Scope(Scopes.LOCAL)` for a Controller-restricted instance
+  constructor(private readonly logger: LoggerService) {}
+
+  @Get('/shared')
+  withSharedLogger() {
+    // Uses shared logger (singleton by default)
+    this.logger.log('Using shared logger');
+  }
+
+  @Get('/isolated')
+  withRequestLogger(@Logger() logger: LoggerService) {
+    // Uses dedicated request logger (unique per request)
+    logger.log('Using request-specific logger');
+    // Automatically tracks timing since request started
+  }
+}
+```
+
+**When to use each:**
+- **Constructor injection** - Application-level logging, service initialization, shared operations
+- **`@Logger()` decorator** - Request-specific operations, performance tracking, isolated request logging
 
 ## Logging Methods
 

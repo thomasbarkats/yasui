@@ -23,6 +23,7 @@ export enum ReflectMetadata {
   PARAMS = 'PARAMS',
   SELF = 'SELF',
   INJECTABLE = 'INJECTABLE',
+  USE_LOGGER = 'USE_LOGGER',
   SWAGGER_OPERATION = 'SWG_OPS',
   SWAGGER_SCHEMA_DEFINITION = 'SWG_SCHEMA_DEF',
   SWAGGER_SCHEMA_NAME = 'SWG_SCHEMA_NAME',
@@ -42,6 +43,7 @@ export interface ReflectTypes {
   [ReflectMetadata.PARAMS]: IRouteParam[];
   [ReflectMetadata.SELF]: Instance;
   [ReflectMetadata.INJECTABLE]: boolean;
+  [ReflectMetadata.USE_LOGGER]: boolean;
   [ReflectMetadata.SWAGGER_OPERATION]: OpenAPIOperation;
   [ReflectMetadata.SWAGGER_SCHEMA_DEFINITION]: Record<string, ApiPropertyDefinition>;
   [ReflectMetadata.SWAGGER_SCHEMA_NAME]: string;

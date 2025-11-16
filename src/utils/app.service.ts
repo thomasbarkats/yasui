@@ -39,8 +39,7 @@ export class AppService {
     req: YasuiRequest,
     next?: NextFunction
   ): MaybePromise<Response> {
-    const logger: LoggerService = req.logger || this.logger;
-    logger.debug(`request ${kleur.italic(`${req.method} ${req.path}`)}`);
+    this.logger.debug(`request ${kleur.italic(`${req.method} ${req.path}`)}`);
     return next ? next() : new Response(null, { status: 200 });
   }
 
@@ -66,8 +65,7 @@ export class AppService {
       const stack: string = err.stack || '';
       const [, filename, line, column] = stack.match(this.errorRegex) || Array(0);
 
-      const logger: LoggerService = req.logger || this.logger;
-      logger.error(
+      this.logger.error(
         'Unexpected ' + err.constructor.name,
         req.source || 'unknown'
       );

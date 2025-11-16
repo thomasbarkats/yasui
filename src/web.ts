@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { MaybePromise, JsonValue } from './interfaces/utils.i.js';
-import { LoggerService } from './services/logger.service.js';
 
 
 /**
@@ -12,8 +11,8 @@ export class YasuiRequest extends Request {
   /** Route parameters extracted from URL path (e.g., /users/:id) */
   params: Record<string, string> = {};
 
-  /** Per-request logger instance with timing capabilities */
-  logger?: LoggerService;
+  /** @deprecated Use `@Logger()` to access Request logger */
+  logger?: never;
 
   /** Source controller or middleware name for debugging */
   source?: string;

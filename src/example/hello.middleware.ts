@@ -9,7 +9,7 @@ export class HelloMiddleware implements IMiddleware {
   use(
     @Req() req: Request,
     @Inject() testsService: TestsService,
-    @Logger() logger: LoggerService, // each request has a dedicated timed log instance
+    @Logger() logger: LoggerService, // each request can have a dedicated timed log instance
   ): void {
     const url = new URL(req.url);
     logger.log(`Request ${req.method} ${url.pathname} ...`, HelloMiddleware.name);

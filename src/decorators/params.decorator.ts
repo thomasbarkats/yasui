@@ -96,4 +96,4 @@ export const Query: RouteReqParamDecorator = routeRequestParamDecorator(RouteReq
 /** Extracts specific body property or entire body if propertyName omitted */
 export const Body: RouteReqParamDecorator = routeRequestParamDecorator(RouteRequestParamTypes.BODY);
 /** Injects timed logger instance dedicated to the current request */
-export const Logger: RouteReqParamDecorator = routeRequestParamDecorator(RouteRequestParamTypes.LOGGER);
+export const Logger: RouteReqParamDecorator = routeRequestParamDecorator('_logger');

@@ -11,7 +11,6 @@ export enum RouteRequestParamTypes {
   PARAM = 'params',
   QUERY = 'query',
   BODY = 'body',
-  LOGGER = 'logger',
 }
 
 /** HTTP verbs, lowercase, internal use */

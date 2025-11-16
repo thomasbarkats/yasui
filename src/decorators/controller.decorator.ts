@@ -71,6 +71,12 @@ export function Controller(
         /** join controller path with route path */
         const fullPath = joinPaths(path, route.path);
 
+        /** detect if route use logger decorator */
+        const routeUseLogger = route.params.some(p => p.path.includes('_logger'));
+        const allMiddlewareClasses = [...middlewares, ...route.middlewares];
+        const middlewaresUseLogger = allMiddlewareClasses.some(Md => core.middlewareUseLogger(Md));
+        const useLogger = routeUseLogger || middlewaresUseLogger;
+
         /** register route with radix3 in core */
         core.addRoute(
           fullPath,
@@ -78,7 +84,8 @@ export function Controller(
           handler,
           allMiddlewares,
           target.name,
-          route.defaultStatus
+          route.defaultStatus,
+          useLogger
         );
       }
     };

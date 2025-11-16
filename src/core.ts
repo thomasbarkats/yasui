@@ -9,6 +9,7 @@ import { ConfigValidator } from './utils/config-validator.js';
 import { DecoratorValidator } from './utils/decorator-validator.js';
 import { SwaggerService } from './utils/swagger.service.js';
 import { setupSwaggerUI } from './utils/swagger.js';
+import { ReflectMetadata, getMetadata } from './utils/reflect.js';
 import { HttpCode } from './enums/index.js';
 import {
   Constructible,
@@ -21,6 +22,8 @@ import {
 } from './interfaces/index.js';
 
 
+type CoreYasuiRequest = YasuiRequest & { _logger?: LoggerService; };
+
 interface IDController extends IController {
   path: string;
   configureRoutes: (self: this, core: Core) => void;
@@ -32,6 +35,7 @@ interface RouteData {
   method: string;
   source?: string;
   defaultStatus?: HttpCode;
+  useLogger?: boolean;
 }
 
 
@@ -45,6 +49,7 @@ export class Core {
   private injector: Injector;
   private router: RadixRouter<RouteData>;
   private globalMiddlewares: RequestHandler[] = [];
+  private middlewareLoggerCache: WeakMap<Function, boolean> = new WeakMap();
 
   constructor(conf: YasuiConfig) {
     ConfigValidator.validate(conf);
@@ -102,7 +107,7 @@ export class Core {
     /** create fetch handler */
     const handler = async (standardReq: Request): Promise<Response> => {
       try {
-        const req = new YasuiRequest(standardReq);
+        const req: CoreYasuiRequest = new YasuiRequest(standardReq);
 
         const routeKey = `${req.method}:${req.path}`;
         const match = this.router.lookup(routeKey);
@@ -111,18 +116,20 @@ export class Core {
           return this.appService.handleNotFound(req);
         }
         req.params = match.params || {};
-        req.logger = new LoggerService().start();
         req.source = match.source;
+        if (match.useLogger) {
+          req._logger = new LoggerService().start();
+        }
 
         return await this.executeChain(req, match);
 
       } catch (error) {
         // minimal request for error handling if conversion failed
-        const req = new YasuiRequest(standardReq.url, {
+        const req: CoreYasuiRequest = new YasuiRequest(standardReq.url, {
           method: standardReq.method,
           headers: standardReq.headers,
         });
-        req.logger = new LoggerService().start();
+        req._logger = new LoggerService().start();
         return this.appService.handleErrors(<Error>error, req);
       }
     };
@@ -148,7 +155,8 @@ export class Core {
     handler: RequestHandler,
     middlewares: RequestHandler[],
     source?: string,
-    defaultStatus?: HttpCode
+    defaultStatus?: HttpCode,
+    logger?: boolean
   ): void {
     const routeKey = `${method.toUpperCase()}:${path}`;
     this.router.insert(routeKey, {
@@ -157,7 +165,21 @@ export class Core {
       method: method.toUpperCase(),
       source,
       defaultStatus,
+      useLogger: logger,
     });
+  }
+
+  /** check if middleware use logger with caching for performance */
+  public middlewareUseLogger(Md: TMiddleware): boolean {
+    if (typeof Md !== 'function' || !Md.prototype) {
+      return false;
+    }
+    if (this.middlewareLoggerCache.has(Md)) {
+      return this.middlewareLoggerCache.get(Md)!;
+    }
+    const need = getMetadata(ReflectMetadata.USE_LOGGER, Md.prototype) || false;
+    this.middlewareLoggerCache.set(Md, need);
+    return need;
   }
 
 
