@@ -5,7 +5,7 @@ import { HttpError, ErrorResourceSchema } from './error.resource.js';
 import { getMetadata, defineMetadata } from './reflect.js';
 import { resolveSchema } from './index.js';
 import { ApiPropertyDefinition, Constructible, OpenAPISchema, ISwaggerConfig } from '../interfaces/index.js';
-import { LoggerService } from '../services/index.js';
+import { LoggerService } from '../utils/index.js';
 import { RequestHandler } from '../web.js';
 
 

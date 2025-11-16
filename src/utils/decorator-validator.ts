@@ -1,6 +1,6 @@
 import { ReflectMetadata, getMetadata } from './reflect.js';
 import { SwaggerService } from './swagger.service.js';
-import { LoggerService } from '../services/index.js';
+import { LoggerService } from '../utils/index.js';
 import { Scopes } from '../enums/index.js';
 import {
   Constructible,

@@ -2,7 +2,7 @@ import kleur from 'kleur';
 import { NextFunction, YasuiRequest } from '../web.js';
 import { ErrorResource, HttpError } from './error.resource.js';
 import { HttpCode } from '../enums/index.js';
-import { LoggerService } from '../services/index.js';
+import { LoggerService } from '../utils/index.js';
 import { MaybePromise, YasuiConfig } from '../interfaces/index.js';
 import { getCwd } from './runtime.js';
 

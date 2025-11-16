@@ -3,7 +3,7 @@ import { createRouter, RadixRouter } from 'radix3';
 
 import { YasuiRequest, RequestHandler, NextFunction, FetchHandler } from './web.js';
 import { Injector } from './injector.js';
-import { LoggerService } from './services/index.js';
+import { LoggerService } from './utils/index.js';
 import { AppService } from './utils/app.service.js';
 import { ConfigValidator } from './utils/config-validator.js';
 import { DecoratorValidator } from './utils/decorator-validator.js';

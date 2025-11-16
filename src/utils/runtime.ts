@@ -38,24 +38,6 @@ export function detectRuntime(): Runtime {
 /** Get current runtime */
 export const RUNTIME: Runtime = detectRuntime();
 
-/** Cross-runtime environment variable access */
-export function getEnv(name: string, fallback = ''): string {
-  try {
-    switch (RUNTIME) {
-      case 'deno':
-        return Deno.env.get(name) ?? fallback;
-      case 'node':
-      case 'bun':
-        // Bun supports process.env like Node
-        return process.env[name] ?? fallback;
-      default:
-        return fallback;
-    }
-  } catch {
-    return fallback;
-  }
-}
-
 /** Cross-runtime current working directory access */
 export function getCwd(): string {
   try {
@@ -73,3 +55,28 @@ export function getCwd(): string {
     return '.';
   }
 }
+
+/**
+ * Safe method to read an environment variable
+ * @param name environment variable name
+ * @param back optional default / fallback value
+ */
+export function getEnv(name: string, fallback = ''): string {
+  try {
+    switch (RUNTIME) {
+      case 'deno':
+        return Deno.env.get(name) ?? fallback;
+      case 'node':
+      case 'bun':
+        // Bun supports process.env like Node
+        return process.env[name] ?? fallback;
+      default:
+        return fallback;
+    }
+  } catch {
+    return fallback;
+  }
+}
+
+/** @deprecated use `getEnv` instead */
+export const ConfigService = { get: getEnv };

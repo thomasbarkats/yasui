@@ -1,6 +1,6 @@
 import kleur from 'kleur';
 import { Scopes } from './enums/index.js';
-import { LoggerService } from './services/index.js';
+import { LoggerService } from './utils/index.js';
 import { DecoratorValidator } from './utils/decorator-validator.js';
 import { ReflectMetadata, getMetadata, defineMetadata } from './utils/reflect.js';
 import { Constructible, Instance } from './interfaces/index.js';

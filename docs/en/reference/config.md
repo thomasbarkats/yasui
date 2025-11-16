@@ -45,7 +45,7 @@ Array of global pipes to apply to all route parameters. See [Pipes](/reference/p
 #### `environment`
 Environment name for your application.
 - **Type:** `string`
-- **Default:** `process.env.NODE_ENV || 'development'`
+- **Default:** `undefined`
 - **Example value:** `production`
 
 #### `port`
@@ -227,71 +227,6 @@ createServer(async (req, res) => {
 - You're deploying to serverless platforms
 - You're integrating with platform-specific features
 
-## Configuration Examples
-
-### Basic API Setup
-
-```typescript
-yasui.createServer({
-  controllers: [UserController, AuthController],
-  port: 3000,
-  debug: true
-});
-```
-
-### Complete Configuration with HTTPS
-
-```typescript
-yasui.createServer({
-  controllers: [UserController, AuthController],
-  middlewares: [LoggingMiddleware, AuthMiddleware],
-  globalPipes: [ValidationPipe, TrimPipe],
-  port: 443,
-  hostname: 'api.example.com',
-  tls: {
-    cert: './certs/cert.pem',
-    key: './certs/key.pem',
-    passphrase: 'optional-passphrase'
-  },
-  runtimeOptions: {
-    node: {
-      http2: true,
-      maxHeaderSize: 16384
-    }
-  },
-  debug: false,
-  environment: 'production',
-  enableDecoratorValidation: true,
-  injections: [
-    { token: 'DATABASE_URL', provide: process.env.DATABASE_URL },
-    { token: 'JWT_SECRET', provide: process.env.JWT_SECRET }
-  ],
-  swagger: {
-    generate: true,
-    path: '/api-docs',
-    info: {
-      title: 'My API',
-      version: '1.0.0',
-      description: 'Complete API with all features'
-    }
-  }
-});
-```
-
-### Multi-Runtime Configuration
-
-The same configuration works across Node.js, Deno, and Bun:
-
-```typescript
-// Works on Node.js, Deno, and Bun
-yasui.createServer({
-  controllers: [UserController],
-  port: 3000,
-  middlewares: [CorsMiddleware], // Use native YasuiJS middlewares
-  debug: true
-});
-```
-
 ### Edge Runtime Deployment
 
 For edge runtimes, use `createApp()` to get a standard fetch handler:
@@ -329,3 +264,23 @@ Debug mode provides:
 - Dependency injection details
 - Route registration information
 - Error stack traces
+
+## Environment
+
+YasuiJS provides access to environment variables that is runtime-agnostic. Use it instead of `process.env` to ensure compatibility across Node.js, Deno, and Bun.
+
+- `getEnv(name: string, fallback?: string): string` - Read environment variable with optional fallback
+
+```typescript
+import { getEnv, Injectable } from 'yasui';
+
+@Injectable()
+export class DatabaseService {
+  private readonly dbUrl = getEnv('DATABASE_URL', 'localhost');
+  private readonly port = getEnv('DB_PORT', '5432');
+
+  connect() {
+    console.log(`Connecting to ${this.dbUrl}:${this.port}`);
+  }
+}
+```
