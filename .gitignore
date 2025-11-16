@@ -3,6 +3,8 @@
 /lib
 /.vscode
 .DS_Store
+/benchmarks
+/.claude
 
 # Docs
 docs/.vitepress/dist

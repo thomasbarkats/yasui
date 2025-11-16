@@ -62,8 +62,10 @@ export default [
     ignores: [
       'debug/**',
       'node_modules/**',
+      'benchmarks/**',
       '.git/**',
       '.vscode/**',
+      '.claude/**',
       'lib/**',
       'docs/.vitepress/cache/**',
       'docs/.vitepress/dist/**'
