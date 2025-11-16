@@ -158,7 +158,7 @@ export class UserController {
 export class AuthMiddleware {
   use(@Req() req: Request) {
     // 检查身份验证
-    const authHeader = req.headers.get('authorization');
+    const authHeader = req.rawHeaders.get('authorization');
     if (!authHeader) {
       throw new Error('Unauthorized'); // 在这里停止
     }
@@ -207,7 +207,7 @@ getUsers() {}
 export class AuthMiddleware {
   use(@Req() req: Request) {
     // 验证请求
-    if (!req.headers.get('authorization')) {
+    if (!req.rawHeaders.get('authorization')) {
       throw new HttpError(401, 'Unauthorized');
     }
     // 自动继续

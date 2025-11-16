@@ -197,7 +197,7 @@ yasui.createServer({
   controllers: [UserController],
   injections: [
     // Valeur directe
-    { token: 'API_KEY', provide: process.env.API_KEY },
+    { token: 'CONFIG', provide: 'value' },
     // Factory asynchrone
     {
       token: 'DATABASE',

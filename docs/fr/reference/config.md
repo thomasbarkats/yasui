@@ -45,7 +45,7 @@ Tableau de pipes globaux à appliquer à tous les paramètres de route. Voir [Pi
 #### `environment`
 Nom d'environnement pour votre application.
 - **Type :** `string`
-- **Défaut :** `process.env.NODE_ENV || 'development'`
+- **Défaut :** `undefined`
 - **Valeur d'exemple :** `production`
 
 #### `port`
@@ -107,7 +107,7 @@ Où `Injection` est :
 ```typescript
 [
   // Valeur directe
-  { token: 'CONFIG', provide: 'value' },
+  { token: 'API_KEY', provide: 'value' },
 
   // Factory asynchrone (construite avant le démarrage du serveur)
   {
@@ -227,92 +227,6 @@ createServer(async (req, res) => {
 - Vous déployez sur des plateformes serverless
 - Vous intégrez avec des fonctionnalités spécifiques à la plateforme
 
-## Exemples de Configuration
-
-### Configuration d'API de Base
-
-```typescript
-yasui.createServer({
-  controllers: [UserController, AuthController],
-  port: 3000,
-  debug: true
-});
-```
-
-### Configuration Complète avec HTTPS
-
-```typescript
-yasui.createServer({
-  controllers: [UserController, AuthController],
-  middlewares: [LoggingMiddleware, AuthMiddleware],
-  globalPipes: [ValidationPipe, TrimPipe],
-  port: 443,
-  hostname: 'api.example.com',
-  tls: {
-    cert: './certs/cert.pem',
-    key: './certs/key.pem',
-    passphrase: 'optional-passphrase'
-  },
-  runtimeOptions: {
-    node: {
-      http2: true,
-      maxHeaderSize: 16384
-    }
-  },
-  debug: false,
-  environment: 'production',
-  enableDecoratorValidation: true,
-  injections: [
-    { token: 'DATABASE_URL', provide: process.env.DATABASE_URL },
-    { token: 'JWT_SECRET', provide: process.env.JWT_SECRET }
-  ],
-  swagger: {
-    generate: true,
-    path: '/api-docs',
-    info: {
-      title: 'Mon API',
-      version: '1.0.0',
-      description: 'API complète avec toutes les fonctionnalités'
-    }
-  }
-});
-```
-
-### Configuration Multi-Runtime
-
-La même configuration fonctionne sur Node.js, Deno et Bun :
-
-```typescript
-// Fonctionne sur Node.js, Deno et Bun
-yasui.createServer({
-  controllers: [UserController],
-  port: 3000,
-  middlewares: [CorsMiddleware], // Utiliser des middlewares YasuiJS natifs
-  debug: true
-});
-```
-
-### Déploiement Runtime Edge
-
-Pour les runtimes edge, utilisez `createApp()` pour obtenir un gestionnaire fetch standard :
-
-```typescript
-const app = yasui.createApp({
-  controllers: [UserController],
-  middlewares: [CorsMiddleware]
-});
-
-// Déployer sur Cloudflare Workers
-export default { fetch: app.fetch };
-
-// Déployer sur Vercel Edge
-export const GET = app.fetch;
-export const POST = app.fetch;
-
-// Déployer sur Deno Deploy
-Deno.serve(app.fetch);
-```
-
 ## Mode Debug
 
 Activez le mode debug pour voir des informations détaillées :
@@ -329,3 +243,23 @@ Le mode debug fournit :
 - Détails de l'injection de dépendances
 - Informations d'enregistrement des routes
 - Traces de pile d'erreurs
+
+## Environment
+
+YasuiJS fournit un accès aux variables d'environnement qui est indépendant du runtime. Utilisez-le au lieu de `process.env` pour garantir la compatibilité sur Node.js, Deno et Bun.
+
+- `getEnv(name: string, fallback?: string): string` - Lire une variable d'environnement avec une valeur de repli optionnelle
+
+```typescript
+import { getEnv, Injectable } from 'yasui';
+
+@Injectable()
+export class DatabaseService {
+  private readonly dbUrl = getEnv('DATABASE_URL', 'localhost');
+  private readonly port = getEnv('DB_PORT', '5432');
+
+  connect() {
+    console.log(`Connexion à ${this.dbUrl}:${this.port}`);
+  }
+}
+```

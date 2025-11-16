@@ -195,6 +195,74 @@ export class UserController {
 }
 ```
 
+**Propriétés de requête disponibles :**
+- `url` - URL complète de la requête
+- `method` - Méthode HTTP (GET, POST, etc.)
+- `headers` / `rawHeaders` - En-têtes de requête (voir [Accès aux En-têtes](#accès-aux-en-têtes))
+- `params` - Paramètres de route
+- `query` - Paramètres de chaîne de requête
+- `cookies` - Cookies analysés
+- `body` - Corps de requête analysé
+- `path` - Nom de chemin de la requête
+- `hostname` - Nom d'hôte de la requête
+- `protocol` - Protocole de la requête (http/https)
+- `ip` - Adresse IP du client
+
+### Accès aux En-têtes
+
+YasuiJS fournit deux façons d'accéder aux en-têtes :
+
+**Style Express (objet simple)**
+
+Pour la compatibilité afin d'éviter un changement incompatible depuis la v3.
+```typescript
+@Get('/')
+getUsers(@Req() req: Request) {
+  const auth = req.headers.authorization;        // Notation par point
+  const type = req.headers['content-type'];      // Notation par crochets
+}
+```
+
+**Standards Web Natifs (objet Headers) :**
+```typescript
+@Get('/')
+getUsers(@Req() req: Request) {
+  const auth = req.rawHeaders.get('authorization');
+  const type = req.rawHeaders.get('content-type');
+}
+```
+
+**Quand utiliser :**
+- `req.headers` - Lorsque vous accédez à plusieurs en-têtes ou préférez la syntaxe style Express
+- `req.rawHeaders` - Meilleur pour les vérifications d'en-tête unique, meilleures performances (pas de conversion d'objet)
+
+### Création de Décorateurs de Requête Personnalisés
+
+Vous pouvez créer vos propres décorateurs pour extraire des propriétés spécifiques de l'objet de requête en utilisant `routeRequestParamDecorator`.
+
+```typescript
+import { routeRequestParamDecorator } from 'yasui';
+
+// Créer un décorateur personnalisé pour l'IP de la requête
+export const Ip = routeRequestParamDecorator('ip');
+
+// Utiliser dans le contrôleur
+@Controller('/api/users')
+export class UserController {
+  @Get('/')
+  getUsers(@Ip() ip: string) {
+    console.log(`Requête depuis ${ip}`);
+    return { users: [] };
+  }
+}
+```
+
+Cette approche est préférée à l'utilisation de `@Req()` pour l'accès à une seule propriété, car elle :
+- Améliore la lisibilité du code
+- Active la sécurité de type
+
+Voir [Accès à l'objet Request](#accès-à-lobjet-request) pour la liste complète des propriétés de requête disponibles.
+
 ## Gestion des réponses
 
 YasuiJS gère automatiquement la sérialisation des réponses et les codes de statut.

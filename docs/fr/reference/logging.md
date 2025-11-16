@@ -50,11 +50,9 @@ export class UserController {
 }
 ```
 
-### Accès au Niveau Méthode
+### Logger au Niveau de la Requête
 
-- `@Logger()` - Obtenir une instance de logger spécifique à la requête (aucun paramètre)
-
-Utilisez le décorateur `@Logger()` pour obtenir une instance de logger dédiée qui est automatiquement démarrée au début de la route. Ceci est utile pour suivre le chronométrage tout au long de l'opération en mode debug. Cela fonctionne à la fois dans les méthodes de contrôleur et les méthodes de middleware.
+Utilisez le décorateur `@Logger()` pour obtenir une **instance de logger dédiée, par requête**. Chaque requête obtient son propre logger isolé qui démarre automatiquement pour le suivi du chronométrage. Le logger démarre lorsque la requête commence.
 
 ```typescript
 import { LoggerService } from 'yasui';
@@ -81,6 +79,36 @@ export class RequestLoggerMiddleware {
   }
 }
 ```
+
+Une instance de logger n'est créée par requête que lorsque le décorateur `@Logger` est utilisé. Le logger n'est pas accessible via `req.logger` - utilisez le décorateur `@Logger()` pour y accéder. Cela garantit des performances optimales en créant des instances de logger uniquement lorsqu'elles sont explicitement nécessaires.
+
+**Logger de Constructeur vs Logger au Niveau de la Requête :**
+
+```typescript
+@Controller('/api/users')
+export class UserController {
+  // Injection par constructeur : Partagé entre toutes les requêtes
+  // Utilisez `@Scope(Scopes.LOCAL)` pour une instance restreinte au Contrôleur
+  constructor(private readonly logger: LoggerService) {}
+
+  @Get('/shared')
+  withSharedLogger() {
+    // Utilise le logger partagé (singleton par défaut)
+    this.logger.log('Utilisation du logger partagé');
+  }
+
+  @Get('/isolated')
+  withRequestLogger(@Logger() logger: LoggerService) {
+    // Utilise un logger de requête dédié (unique par requête)
+    logger.log('Utilisation du logger spécifique à la requête');
+    // Suit automatiquement le chronométrage depuis le début de la requête
+  }
+}
+```
+
+**Quand utiliser chacun :**
+- **Injection par constructeur** - Journalisation au niveau de l'application, initialisation des services, opérations partagées
+- **Décorateur `@Logger()`** - Opérations spécifiques à la requête, suivi des performances, journalisation de requête isolée
 
 ## Méthodes de Journalisation
 

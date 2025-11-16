@@ -50,11 +50,9 @@ export class UserController {
 }
 ```
 
-### 方法级访问
+### 请求级日志记录器
 
-- `@Logger()` - 获取请求特定的日志记录器实例（无参数）
-
-使用 `@Logger()` 装饰器获取一个专用的日志记录器实例，该实例在路由开始时自动启动。这对于在调试模式下跟踪整个操作的计时很有用。这在控制器方法和中间件方法中都有效。
+使用 `@Logger()` 装饰器获取一个**专用的每请求日志记录器实例**。每个请求都获得自己的隔离日志记录器，该日志记录器会自动启动以进行计时跟踪。日志记录器在请求开始时启动。
 
 ```typescript
 import { LoggerService } from 'yasui';
@@ -78,6 +76,32 @@ export class RequestLoggerMiddleware {
     @Logger() logger: LoggerService
   ) {
     logger.log('传入请求', { method: req.method, path: req.path });
+  }
+}
+```
+
+仅在使用 `@Logger` 装饰器时才会为每个请求创建日志记录器实例。日志记录器无法通过 `req.logger` 访问 - 使用 `@Logger()` 装饰器访问它。这通过仅在明确需要时创建日志记录器实例来确保最佳性能。
+
+**构造函数日志记录器 vs 请求级日志记录器：**
+
+```typescript
+@Controller('/api/users')
+export class UserController {
+  // 构造函数注入：在所有请求间共享
+  // 使用 `@Scope(Scopes.LOCAL)` 获取控制器范围的实例
+  constructor(private readonly logger: LoggerService) {}
+
+  @Get('/shared')
+  withSharedLogger() {
+    // 使用共享日志记录器（默认单例）
+    this.logger.log('使用共享日志记录器');
+  }
+
+  @Get('/isolated')
+  withRequestLogger(@Logger() logger: LoggerService) {
+    // 使用专用请求日志记录器（每请求唯一）
+    logger.log('使用请求特定日志记录器');
+    // 自动跟踪从请求开始以来的计时
   }
 }
 ```
@@ -150,6 +174,10 @@ yasui.createServer({
   debug: true // 启用详细日志记录
 });
 ```
+
+**何时使用哪个：**
+- **构造函数注入** - 用于一般日志记录，在控制器方法间共享状态
+- **`@Logger()` 装饰器** - 用于请求特定的日志记录，带有自动计时跟踪
 
 在调试模式下：
 - 所有传入请求都会自动记录

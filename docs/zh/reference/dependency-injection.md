@@ -197,7 +197,7 @@ yasui.createServer({
   controllers: [UserController],
   injections: [
     // 直接值
-    { token: 'API_KEY', provide: process.env.API_KEY },
+    { token: 'CONFIG', provide: 'value' },
     // 异步工厂函数
     {
       token: 'DATABASE',

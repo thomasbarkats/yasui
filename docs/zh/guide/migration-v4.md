@@ -67,9 +67,8 @@ yasui.createServer({
 export class AuthMiddleware {
   use(@Req() req: Request, @Res() res: Response) {
     if (!req.headers.authorization) {
-      // 使用 @Res() 是可能的但不推荐
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
+      // 抛出错误或返回 Response 对象
+      throw new HttpError(401, 'Unauthorized');
     }
   }
 }
@@ -80,7 +79,7 @@ export class AuthMiddleware {
 @Middleware()
 export class AuthMiddleware {
   use(@Req() req: Request) {
-    if (!req.headers.get('authorization')) {
+    if (!req.rawHeaders.get('authorization')) {
       // 抛出错误或返回 Response 对象
       throw new HttpError(401, 'Unauthorized');
     }
@@ -108,7 +107,7 @@ export class AuthMiddleware {
 @Get('/users')
 getUsers(@Req() req: Request) {
   // 通过原生 Headers 对象的 .get() 获取头部
-  const auth = req.headers.get('authorization');
+  const auth = req.rawHeaders.get('authorization');
 
   // Express 兼容属性仍然有效
   const auth = req.headers.authorization;
@@ -261,17 +260,8 @@ export class CorsMiddleware implements IMiddleware {
   }
 }
 
-// 创建原生日志中间件
-@Middleware()
-export class LoggingMiddleware implements IMiddleware {
-  async use(@Req() req: Request, @Logger() logger: LoggerService, @Next() next: NextFunction) {
-    logger.log(`${req.method} ${req.path}`);
-    return await next();
-  }
-}
-
 yasui.createServer({
-  middlewares: [CorsMiddleware, LoggingMiddleware]  // ✅ 有效
+  middlewares: [CorsMiddleware]  // ✅ 有效
 });
 ```
 

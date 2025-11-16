@@ -195,6 +195,74 @@ export class UserController {
 }
 ```
 
+**Propiedades de solicitud disponibles:**
+- `url` - URL completa de la solicitud
+- `method` - Método HTTP (GET, POST, etc.)
+- `headers` / `rawHeaders` - Encabezados de solicitud (ver [Acceso a Encabezados](#acceso-a-encabezados))
+- `params` - Parámetros de ruta
+- `query` - Parámetros de query string
+- `cookies` - Cookies parseadas
+- `body` - Cuerpo de solicitud parseado
+- `path` - Pathname de la solicitud
+- `hostname` - Hostname de la solicitud
+- `protocol` - Protocolo de solicitud (http/https)
+- `ip` - Dirección IP del cliente
+
+### Acceso a Encabezados
+
+YasuiJS proporciona dos formas de acceder a encabezados:
+
+**Estilo Express (objeto plano)**
+
+Para compatibilidad al evitar un cambio incompatible desde v3.
+```typescript
+@Get('/')
+getUsers(@Req() req: Request) {
+  const auth = req.headers.authorization;        // Notación de punto
+  const type = req.headers['content-type'];      // Notación de corchetes
+}
+```
+
+**Web Standards Nativos (objeto Headers):**
+```typescript
+@Get('/')
+getUsers(@Req() req: Request) {
+  const auth = req.rawHeaders.get('authorization');
+  const type = req.rawHeaders.get('content-type');
+}
+```
+
+**Cuándo usar:**
+- `req.headers` - Cuando accedes a múltiples encabezados o prefieres sintaxis estilo Express
+- `req.rawHeaders` - Mejor para verificaciones de un solo encabezado, mejor rendimiento (sin conversión de objeto)
+
+### Creación de Decoradores de Solicitud Personalizados
+
+Puedes crear tus propios decoradores para extraer propiedades específicas del objeto de solicitud usando `routeRequestParamDecorator`.
+
+```typescript
+import { routeRequestParamDecorator } from 'yasui';
+
+// Crear decorador personalizado para IP de solicitud
+export const Ip = routeRequestParamDecorator('ip');
+
+// Usar en controlador
+@Controller('/api/users')
+export class UserController {
+  @Get('/')
+  getUsers(@Ip() ip: string) {
+    console.log(`Solicitud desde ${ip}`);
+    return { users: [] };
+  }
+}
+```
+
+Este enfoque es preferido sobre usar `@Req()` para acceso a una sola propiedad, ya que:
+- Mejora la legibilidad del código
+- Habilita seguridad de tipos
+
+Ver [Acceso al Objeto Request](#acceso-al-objeto-request) para la lista completa de propiedades de solicitud disponibles.
+
 ## Manejo de Respuestas
 
 YasuiJS maneja automáticamente la serialización de respuestas y códigos de estado.

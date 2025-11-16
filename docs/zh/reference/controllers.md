@@ -178,7 +178,7 @@ TypeScript 无法在运行时检测数组项类型，因此您必须为非字符
 @Header('headerName', [Type]) headerName: Type[]
 ```
 
-## 请求对象访问
+## 访问请求对象
 
 `@Req()` - 访问 YasuiJS 请求对象（具有 Express 兼容属性的 Web 标准请求）
 
@@ -194,6 +194,74 @@ export class UserController {
   }
 }
 ```
+
+### 可用的请求属性
+- `url` - 完整的请求 URL
+- `method` - HTTP 方法（GET、POST 等）
+- `headers` / `rawHeaders` - 请求头（参见[访问请求头](#访问请求头)）
+- `params` - 路由参数
+- `query` - 查询字符串参数
+- `cookies` - 解析的 cookies
+- `body` - 解析的请求体
+- `path` - 请求路径名
+- `hostname` - 请求主机名
+- `protocol` - 请求协议（http/https）
+- `ip` - 客户端 IP 地址
+
+### 访问请求头
+
+YasuiJS 提供两种访问请求头的方式：
+
+**Express 风格（普通对象）**
+
+为了兼容性，避免从 v3 的破坏性变更。
+```typescript
+@Get('/')
+getUsers(@Req() req: Request) {
+  const auth = req.headers.authorization;        // 点符号
+  const type = req.headers['content-type'];      // 括号符号
+}
+```
+
+**原生 Web 标准（Headers 对象）：**
+```typescript
+@Get('/')
+getUsers(@Req() req: Request) {
+  const auth = req.rawHeaders.get('authorization');
+  const type = req.rawHeaders.get('content-type');
+}
+```
+
+**何时使用：**
+- `req.headers` - 当访问多个头部或更喜欢 Express 风格语法时
+- `req.rawHeaders` - 更适合单个头部检查，性能更好（无对象转换）
+
+### 创建自定义请求装饰器
+
+您可以使用 `routeRequestParamDecorator` 创建自己的装饰器来提取请求对象的特定属性。
+
+```typescript
+import { routeRequestParamDecorator } from 'yasui';
+
+// 为请求 IP 创建自定义装饰器
+export const Ip = routeRequestParamDecorator('ip');
+
+// 在控制器中使用
+@Controller('/api/users')
+export class UserController {
+  @Get('/')
+  getUsers(@Ip() ip: string) {
+    console.log(`来自 ${ip} 的请求`);
+    return { users: [] };
+  }
+}
+```
+
+这种方法优于使用 `@Req()` 访问单个属性，因为它：
+- 提高代码可读性
+- 启用类型安全
+
+查看[访问请求对象](#访问请求对象)获取可用请求属性的完整列表。
 
 ## 响应处理
 

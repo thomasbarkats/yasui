@@ -45,7 +45,7 @@ Array de pipes globales para aplicar a todos los parámetros de ruta. Ver [Pipes
 #### `environment`
 Nombre del entorno para tu aplicación.
 - **Tipo:** `string`
-- **Por defecto:** `process.env.NODE_ENV || 'development'`
+- **Por defecto:** `undefined`
 - **Valor de ejemplo:** `production`
 
 #### `port`
@@ -107,7 +107,7 @@ Donde `Injection` es:
 ```typescript
 [
   // Valor directo
-  { token: 'CONFIG', provide: 'value' },
+  { token: 'API_KEY', provide: 'value' },
 
   // Factory asíncrona (construida antes de que el servidor inicie)
   {
@@ -227,71 +227,6 @@ createServer(async (req, res) => {
 - Estás desplegando en plataformas serverless
 - Estás integrando con características específicas de la plataforma
 
-## Ejemplos de Configuración
-
-### Configuración Básica de API
-
-```typescript
-yasui.createServer({
-  controllers: [UserController, AuthController],
-  port: 3000,
-  debug: true
-});
-```
-
-### Configuración Completa con HTTPS
-
-```typescript
-yasui.createServer({
-  controllers: [UserController, AuthController],
-  middlewares: [LoggingMiddleware, AuthMiddleware],
-  globalPipes: [ValidationPipe, TrimPipe],
-  port: 443,
-  hostname: 'api.example.com',
-  tls: {
-    cert: './certs/cert.pem',
-    key: './certs/key.pem',
-    passphrase: 'optional-passphrase'
-  },
-  runtimeOptions: {
-    node: {
-      http2: true,
-      maxHeaderSize: 16384
-    }
-  },
-  debug: false,
-  environment: 'production',
-  enableDecoratorValidation: true,
-  injections: [
-    { token: 'DATABASE_URL', provide: process.env.DATABASE_URL },
-    { token: 'JWT_SECRET', provide: process.env.JWT_SECRET }
-  ],
-  swagger: {
-    generate: true,
-    path: '/api-docs',
-    info: {
-      title: 'Mi API',
-      version: '1.0.0',
-      description: 'API completa con todas las características'
-    }
-  }
-});
-```
-
-### Configuración Multi-Runtime
-
-La misma configuración funciona en Node.js, Deno y Bun:
-
-```typescript
-// Funciona en Node.js, Deno y Bun
-yasui.createServer({
-  controllers: [UserController],
-  port: 3000,
-  middlewares: [CorsMiddleware], // Usar middlewares nativos de YasuiJS
-  debug: true
-});
-```
-
 ### Despliegue en Runtime Edge
 
 Para runtimes edge, usa `createApp()` para obtener un manejador fetch estándar:
@@ -329,3 +264,23 @@ El modo debug proporciona:
 - Detalles de inyección de dependencias
 - Información de registro de rutas
 - Trazas de pila de errores
+
+## Environment
+
+YasuiJS proporciona acceso a variables de entorno que es independiente del runtime. Úsalo en lugar de `process.env` para asegurar compatibilidad en Node.js, Deno y Bun.
+
+- `getEnv(name: string, fallback?: string): string` - Leer variable de entorno con valor de respaldo opcional
+
+```typescript
+import { getEnv, Injectable } from 'yasui';
+
+@Injectable()
+export class DatabaseService {
+  private readonly dbUrl = getEnv('DATABASE_URL', 'localhost');
+  private readonly port = getEnv('DB_PORT', '5432');
+
+  connect() {
+    console.log(`Conectando a ${this.dbUrl}:${this.port}`);
+  }
+}
+```

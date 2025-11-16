@@ -45,7 +45,7 @@ yasui.createServer({
 #### `environment`
 应用程序的环境名称。
 - **类型：** `string`
-- **默认值：** `process.env.NODE_ENV || 'development'`
+- **默认值：** `undefined`
 - **示例值：** `production`
 
 #### `port`
@@ -107,7 +107,7 @@ TLS/HTTPS 配置。提供时，服务器自动使用 HTTPS。
 ```typescript
 [
   // 直接值
-  { token: 'CONFIG', provide: 'value' },
+  { token: 'API_KEY', provide: 'value' },
 
   // 异步工厂函数（在服务器启动前构建）
   {
@@ -227,92 +227,6 @@ createServer(async (req, res) => {
 - 您正在部署到无服务器平台
 - 您正在集成平台特定功能
 
-## 配置示例
-
-### 基本 API 设置
-
-```typescript
-yasui.createServer({
-  controllers: [UserController, AuthController],
-  port: 3000,
-  debug: true
-});
-```
-
-### 带 HTTPS 的完整配置
-
-```typescript
-yasui.createServer({
-  controllers: [UserController, AuthController],
-  middlewares: [LoggingMiddleware, AuthMiddleware],
-  globalPipes: [ValidationPipe, TrimPipe],
-  port: 443,
-  hostname: 'api.example.com',
-  tls: {
-    cert: './certs/cert.pem',
-    key: './certs/key.pem',
-    passphrase: 'optional-passphrase'
-  },
-  runtimeOptions: {
-    node: {
-      http2: true,
-      maxHeaderSize: 16384
-    }
-  },
-  debug: false,
-  environment: 'production',
-  enableDecoratorValidation: true,
-  injections: [
-    { token: 'DATABASE_URL', provide: process.env.DATABASE_URL },
-    { token: 'JWT_SECRET', provide: process.env.JWT_SECRET }
-  ],
-  swagger: {
-    generate: true,
-    path: '/api-docs',
-    info: {
-      title: 'My API',
-      version: '1.0.0',
-      description: 'Complete API with all features'
-    }
-  }
-});
-```
-
-### 多运行时配置
-
-相同的配置在 Node.js、Deno 和 Bun 中都有效：
-
-```typescript
-// 在 Node.js、Deno 和 Bun 中都有效
-yasui.createServer({
-  controllers: [UserController],
-  port: 3000,
-  middlewares: [CorsMiddleware], // 使用原生 YasuiJS 中间件
-  debug: true
-});
-```
-
-### 边缘运行时部署
-
-对于边缘运行时，使用 `createApp()` 获取标准 fetch 处理器：
-
-```typescript
-const app = yasui.createApp({
-  controllers: [UserController],
-  middlewares: [CorsMiddleware]
-});
-
-// 部署到 Cloudflare Workers
-export default { fetch: app.fetch };
-
-// 部署到 Vercel Edge
-export const GET = app.fetch;
-export const POST = app.fetch;
-
-// 部署到 Deno Deploy
-Deno.serve(app.fetch);
-```
-
 ## 调试模式
 
 启用调试模式以查看详细信息：
@@ -329,3 +243,23 @@ yasui.createServer({
 - 依赖注入详情
 - 路由注册信息
 - 错误堆栈跟踪
+
+## 环境变量
+
+YasuiJS 提供对环境变量的访问，该访问与运行时无关。使用它而不是 `process.env` 以确保在 Node.js、Deno 和 Bun 中的兼容性。
+
+- `getEnv(name: string, fallback?: string): string` - 读取环境变量，带可选的后备值
+
+```typescript
+import { getEnv, Injectable } from 'yasui';
+
+@Injectable()
+export class DatabaseService {
+  private readonly dbUrl = getEnv('DATABASE_URL', 'localhost');
+  private readonly port = getEnv('DB_PORT', '5432');
+
+  connect() {
+    console.log(`连接到 ${this.dbUrl}:${this.port}`);
+  }
+}
+```

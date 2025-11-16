@@ -50,11 +50,9 @@ export class UserController {
 }
 ```
 
-### Acceso a Nivel de Método
+### Logger a Nivel de Solicitud
 
-- `@Logger()` - Obtener instancia de logger específica de solicitud (sin parámetros)
-
-Usa el decorador `@Logger()` para obtener una instancia de logger dedicada que se inicia automáticamente al comienzo de la ruta. Esto es útil para rastrear el cronometraje a lo largo de la operación en modo debug. Esto funciona tanto en métodos de controlador como en métodos de middleware.
+Usa el decorador `@Logger()` para obtener una **instancia de logger dedicada, por solicitud**. Cada solicitud obtiene su propio logger aislado que se inicia automáticamente para rastreo de cronometraje. El logger se inicia cuando comienza la solicitud.
 
 ```typescript
 import { LoggerService } from 'yasui';
@@ -81,6 +79,36 @@ export class RequestLoggerMiddleware {
   }
 }
 ```
+
+Una instancia de logger solo se crea por solicitud cuando se usa el decorador `@Logger`. El logger no es accesible vía `req.logger` - usa el decorador `@Logger()` para acceder a él. Esto asegura rendimiento óptimo al crear instancias de logger solo cuando se necesitan explícitamente.
+
+**Logger de Constructor vs Logger a Nivel de Solicitud:**
+
+```typescript
+@Controller('/api/users')
+export class UserController {
+  // Inyección de constructor: Compartido entre todas las solicitudes
+  // Usa `@Scope(Scopes.LOCAL)` para una instancia restringida al Controlador
+  constructor(private readonly logger: LoggerService) {}
+
+  @Get('/shared')
+  withSharedLogger() {
+    // Usa logger compartido (singleton por defecto)
+    this.logger.log('Usando logger compartido');
+  }
+
+  @Get('/isolated')
+  withRequestLogger(@Logger() logger: LoggerService) {
+    // Usa logger de solicitud dedicado (único por solicitud)
+    logger.log('Usando logger específico de solicitud');
+    // Rastrea automáticamente el cronometraje desde que comenzó la solicitud
+  }
+}
+```
+
+**Cuándo usar cada uno:**
+- **Inyección de constructor** - Logging a nivel de aplicación, inicialización de servicios, operaciones compartidas
+- **Decorador `@Logger()`** - Operaciones específicas de solicitud, rastreo de rendimiento, logging de solicitud aislado
 
 ## Métodos de Logging
 

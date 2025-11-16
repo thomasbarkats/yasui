@@ -36,7 +36,7 @@ import { Middleware, IMiddleware, Request, Req } from 'yasui';
 @Middleware()
 export class AuthMiddleware implements IMiddleware {
   use(@Req() req: Request) {
-    const token = req.headers.authorization;
+    const token = req.rawHeaders.get('authorization');
 
     if (!token) {
       throw new HttpError(401, 'Unauthorized');
