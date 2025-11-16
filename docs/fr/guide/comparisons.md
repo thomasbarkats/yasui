@@ -1,6 +1,6 @@
 # Comparaisons de Frameworks
 
-Vous aimez l'architecture pilotée par les décorateurs de NestJS mais construisez des API REST ? **YasuiJS vous offre la même expérience élégante—25,9% plus rapide, sans bloat, sur les Standards Web modernes.**
+Vous aimez l'architecture pilotée par les décorateurs de NestJS mais construisez des API REST ? **YasuiJS vous offre la même expérience élégante—25% plus rapide, sans bloat, sur les Standards Web modernes.**
 
 ## Pourquoi YasuiJS plutôt que NestJS ?
 
@@ -36,7 +36,7 @@ YasuiJS **conserve toutes les bonnes parties de NestJS :**
 
 ### L'Avantage Performance
 
-**YasuiJS est 25,9% plus rapide que NestJS.**
+**YasuiJS est 25% plus rapide que NestJS.**
 
 | Aspect | YasuiJS | NestJS |
 |--------|---------|--------|
@@ -583,45 +583,38 @@ Node.js v22 avec Windows 11. Tous les frameworks implémentent des fonctionnalit
 Une API REST réaliste avec :
 - **3 Contrôleurs** : User, Product, Order
 - **9 Endpoints** : Lister les ressources, obtenir par ID, filtrer par catégorie/utilisateur/statut
-- **Middleware Global** : Middleware de logging sur toutes les routes
 - **Injection de Dépendances** : Services injectés dans les contrôleurs
-- **Test de Charge** : 10 connexions simultanées, 10 secondes par endpoint
-
-### Comparaison de Taille de Bundle
-
-Empreinte totale incluant node_modules et build de production :
-
-| Framework | node_modules | Build de Production | Total |
-|-----------|--------------|---------------------|-------|
-| **YasuiJS** 🏆 | **25.02 MB** | **5.99 KB** | **25.03 MB** |
-| Express | 27.04 MB | 2.87 KB | 27.04 MB |
-| NestJS | 34.88 MB | 7.07 KB | 34.88 MB |
-
-**YasuiJS est 7,4% plus petit qu'Express et 28,2% plus petit que NestJS.**
 
 ### Performance d'Exécution
 
-| Métrique | YasuiJS | NestJS | Express |
-|----------|---------|--------|---------|
-| **Requêtes/sec** 🚀 | **5,157** 🏆 | 4,508 | 4,920 |
-| **Latence Moy.** | **1.45ms** 🏆 | 1.72ms | 1.51ms |
-| **Démarrage à Froid** | 472ms | 915ms | 252ms 🏆 |
-| **Utilisation Mémoire** | **10.66 MB** 🏆 | 16.48 MB | 12.68 MB |
+#### Charge Légère (10 connexions simultanées, 10s par endpoint)
 
-### Résultats Clés
+| Métrique | YasuiJS | Express | NestJS |
+|----------|---------|---------|--------|
+| **Requêtes/sec** 🚀 | **7,209** 🏆 | 6,602 | 5,695 |
+| **Latence Moy.** | **0.91ms** 🏆 | 1.07ms | 1.26ms |
+| **Démarrage à Froid** | 280ms | 229ms 🏆 | 568ms |
 
-- ✅ **YasuiJS est 4,8% plus rapide qu'Express**
-- ✅ **YasuiJS est 14,4% plus rapide que NestJS** sur tous les endpoints
-- ✅ **YasuiJS utilise 16% moins de mémoire qu'Express**
-- ✅ **YasuiJS utilise 35% moins de mémoire que NestJS**
+**Résultats Clés :**
+- ✅ **YasuiJS est presque 10% plus rapide qu'Express**
+- ✅ **YasuiJS est plus de 25% plus rapide que NestJS**
+
+#### Charge Lourde (100 connexions simultanées, 30s par endpoint)
+
+| Métrique | YasuiJS | Express | NestJS |
+|----------|---------|---------|--------|
+| **Requêtes/sec** 🚀 | **6,951** 🏆 | 6,755 | 5,492 |
+| **Latence Moy.** | **13.89ms** 🏆 | 14.31ms | 17.72ms |
+| **Démarrage à Froid** | 256ms | 225ms 🏆 | 595ms |
+
+**Résultats Clés :**
+- ✅ **YasuiJS est plus de 25% plus rapide que NestJS**
 
 **Pourquoi YasuiJS Évolue Mieux :**
 - **Routeur Radix3** : Correspondance de route efficace pour plusieurs endpoints
 - **Cache ID** : Dépendances résolues une fois et mises en cache
 - **Métadonnées de Décorateur** : Pré-calculées au démarrage, pas par requête
 - **Middleware Optimisé** : Pipeline basé sur les promesses avec surcharge minimale
-
-Plus votre API devient complexe, plus les avantages architecturaux de YasuiJS brillent.
 
 ::: details Performance Détaillée par Endpoint
 

@@ -1,6 +1,6 @@
 # Framework Comparisons
 
-Love NestJS's decorator-driven architecture but building REST APIs? **YasuiJS gives you the same elegant DX—25.9% faster, with zero bloat, on modern Web Standards.**
+Love NestJS's decorator-driven architecture but building REST APIs? **YasuiJS gives you the same elegant DX—25% faster, with zero bloat, on modern Web Standards.**
 
 ## Why YasuiJS over NestJS?
 
@@ -36,7 +36,7 @@ YasuiJS **keeps all the good parts from NestJS:**
 
 ### The Performance Advantage
 
-**YasuiJS is 26.6% faster than NestJS.**
+**YasuiJS is 25% faster than NestJS.**
 
 | Aspect | YasuiJS | NestJS |
 |--------|---------|--------|
