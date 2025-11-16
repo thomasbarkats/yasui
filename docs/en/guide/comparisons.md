@@ -36,7 +36,7 @@ YasuiJS **keeps all the good parts from NestJS:**
 
 ### The Performance Advantage
 
-**YasuiJS is 25.9% faster than NestJS.**
+**YasuiJS is 26.6% faster than NestJS.**
 
 | Aspect | YasuiJS | NestJS |
 |--------|---------|--------|
@@ -584,20 +584,31 @@ A realistic REST API with:
 - **3 Controllers**: User, Product, Order
 - **9 Endpoints**: List resources, get by ID, filter by category/user/status
 - **Dependency Injection**: Services injected into controllers
-- **Load Test**: 10 concurrent connections, 10 seconds per endpoint
 
 ### Runtime Performance
 
+#### Light Load (10 concurrent connections, 10s per endpoint)
+
 | Metric | YasuiJS | Express | NestJS |
 |--------|---------|---------|--------|
-| **Requests/sec** 🚀 | **6,850** 🏆 | 5,505 | 5,442 |
-| **Avg Latency** | **0.98ms** 🏆 | 1.31ms | 1.31ms |
-| **Cold Start** | 247ms | 15ms 🏆 | 582ms |
+| **Requests/sec** 🚀 | **7,209** 🏆 | 6,602 | 5,695 |
+| **Avg Latency** | **0.91ms** 🏆 | 1.07ms | 1.26ms |
+| **Cold Start** | 280ms | 229ms 🏆 | 568ms |
 
-### Key Findings
+**Key Findings:**
+- ✅ **YasuiJS is almost 10% faster than Express**
+- ✅ **YasuiJS is more than 25% faster than NestJS**
 
-- ✅ **YasuiJS is 24.4% faster than Express**
-- ✅ **YasuiJS is 25.9% faster than NestJS** across all endpoints
+#### Heavy Load (100 concurrent connections, 30s per endpoint)
+
+| Metric | YasuiJS | Express | NestJS |
+|--------|---------|---------|--------|
+| **Requests/sec** 🚀 | **6,951** 🏆 | 6,755 | 5,492 |
+| **Avg Latency** | **13.89ms** 🏆 | 14.31ms | 17.72ms |
+| **Cold Start** | 256ms | 225ms 🏆 | 595ms |
+
+**Key Findings:**
+- ✅ **YasuiJS is more than 25% faster than NestJS**
 
 **Why YasuiJS Scales Better:**
 - **Radix3 Router**: Efficient route matching for multiple endpoints
