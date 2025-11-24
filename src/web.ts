@@ -24,7 +24,7 @@ export class YasuiRequest extends Request {
   private _headersObj?: Record<string, string>;
 
   /** Cached parsed query string */
-  private _query?: Record<string, string>;
+  private _query?: Record<string, string | string[]>;
 
   /** Cached parsed cookies */
   private _cookies?: Record<string, string>;
@@ -109,9 +109,14 @@ export class YasuiRequest extends Request {
   }
 
   /** Get parsed query string as object (Express-compatible property) */
-  get query(): Record<string, string> {
+  get query(): Record<string, string | string[]> {
     if (!this._query) {
-      this._query = Object.fromEntries(this.parsedUrl.searchParams);
+      this._query = {};
+      const searchParams = this.parsedUrl.searchParams;
+      for (const key of searchParams.keys()) {
+        const values = searchParams.getAll(key);
+        this._query[key] = values.length === 1 ? values[0] : values;
+      }
     }
     return this._query;
   }

@@ -107,26 +107,32 @@ function shouldCastParam(path: string[]): boolean {
 }
 
 function castParamValue(
-  value: string,
+  value: string | string[],
   paramType: Function,
   itemsType?: ArrayItem
 ): unknown {
+  // Handle Array type first (uses all values)
+  if (paramType === Array) {
+    return Array.isArray(value)
+      ? (itemsType ? value.map(v => castParamValue(v, itemsType)) : value)
+      : [itemsType ? castParamValue(value, itemsType) : value];
+  }
+
+  // For non-Array types, use first value if array is provided
+  const singleValue = Array.isArray(value) ? value[0] : value;
+
   switch (paramType) {
     case Number:
-      return Number(value);
+      return Number(singleValue);
     case Boolean:
-      return value === 'true' || value === '1';
+      return singleValue === 'true' || singleValue === '1';
     case Date:
-      return new Date(<string>value);
-    case Array:
-      return Array.isArray(value)
-        ? (itemsType ? value.map(v => castParamValue(v, itemsType)) : value)
-        : [itemsType ? castParamValue(value, itemsType) : value];
+      return new Date(singleValue);
     case String:
-      return value;
+      return singleValue;
     default:
       try {
-        return JSON.parse(value);
+        return JSON.parse(singleValue);
       } catch {
         return null;
       }

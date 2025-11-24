@@ -22,7 +22,8 @@ export interface IControllerRoute {
 }
 
 /** Constructible type for array element validation */
-export type ArrayItem = Constructible<number | boolean | Date | string>;
+// eslint-disable-next-line @typescript-eslint/no-wrapper-object-types
+export type ArrayItem = Constructible<Number | Boolean | String>;
 
 /** Parameter metadata for route handlers */
 export interface IRouteParam {
