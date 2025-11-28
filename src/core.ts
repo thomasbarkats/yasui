@@ -144,7 +144,7 @@ export class Core {
   public useMiddleware(Middleware: TMiddleware): RequestHandler {
     if (this.isClassMiddleware(Middleware)) {
       const middleware = this.build(Middleware) as IDMiddleware;
-      return middleware.run(middleware);
+      return middleware.run(middleware, this.config.strictValidation);
     }
     return <RequestHandler>Middleware;
   }

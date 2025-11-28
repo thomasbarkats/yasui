@@ -153,6 +153,12 @@ Activer la validation des décorateurs au démarrage pour détecter les erreurs 
 - **Type :** `boolean`
 - **Défaut :** `true`
 
+#### `strictValidation`
+Activer la validation stricte pour la conversion de types et l'analyse JSON. Lorsqu'activé, lance `HttpError(400)` au lieu de retourner des valeurs invalides (NaN, Invalid Date, null) ou un body indéfini.
+- **Type :** `boolean`
+- **Défaut :** `false`
+- **Voir :** [Mode de validation stricte](/reference/controllers#mode-de-validation-stricte) pour le comportement détaillé et les exemples
+
 ## createServer() vs createApp()
 
 ### createServer()
