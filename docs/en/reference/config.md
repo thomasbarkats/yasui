@@ -153,6 +153,12 @@ Enable validation of decorators at startup to catch configuration errors.
 - **Type:** `boolean`
 - **Default:** `true`
 
+#### `strictValidation`
+Enable strict validation type casting and JSON parsing. When enabled, throws `HttpError(400)` instead of returning invalid values (NaN, Invalid Date, null) or undefined body.
+- **Type:** `boolean`
+- **Default:** `false`
+- **See:** [Strict Validation Mode](/reference/controllers#strict-validation-mode) for detailed behavior and examples
+
 ## createServer() vs createApp()
 
 ### createServer()

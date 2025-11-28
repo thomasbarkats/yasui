@@ -160,10 +160,10 @@ YasuiJS 根据 TypeScript 类型自动转换参数：
 
 ### 基本类型
 - **string** - 无转换（默认）
-- **number** - 转换为数字，无效时返回 NaN
 - **boolean** - 将 "true"/"1" 转换为 true，其他所有内容转换为 false
-- **Date** - 转换为 Date 对象，无效时返回 Invalid Date
-- **object** - 解析 JSON 字符串，用于像 `?data={"key":"value"}` 这样的查询，失败时返回 `null`
+- **number** - 转换为数字，无效时返回 `NaN`（或使用 `strictValidation` 时抛出）
+- **Date** - 转换为 Date 对象，无效时返回 `Invalid Date`（或抛出 ``）
+- **object** - 解析 JSON 字符串，用于像 `?data={"key":"value"}` 这样的查询，失败时返回 `null`（或抛出 ``）
 
 ### 数组类型
 TypeScript 无法在运行时检测数组项类型，因此您必须为非字符串数组指定 `[Type]`：
@@ -174,9 +174,70 @@ TypeScript 无法在运行时检测数组项类型，因此您必须为非字符
 **类型化数组语法：**
 ```typescript
 @Query('paramName', [Type]) paramName: Type[]
-@Param('paramName', [Type]) paramName: Type[]  
+@Param('paramName', [Type]) paramName: Type[]
 @Header('headerName', [Type]) headerName: Type[]
 ```
+
+### 严格验证模式
+
+默认情况下，YasuiJS 在类型转换失败时返回无效值（NaN、Invalid Date、null）。在配置中启用 `strictValidation` 以抛出 HTTP 400 错误：
+
+```typescript
+yasui.createServer({
+  controllers: [UserController],
+  strictValidation: true  // 类型转换失败时抛出错误
+});
+```
+
+**默认行为（strictValidation: false）：**
+```typescript
+@Get('/:id')
+getUser(@Param('id') id: number) {
+  // GET /user/abc → id = NaN（静默失败）
+  // GET /user/123 → id = 123
+}
+
+@Get('/search')
+search(@Query('date') date: Date) {
+  // GET /search?date=invalid → date = Invalid Date
+  // GET /search?date=2024-01-01 → date = Date 对象
+}
+```
+
+**严格验证（strictValidation: true）：**
+```typescript
+@Get('/:id')
+getUser(@Param('id') id: number) {
+  // GET /user/abc → 抛出 HttpError(400, "Parameter 'id' expected number, got 'abc'")
+  // GET /user/123 → id = 123
+}
+
+@Get('/search')
+search(
+  @Query('date') date: Date,
+  @Query('ids', [Number]) ids: number[]
+) {
+  // GET /search?date=invalid
+  //   → 抛出 HttpError(400, "Parameter 'date' expected valid date, got 'invalid'")
+
+  // GET /search?ids=1&ids=2&ids=abc
+  //   → 抛出 HttpError(400, "Parameter 'ids[2]' expected number, got 'abc'")
+}
+```
+
+**JSON body 解析：**
+```typescript
+@Post('/')
+createUser(@Body() data: any) {
+  // strictValidation: false
+  //   无效 JSON → data = undefined（静默失败）
+
+  // strictValidation: true
+  //   无效 JSON → 抛出 HttpError(400, "Failed to parse JSON body: ...")
+}
+```
+
+参见 [配置](/reference/config#strictvalidation) 获取更多详情。
 
 ## 访问请求对象
 
