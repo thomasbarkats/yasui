@@ -160,10 +160,10 @@ YasuiJS automatically converts parameters based on TypeScript types:
 
 ### Basic Types
 - **string** - No conversion (default)
-- **number** - Converts to number, returns NaN if invalid
 - **boolean** - Converts "true"/"1" to true, everything else to false
-- **Date** - Converts to Date object, returns Invalid Date if invalid
-- **object** - Parses JSON strings for queries like `?data={"key":"value"}`, returns `null` if fails
+- **number** - Converts to number, returns `NaN` if invalid (or throws with `strictValidation`)
+- **Date** - Converts to Date object, returns `Invalid Date` if invalid (or throws ``)
+- **object** - Parses JSON strings for queries like `?data={"key":"value"}`, returns `null` if fails (or throws ``)
 
 ### Array Types
 TypeScript cannot detect array item types at runtime, so you must specify `[Type]` for non-string arrays:
@@ -174,9 +174,70 @@ TypeScript cannot detect array item types at runtime, so you must specify `[Type
 **Typed Array Syntax:**
 ```typescript
 @Query('paramName', [Type]) paramName: Type[]
-@Param('paramName', [Type]) paramName: Type[]  
+@Param('paramName', [Type]) paramName: Type[]
 @Header('headerName', [Type]) headerName: Type[]
 ```
+
+### Strict Validation Mode
+
+By default, YasuiJS returns invalid values (NaN, Invalid Date, null) when type casting fails. Enable `strictValidation` in your config to throw an HTTP 400 error instead:
+
+```typescript
+yasui.createServer({
+  controllers: [UserController],
+  strictValidation: true  // Throw errors on type casting failures
+});
+```
+
+**Default behavior (strictValidation: false):**
+```typescript
+@Get('/:id')
+getUser(@Param('id') id: number) {
+  // GET /user/abc → id = NaN (silently fails)
+  // GET /user/123 → id = 123
+}
+
+@Get('/search')
+search(@Query('date') date: Date) {
+  // GET /search?date=invalid → date = Invalid Date
+  // GET /search?date=2024-01-01 → date = Date object
+}
+```
+
+**Strict validation (strictValidation: true):**
+```typescript
+@Get('/:id')
+getUser(@Param('id') id: number) {
+  // GET /user/abc → throws HttpError(400, "Parameter 'id' expected number, got 'abc'")
+  // GET /user/123 → id = 123
+}
+
+@Get('/search')
+search(
+  @Query('date') date: Date,
+  @Query('ids', [Number]) ids: number[]
+) {
+  // GET /search?date=invalid
+  //   → throws HttpError(400, "Parameter 'date' expected valid date, got 'invalid'")
+
+  // GET /search?ids=1&ids=2&ids=abc
+  //   → throws HttpError(400, "Parameter 'ids[2]' expected number, got 'abc'")
+}
+```
+
+**JSON body parsing:**
+```typescript
+@Post('/')
+createUser(@Body() data: any) {
+  // With strictValidation: false
+  //   Invalid JSON → data = undefined (silent failure)
+
+  // With strictValidation: true
+  //   Invalid JSON → throws HttpError(400, "Failed to parse JSON body: ...")
+}
+```
+
+See [Configuration](/reference/config#strictvalidation) for more details.
 
 ## Request Object Access
 

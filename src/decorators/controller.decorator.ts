@@ -65,7 +65,8 @@ export function Controller(
           route.descriptor,
           route.params,
           pipes,
-          false
+          false,
+          core.config.strictValidation
         );
 
         /** join controller path with route path */

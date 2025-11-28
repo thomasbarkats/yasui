@@ -14,7 +14,10 @@ export function Middleware(): ClassDecorator {
     const useLogger = params.some(p => p.path.includes('_logger'));
     defineMetadata(ReflectMetadata.USE_LOGGER, useLogger, target.prototype);
 
-    target.prototype.run = (self: IMiddleware): RequestHandler => {
+    target.prototype.run = (
+      self: IMiddleware,
+      strictValidation?: boolean
+    ): RequestHandler => {
       const descriptor = Object.getOwnPropertyDescriptor(target.prototype, 'use');
       if (!descriptor) {
         throw new Error('middleware must implement use() method');
@@ -28,7 +31,8 @@ export function Middleware(): ClassDecorator {
         descriptor,
         params,
         [],
-        true
+        true,
+        strictValidation
       );
     };
   };

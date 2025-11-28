@@ -160,10 +160,10 @@ YasuiJS convertit automatiquement les paramètres basés sur les types TypeScrip
 
 ### Types de base
 - **string** - Aucune conversion (par défaut)
-- **number** - Convertit en nombre, retourne NaN si invalide
 - **boolean** - Convertit "true"/"1" en true, tout le reste en false
-- **Date** - Convertit en objet Date, retourne Invalid Date si invalide
-- **object** - Parse les chaînes JSON pour les requêtes comme `?data={"key":"value"}`, retourne `null` si échec
+- **number** - Convertit en nombre, retourne `NaN` si invalide (ou lance avec `strictValidation`)
+- **Date** - Convertit en objet Date, retourne `Invalid Date` si invalide (ou lance ``)
+- **object** - Parse les chaînes JSON pour les requêtes comme `?data={"key":"value"}`, retourne `null` si échec (ou lance ``)
 
 ### Types de tableaux
 TypeScript ne peut pas détecter les types d'éléments de tableau à l'exécution, donc vous devez spécifier `[Type]` pour les tableaux non-string :
@@ -174,9 +174,70 @@ TypeScript ne peut pas détecter les types d'éléments de tableau à l'exécuti
 **Syntaxe de tableau typé :**
 ```typescript
 @Query('paramName', [Type]) paramName: Type[]
-@Param('paramName', [Type]) paramName: Type[]  
+@Param('paramName', [Type]) paramName: Type[]
 @Header('headerName', [Type]) headerName: Type[]
 ```
+
+### Mode de validation stricte
+
+Par défaut, YasuiJS retourne des valeurs invalides (NaN, Invalid Date, null) lors de l'échec de conversion de type. Activez `strictValidation` dans votre configuration pour lancer une erreur HTTP 400 à la place :
+
+```typescript
+yasui.createServer({
+  controllers: [UserController],
+  strictValidation: true  // Lance des erreurs lors d'échecs de conversion de types
+});
+```
+
+**Comportement par défaut (strictValidation: false) :**
+```typescript
+@Get('/:id')
+getUser(@Param('id') id: number) {
+  // GET /user/abc → id = NaN (échec silencieux)
+  // GET /user/123 → id = 123
+}
+
+@Get('/search')
+search(@Query('date') date: Date) {
+  // GET /search?date=invalid → date = Invalid Date
+  // GET /search?date=2024-01-01 → date = objet Date
+}
+```
+
+**Validation stricte (strictValidation: true) :**
+```typescript
+@Get('/:id')
+getUser(@Param('id') id: number) {
+  // GET /user/abc → lance HttpError(400, "Parameter 'id' expected number, got 'abc'")
+  // GET /user/123 → id = 123
+}
+
+@Get('/search')
+search(
+  @Query('date') date: Date,
+  @Query('ids', [Number]) ids: number[]
+) {
+  // GET /search?date=invalid
+  //   → lance HttpError(400, "Parameter 'date' expected valid date, got 'invalid'")
+
+  // GET /search?ids=1&ids=2&ids=abc
+  //   → lance HttpError(400, "Parameter 'ids[2]' expected number, got 'abc'")
+}
+```
+
+**Analyse du body JSON :**
+```typescript
+@Post('/')
+createUser(@Body() data: any) {
+  // Avec strictValidation: false
+  //   JSON invalide → data = undefined (échec silencieux)
+
+  // Avec strictValidation: true
+  //   JSON invalide → lance HttpError(400, "Failed to parse JSON body: ...")
+}
+```
+
+Voir [Configuration](/reference/config#strictvalidation) pour plus de détails.
 
 ## Accès à l'objet Request
 

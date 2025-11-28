@@ -153,6 +153,12 @@ Swagger 文档配置。详情请参见 [Swagger](/zh/reference/swagger)。
 - **类型：** `boolean`
 - **默认值：** `true`
 
+#### `strictValidation`
+启用类型转换和 JSON 解析的严格验证。启用后，抛出 `HttpError(400)` 而不是返回无效值（NaN、Invalid Date、null）或 undefined body。
+- **类型：** `boolean`
+- **默认值：** `false`
+- **参见：** [严格验证模式](/reference/controllers#严格验证模式) 获取详细行为和示例
+
 ## createServer() vs createApp()
 
 ### createServer()

@@ -76,5 +76,9 @@ export interface YasuiConfig {
   /** If false, disables all validation checks on decorators (unsafe)
    *  @default true */
   enableDecoratorValidation?: boolean;
+  /** If true, throws error on type casting failures and JSON parsing errors,
+   *  instead of setting invalid values (NaN, Invalid Date) or undefined body
+   *  @default false */
+  strictValidation?: boolean;
   swagger?: YasuiSwaggerConfig;
 }

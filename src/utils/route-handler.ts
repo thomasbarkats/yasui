@@ -2,6 +2,8 @@ import { RequestHandler, NextFunction, YasuiRequest } from '../web.js';
 import { ReflectMetadata, getMetadata } from './reflect.js';
 import { RouteRequestParamTypes } from '../enums/index.js';
 import { IRouteParam, IPipeTransform, IParamMetadata, ArrayItem, JsonValue } from '../interfaces/index.js';
+import { HttpError } from './error.resource.js';
+import { HttpCode } from '../enums/index.js';
 
 
 /** Create yasui route handler from controller/middleware method */
@@ -11,6 +13,7 @@ export function routeHandler(
   params: IRouteParam[],
   pipes: IPipeTransform[],
   isMiddleware?: boolean,
+  strictValidation?: boolean,
 ): RequestHandler {
   const routeFunction: Function = descriptor.value;
 
@@ -41,7 +44,14 @@ export function routeHandler(
     ) {
       try {
         await req.json();
-      } catch {
+      } catch (err) {
+        if (strictValidation) {
+          const errorMsg = err instanceof Error ? err.message : 'Invalid JSON';
+          throw new HttpError(
+            HttpCode.BAD_REQUEST,
+            `Failed to parse JSON body: ${errorMsg}`
+          );
+        }
         // Body parsing failed, will be undefined
       }
     }
@@ -62,7 +72,7 @@ export function routeHandler(
 
       // Cast string values from HTTP (params/query/headers) to target types
       if (value !== null && param.type && shouldCastParam(param.path)) {
-        value = castParamValue(<string>value, param.type, param.itemsType);
+        value = castParamValue(<string>value, param.type, param.path[2], strictValidation, param.itemsType);
       }
 
       // Apply validation/transformation pipes
@@ -109,31 +119,59 @@ function shouldCastParam(path: string[]): boolean {
 function castParamValue(
   value: string | string[],
   paramType: Function,
-  itemsType?: ArrayItem
+  paramName: string,
+  strictValidation?: boolean,
+  itemsType?: ArrayItem,
 ): unknown {
   // Handle Array type first (uses all values)
   if (paramType === Array) {
-    return Array.isArray(value)
-      ? (itemsType ? value.map(v => castParamValue(v, itemsType)) : value)
-      : [itemsType ? castParamValue(value, itemsType) : value];
+    const arrayValues = Array.isArray(value) ? value : [value];
+    if (itemsType) {
+      return arrayValues.map((v, idx) => {
+        return castParamValue(v, itemsType, `${paramName}[${idx}]`, strictValidation);
+      });
+    }
+    return arrayValues;
   }
 
   // For non-Array types, use first value if array is provided
   const singleValue = Array.isArray(value) ? value[0] : value;
 
   switch (paramType) {
-    case Number:
-      return Number(singleValue);
+    case Number: {
+      const num = Number(singleValue);
+      if (strictValidation && isNaN(num)) {
+        throw new HttpError(
+          HttpCode.BAD_REQUEST,
+          `Parameter '${paramName || 'value'}' expected number, got '${singleValue}'`
+        );
+      }
+      return num;
+    }
     case Boolean:
       return singleValue === 'true' || singleValue === '1';
-    case Date:
-      return new Date(singleValue);
+    case Date: {
+      const date = new Date(singleValue);
+      if (strictValidation && isNaN(date.getTime())) {
+        throw new HttpError(
+          HttpCode.BAD_REQUEST,
+          `Parameter '${paramName || 'value'}' expected valid date, got '${singleValue}'`
+        );
+      }
+      return date;
+    }
     case String:
       return singleValue;
     default:
       try {
         return JSON.parse(singleValue);
       } catch {
+        if (strictValidation) {
+          throw new HttpError(
+            HttpCode.BAD_REQUEST,
+            `Parameter '${paramName || 'value'}' expected valid JSON, got '${singleValue}'`
+          );
+        }
         return null;
       }
   }

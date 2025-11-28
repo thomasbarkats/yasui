@@ -153,6 +153,12 @@ Habilitar validación de decoradores al inicio para detectar errores de configur
 - **Tipo:** `boolean`
 - **Por defecto:** `true`
 
+#### `strictValidation`
+Habilitar validación estricta de conversión de tipos y análisis JSON. Cuando está habilitado, lanza `HttpError(400)` en lugar de devolver valores inválidos (NaN, Invalid Date, null) o body indefinido.
+- **Tipo:** `boolean`
+- **Por defecto:** `false`
+- **Ver:** [Modo de Validación Estricta](/reference/controllers#modo-de-validación-estricta) para comportamiento detallado y ejemplos
+
 ## createServer() vs createApp()
 
 ### createServer()
