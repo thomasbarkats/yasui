@@ -1,5 +1,5 @@
 import kleur from 'kleur';
-import { serve, type Server } from 'srvx';
+import { serve, type ServerOptions, type Server } from 'srvx';
 import { Core } from './core.js';
 import { YasuiConfig } from './interfaces/index.js';
 import { FetchHandler } from './web.js';
@@ -27,33 +27,15 @@ export async function createServer(conf: YasuiConfig): Promise<Server> {
     (conf.environment === 'development' ? 'localhost' : undefined);
 
   // Build srvx server options
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const serverOptions: any = {
+  const serverOptions: ServerOptions = {
     fetch: app.fetch,
     silent: true,
     protocol,
     port,
     hostname,
+    ...(conf.tls && { tls: conf.tls }),
+    ...(conf.runtimeOptions || {}),
   };
-
-  // Add TLS configuration if provided
-  if (conf.tls) {
-    serverOptions.tls = {
-      ...(conf.tls.cert && { cert: conf.tls.cert }),
-      ...(conf.tls.key && { key: conf.tls.key }),
-      ...(conf.tls.passphrase && { passphrase: conf.tls.passphrase }),
-      ...(conf.tls.ca && { ca: conf.tls.ca }),
-    };
-  }
-
-  // Add runtime-specific options
-  if (conf.runtimeOptions?.node) {
-    serverOptions.node = {
-      ...(conf.runtimeOptions.node.http2 !== undefined && { http2: conf.runtimeOptions.node.http2 }),
-      ...(conf.runtimeOptions.node.maxHeaderSize && { maxHeaderSize: conf.runtimeOptions.node.maxHeaderSize }),
-      ...(conf.runtimeOptions.node.ipv6Only !== undefined && { ipv6Only: conf.runtimeOptions.node.ipv6Only }),
-    };
-  }
 
   const server = serve(serverOptions);
 

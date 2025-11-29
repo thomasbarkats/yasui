@@ -58,8 +58,20 @@ yasui.createServer({
 - **类型：** `string | undefined`
 - **默认值：** 开发环境中为 `'localhost'`，生产环境中为 undefined
 
+#### `maxBodySize`
+请求体的最大字节大小。超过此限制的请求将被拒绝并返回 413 Payload Too Large。
+- **类型：** `number`
+- **默认值：** `10485760`（10MB）
+- **注意：** 这是应用程序级别的检查，适用于所有运行时（Node.js、Deno、Bun）
+
+#### `maxHeaderSize`
+请求头的最大总字节大小。超过此限制的请求将被拒绝并返回 413 Payload Too Large。
+- **类型：** `number`
+- **默认值：** `16384`（16KB）
+- **注意：** 这是应用程序级别的检查，适用于所有运行时。
+
 #### `tls`
-TLS/HTTPS 配置。提供时，服务器自动使用 HTTPS。
+TLS/HTTPS 配置。提供时，服务器自动使用 HTTPS。类型从 **srvx** 提取。
 - **类型：** `TLSConfig | undefined`
 - **默认值：** `undefined`（HTTP）
 - **示例值：**
@@ -67,25 +79,42 @@ TLS/HTTPS 配置。提供时，服务器自动使用 HTTPS。
 {
   cert: './path/to/cert.pem',  // 或 PEM 字符串
   key: './path/to/key.pem',    // 或 PEM 字符串
-  passphrase: 'optional',      // 可选密钥密码
-  ca: './path/to/ca.pem'       // 可选 CA 证书
+  passphrase: 'optional'       // 可选密钥密码
 }
 ```
 
 #### `runtimeOptions`
-运行时特定的配置选项。
+运行时特定的服务器配置选项。这些选项直接传递给底层服务器（[srvx](https://srvx.h3.dev)），然后传递给相应的运行时。类型从 srvx 的 `ServerOptions` 提取以确保类型安全。
 - **类型：** `RuntimeOptions | undefined`
 - **默认值：** `undefined`
-- **示例值：**
+- **支持的运行时：** `node`、`bun`、`deno`、`serviceWorker`
+
+**各运行时可用选项：**
+
+- **`node`**：接受所有 [Node.js HTTP ServerOptions](https://nodejs.org/api/http.html#httpcreateserveroptions-requestlistener)、[HTTPS ServerOptions](https://nodejs.org/api/https.html#httpscreateserveroptions-requestlistener)、[HTTP/2 ServerOptions](https://nodejs.org/api/http2.html#http2createsecureserveroptions-onrequesthandler) 和 [ListenOptions](https://nodejs.org/api/net.html#serverlistenoptions-callback)，以及：
+  - `http2?: boolean` - 启用 HTTP/2（默认：使用 TLS 时为 true）
+
+- **`bun`**：接受所有 [Bun.Serve.Options](https://bun.sh/docs/api/http)（除了 `fetch`）
+
+- **`deno`**：接受所有 [Deno.ServeOptions](https://docs.deno.com/api/deno/~/Deno.ServeOptions)
+
+- **`serviceWorker`**：接受 service worker 配置（参见 [srvx 文档](https://srvx.h3.dev/guide/options)）
+
+**示例：**
 ```typescript
-{
-  node: {
-    http2: true,              // 启用 HTTP/2（默认：使用 TLS 时为 true）
-    maxHeaderSize: 16384,     // 自定义头部大小
-    ipv6Only: false           // 仅 IPv6 模式
+yasui.createServer({
+  controllers: [UserController],
+  runtimeOptions: {
+    node: {
+      http2: true,
+      maxHeadersize: 16384,
+      ipv6Only: false
+    }
   }
-}
+});
 ```
+
+**注意：** 要在所有运行时中实现一致的头部/请求体大小限制，请使用根级别的 `maxHeaderSize` 和 `maxBodySize` 选项。运行时特定选项在支持的情况下提供额外的深度防御。
 
 #### `debug`
 启用调试模式，包含额外的日志记录和请求跟踪。
