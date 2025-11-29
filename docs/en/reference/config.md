@@ -188,6 +188,12 @@ Enable strict validation type casting and JSON parsing. When enabled, throws `Ht
 - **Default:** `false`
 - **See:** [Strict Validation Mode](/reference/controllers#strict-validation-mode) for detailed behavior and examples
 
+#### `requestTimeout`
+Maximum request duration in milliseconds. Requests exceeding this duration will be terminated with 408 Request Timeout.
+- **Type:** `number`
+- **Default:** `30000` (30 seconds)
+- **Note:** Prevents long-running requests from exhausting server resources. Set to `0` to disable timeout.
+
 ## createServer() vs createApp()
 
 ### createServer()

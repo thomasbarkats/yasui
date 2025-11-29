@@ -61,5 +61,8 @@ export interface YasuiConfig {
   /** Maximum total header size in bytes. Requests exceeding this limit will be rejected with 413 Payload Too Large
    *  @default 16384 (16KB) */
   maxHeaderSize?: number;
+  /** Request timeout in milliseconds. Requests exceeding this duration will be terminated with 408 Request Timeout
+   *  @default 30000 (30s) */
+  requestTimeout?: number;
   swagger?: YasuiSwaggerConfig;
 }

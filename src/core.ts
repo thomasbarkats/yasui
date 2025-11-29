@@ -58,7 +58,8 @@ export class Core {
     const defaultConfig: Partial<YasuiConfig> = {
       enableDecoratorValidation: true,
       maxBodySize: 10485760,
-      maxHeaderSize: 16384
+      maxHeaderSize: 16384,
+      requestTimeout: 30000
     };
 
     this.config = { ...defaultConfig, ...conf };
@@ -137,6 +138,23 @@ export class Core {
         req.source = match.source;
         if (match.useLogger) {
           req._logger = new LoggerService().start();
+        }
+
+        // Apply request timeout if configured
+        if (this.config.requestTimeout) {
+          const timeoutPromise = new Promise<Response>((_, reject) => {
+            setTimeout(() => {
+              reject(new HttpError(
+                HttpCode.REQUEST_TIMEOUT,
+                `Request exceeded timeout of ${this.config.requestTimeout}ms`
+              ));
+            }, this.config.requestTimeout);
+          });
+
+          return await Promise.race([
+            this.executeChain(req, match),
+            timeoutPromise
+          ]);
         }
 
         return await this.executeChain(req, match);
