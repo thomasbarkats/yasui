@@ -14,6 +14,7 @@ export function routeHandler(
   pipes: IPipeTransform[],
   isMiddleware?: boolean,
   strictValidation?: boolean,
+  maxBodySize?: number,
 ): RequestHandler {
   const routeFunction: Function = descriptor.value;
 
@@ -42,6 +43,20 @@ export function routeHandler(
       req.method !== 'GET' &&
       req.rawHeaders.get('content-type')?.includes('application/json')
     ) {
+      // Check body size limit before parsing
+      if (maxBodySize) {
+        const contentLength = req.rawHeaders.get('content-length');
+        if (contentLength) {
+          const bodySize = parseInt(contentLength, 10);
+          if (!isNaN(bodySize) && bodySize > maxBodySize) {
+            throw new HttpError(
+              HttpCode.REQUEST_ENTITY_TOO_LARGE,
+              `Request body size (${bodySize} bytes) exceeds maximum allowed size (${maxBodySize} bytes)`
+            );
+          }
+        }
+      }
+
       try {
         await req.json();
       } catch (err) {

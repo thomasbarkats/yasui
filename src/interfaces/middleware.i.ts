@@ -13,5 +13,5 @@ export interface IMiddleware extends Instance {
 
 /** Decorated middleware interface */
 export interface IDMiddleware extends IMiddleware {
-  run: (self: this, strictValidation?: boolean) => RequestHandler;
+  run: (self: this, strictValidation?: boolean, maxBodySize?: number) => RequestHandler;
 }

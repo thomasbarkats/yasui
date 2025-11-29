@@ -58,8 +58,20 @@ Nombre del host al cual vincular el servidor.
 - **Tipo:** `string | undefined`
 - **Por defecto:** `'localhost'` en desarrollo, undefined en producción
 
+#### `maxBodySize`
+Tamaño máximo del cuerpo de solicitud en bytes. Las solicitudes que excedan este límite serán rechazadas con 413 Payload Too Large.
+- **Tipo:** `number`
+- **Por defecto:** `10485760` (10MB)
+- **Nota:** Esta es una verificación a nivel de aplicación que funciona en todos los runtimes (Node.js, Deno, Bun)
+
+#### `maxHeaderSize`
+Tamaño total máximo de encabezados en bytes. Las solicitudes que excedan este límite serán rechazadas con 413 Payload Too Large.
+- **Tipo:** `number`
+- **Por defecto:** `16384` (16KB)
+- **Nota:** Esta es una verificación a nivel de aplicación que funciona en todos los runtimes.
+
 #### `tls`
-Configuración TLS/HTTPS. Cuando se proporciona, el servidor usa HTTPS automáticamente.
+Configuración TLS/HTTPS. Cuando se proporciona, el servidor usa HTTPS automáticamente. Los tipos se extraen de **srvx**.
 - **Tipo:** `TLSConfig | undefined`
 - **Por defecto:** `undefined` (HTTP)
 - **Valor de ejemplo:**
@@ -67,25 +79,42 @@ Configuración TLS/HTTPS. Cuando se proporciona, el servidor usa HTTPS automáti
 {
   cert: './path/to/cert.pem',  // o string PEM
   key: './path/to/key.pem',    // o string PEM
-  passphrase: 'optional',      // frase de contraseña opcional de la clave
-  ca: './path/to/ca.pem'       // certificados CA opcionales
+  passphrase: 'optional'       // frase de contraseña opcional de la clave
 }
 ```
 
 #### `runtimeOptions`
-Opciones de configuración específicas del runtime.
+Opciones de configuración del servidor específicas del runtime. Se pasan directamente al servidor subyacente ([srvx](https://srvx.h3.dev)), que luego las pasa al runtime respectivo. Los tipos se extraen de `ServerOptions` de srvx para seguridad de tipos.
 - **Tipo:** `RuntimeOptions | undefined`
 - **Por defecto:** `undefined`
-- **Valor de ejemplo:**
+- **Runtimes soportados:** `node`, `bun`, `deno`, `serviceWorker`
+
+**Opciones disponibles por runtime:**
+
+- **`node`**: Acepta todas las [Node.js HTTP ServerOptions](https://nodejs.org/api/http.html#httpcreateserveroptions-requestlistener), [HTTPS ServerOptions](https://nodejs.org/api/https.html#httpscreateserveroptions-requestlistener), [HTTP/2 ServerOptions](https://nodejs.org/api/http2.html#http2createsecureserveroptions-onrequesthandler), y [ListenOptions](https://nodejs.org/api/net.html#serverlistenoptions-callback), además de:
+  - `http2?: boolean` - Habilitar HTTP/2 (por defecto: true con TLS)
+
+- **`bun`**: Acepta todas las [Bun.Serve.Options](https://bun.sh/docs/api/http) (excepto `fetch`)
+
+- **`deno`**: Acepta todas las [Deno.ServeOptions](https://docs.deno.com/api/deno/~/Deno.ServeOptions)
+
+- **`serviceWorker`**: Acepta configuración de service worker (ver [docs de srvx](https://srvx.h3.dev/guide/options))
+
+**Ejemplo:**
 ```typescript
-{
-  node: {
-    http2: true,              // Habilitar HTTP/2 (por defecto: true con TLS)
-    maxHeaderSize: 16384,     // Personalizar tamaño de encabezado
-    ipv6Only: false           // Modo solo IPv6
+yasui.createServer({
+  controllers: [UserController],
+  runtimeOptions: {
+    node: {
+      http2: true,
+      maxHeadersize: 16384,
+      ipv6Only: false
+    }
   }
-}
+});
 ```
+
+**Nota:** Para límites consistentes de tamaño de encabezados/cuerpo en todos los runtimes, usa las opciones de nivel raíz `maxHeaderSize` y `maxBodySize`. Las opciones específicas del runtime proporcionan defensa adicional en profundidad donde sea compatible.
 
 #### `debug`
 Habilitar modo debug con logging adicional y rastreo de solicitudes.

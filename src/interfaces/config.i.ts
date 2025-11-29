@@ -3,6 +3,7 @@ import { TMiddleware } from './middleware.i.js';
 import { IPipeTransform } from './pipe.i.js';
 import { ISwaggerConfig } from './swagger.i.js';
 import { Constructible, Injection } from './utils.i.js';
+import type { ServerOptions } from 'srvx';
 
 
 /** YasuiJS Swagger configuration */
@@ -18,32 +19,6 @@ export interface YasuiSwaggerConfig extends Omit<ISwaggerConfig, 'openapi' | 'pa
    *  @example https://unpkg.com/swagger-ui-dist@5
    *  @example /swagger-ui (for local self-hosted assets) */
   cdn?: string;
-}
-
-/** TLS/SSL configuration for HTTPS */
-export interface YasuiTLSConfig {
-  /** Path to certificate file or inline certificate in PEM format */
-  cert?: string;
-  /** Path to private key file or inline private key in PEM format */
-  key?: string;
-  /** Optional passphrase for the private key */
-  passphrase?: string;
-  /** Optional CA certificates */
-  ca?: string | string[];
-}
-
-/** Runtime-specific server options */
-export interface YasuiRuntimeOptions {
-  /** Node.js-specific options */
-  node?: {
-    /** Enable/disable HTTP/2 support (enabled by default in TLS mode)
-     *  @default true */
-    http2?: boolean;
-    /** Maximum header size in bytes */
-    maxHeaderSize?: number;
-    /** Use IPv6 only (disable dual-stack) */
-    ipv6Only?: boolean;
-  };
 }
 
 
@@ -65,9 +40,9 @@ export interface YasuiConfig {
   /** @deprecated Protocol is now automatically determined from TLS configuration. */
   protocol?: 'http' | 'https';
   /** TLS/SSL configuration for HTTPS. When provided, server will use HTTPS protocol */
-  tls?: YasuiTLSConfig;
+  tls?: ServerOptions['tls'];
   /** Runtime-specific server options (Node.js, Deno, Bun) */
-  runtimeOptions?: YasuiRuntimeOptions;
+  runtimeOptions?: Pick<ServerOptions, 'node' | 'bun' | 'deno' | 'serviceWorker'>;
   /** If true, display more logs and logs all incoming requests
    *  @default false */
   debug?: boolean;
@@ -80,5 +55,11 @@ export interface YasuiConfig {
    *  instead of setting invalid values (NaN, Invalid Date) or undefined body
    *  @default false */
   strictValidation?: boolean;
+  /** Maximum request body size in bytes. Requests exceeding this limit will be rejected with 413 Payload Too Large
+   *  @default 10485760 (10MB) */
+  maxBodySize?: number;
+  /** Maximum total header size in bytes. Requests exceeding this limit will be rejected with 413 Payload Too Large
+   *  @default 16384 (16KB) */
+  maxHeaderSize?: number;
   swagger?: YasuiSwaggerConfig;
 }

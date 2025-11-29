@@ -11,6 +11,7 @@ import { SwaggerService } from './utils/swagger.service.js';
 import { setupSwaggerUI } from './utils/swagger.js';
 import { ReflectMetadata, getMetadata } from './utils/reflect.js';
 import { HttpCode } from './enums/index.js';
+import { HttpError } from './utils/error.resource.js';
 import {
   Constructible,
   IController,
@@ -54,10 +55,13 @@ export class Core {
   constructor(conf: YasuiConfig) {
     ConfigValidator.validate(conf);
 
-    this.config = conf;
-    if (conf.enableDecoratorValidation === undefined) {
-      this.config.enableDecoratorValidation = true;
-    }
+    const defaultConfig: Partial<YasuiConfig> = {
+      enableDecoratorValidation: true,
+      maxBodySize: 10485760,
+      maxHeaderSize: 16384
+    };
+
+    this.config = { ...defaultConfig, ...conf };
     this.logger = new LoggerService();
     this.appService = new AppService(this.config);
     this.decoratorValidator = this.config.enableDecoratorValidation
@@ -109,6 +113,20 @@ export class Core {
       try {
         const req: CoreYasuiRequest = new YasuiRequest(standardReq);
 
+        // Check header size limit
+        if (this.config.maxHeaderSize) {
+          let totalHeaderSize = 0;
+          standardReq.headers.forEach((value, key) => {
+            totalHeaderSize += key.length + value.length + 4; // +4 for ": " and "\r\n"
+          });
+          if (totalHeaderSize > this.config.maxHeaderSize) {
+            throw new HttpError(
+              HttpCode.REQUEST_ENTITY_TOO_LARGE,
+              `Request headers size (${totalHeaderSize} bytes) exceeds maximum allowed size (${this.config.maxHeaderSize} bytes)`
+            );
+          }
+        }
+
         const routeKey = `${req.method}:${req.path}`;
         const match = this.router.lookup(routeKey);
 
@@ -144,7 +162,7 @@ export class Core {
   public useMiddleware(Middleware: TMiddleware): RequestHandler {
     if (this.isClassMiddleware(Middleware)) {
       const middleware = this.build(Middleware) as IDMiddleware;
-      return middleware.run(middleware, this.config.strictValidation);
+      return middleware.run(middleware, this.config.strictValidation, this.config.maxBodySize);
     }
     return <RequestHandler>Middleware;
   }

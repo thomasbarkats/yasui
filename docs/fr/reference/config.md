@@ -58,8 +58,20 @@ Nom d'hôte auquel lier le serveur.
 - **Type :** `string | undefined`
 - **Défaut :** `'localhost'` en développement, undefined en production
 
+#### `maxBodySize`
+Taille maximale du corps de la requête en octets. Les requêtes dépassant cette limite seront rejetées avec 413 Payload Too Large.
+- **Type :** `number`
+- **Défaut :** `10485760` (10MB)
+- **Note :** Il s'agit d'une vérification au niveau de l'application qui fonctionne sur tous les runtimes (Node.js, Deno, Bun)
+
+#### `maxHeaderSize`
+Taille totale maximale des en-têtes en octets. Les requêtes dépassant cette limite seront rejetées avec 413 Payload Too Large.
+- **Type :** `number`
+- **Défaut :** `16384` (16KB)
+- **Note :** Il s'agit d'une vérification au niveau de l'application qui fonctionne sur tous les runtimes.
+
 #### `tls`
-Configuration TLS/HTTPS. Lorsqu'elle est fournie, le serveur utilise automatiquement HTTPS.
+Configuration TLS/HTTPS. Lorsqu'elle est fournie, le serveur utilise automatiquement HTTPS. Les types sont extraits de **srvx**.
 - **Type :** `TLSConfig | undefined`
 - **Défaut :** `undefined` (HTTP)
 - **Valeur d'exemple :**
@@ -67,25 +79,42 @@ Configuration TLS/HTTPS. Lorsqu'elle est fournie, le serveur utilise automatique
 {
   cert: './path/to/cert.pem',  // ou chaîne PEM
   key: './path/to/key.pem',    // ou chaîne PEM
-  passphrase: 'optional',      // phrase de passe optionnelle de la clé
-  ca: './path/to/ca.pem'       // certificats CA optionnels
+  passphrase: 'optional'       // phrase de passe optionnelle de la clé
 }
 ```
 
 #### `runtimeOptions`
-Options de configuration spécifiques au runtime.
+Options de configuration du serveur spécifiques au runtime. Elles sont transmises directement au serveur sous-jacent ([srvx](https://srvx.h3.dev)), qui les transmet ensuite au runtime respectif. Les types sont extraits de `ServerOptions` de srvx pour la sécurité des types.
 - **Type :** `RuntimeOptions | undefined`
 - **Défaut :** `undefined`
-- **Valeur d'exemple :**
+- **Runtimes supportés :** `node`, `bun`, `deno`, `serviceWorker`
+
+**Options disponibles par runtime :**
+
+- **`node`** : Accepte toutes les [Node.js HTTP ServerOptions](https://nodejs.org/api/http.html#httpcreateserveroptions-requestlistener), [HTTPS ServerOptions](https://nodejs.org/api/https.html#httpscreateserveroptions-requestlistener), [HTTP/2 ServerOptions](https://nodejs.org/api/http2.html#http2createsecureserveroptions-onrequesthandler), et [ListenOptions](https://nodejs.org/api/net.html#serverlistenoptions-callback), plus :
+  - `http2?: boolean` - Activer HTTP/2 (défaut : true avec TLS)
+
+- **`bun`** : Accepte toutes les [Bun.Serve.Options](https://bun.sh/docs/api/http) (sauf `fetch`)
+
+- **`deno`** : Accepte toutes les [Deno.ServeOptions](https://docs.deno.com/api/deno/~/Deno.ServeOptions)
+
+- **`serviceWorker`** : Accepte la configuration du service worker (voir [docs srvx](https://srvx.h3.dev/guide/options))
+
+**Exemple :**
 ```typescript
-{
-  node: {
-    http2: true,              // Activer HTTP/2 (défaut : true avec TLS)
-    maxHeaderSize: 16384,     // Personnaliser la taille d'en-tête
-    ipv6Only: false           // Mode IPv6 uniquement
+yasui.createServer({
+  controllers: [UserController],
+  runtimeOptions: {
+    node: {
+      http2: true,
+      maxHeadersize: 16384,
+      ipv6Only: false
+    }
   }
-}
+});
 ```
+
+**Note :** Pour des limites de taille d'en-têtes/corps cohérentes sur tous les runtimes, utilisez les options de niveau racine `maxHeaderSize` et `maxBodySize`. Les options spécifiques au runtime fournissent une défense en profondeur supplémentaire lorsque cela est pris en charge.
 
 #### `debug`
 Activer le mode debug avec journalisation supplémentaire et traçage des requêtes.
