@@ -58,8 +58,20 @@ Hostname to bind the server to.
 - **Type:** `string | undefined`
 - **Default:** `'localhost'` in development, undefined in production
 
+#### `maxBodySize`
+Maximum request body size in bytes. Requests exceeding this limit will be rejected with 413 Payload Too Large.
+- **Type:** `number`
+- **Default:** `10485760` (10MB)
+- **Note:** This is an application-level check that works across all runtimes (Node.js, Deno, Bun)
+
+#### `maxHeaderSize`
+Maximum total header size in bytes. Requests exceeding this limit will be rejected with 413 Payload Too Large.
+- **Type:** `number`
+- **Default:** `16384` (16KB)
+- **Note:** This is an application-level check that works across all runtimes.
+
 #### `tls`
-TLS/HTTPS configuration. When provided, server automatically uses HTTPS.
+TLS/HTTPS configuration. When provided, server automatically uses HTTPS. Types are extracted from **srvx**.
 - **Type:** `TLSConfig | undefined`
 - **Default:** `undefined` (HTTP)
 - **Example value:**
@@ -67,25 +79,42 @@ TLS/HTTPS configuration. When provided, server automatically uses HTTPS.
 {
   cert: './path/to/cert.pem',  // or PEM string
   key: './path/to/key.pem',    // or PEM string
-  passphrase: 'optional',      // optional key passphrase
-  ca: './path/to/ca.pem'       // optional CA certificates
+  passphrase: 'optional'       // optional key passphrase
 }
 ```
 
 #### `runtimeOptions`
-Runtime-specific configuration options.
+Runtime-specific server configuration options. These are passed directly to the underlying server ([srvx](https://srvx.h3.dev)), which then passes them to the respective runtime. Types are extracted from srvx's `ServerOptions` for type safety.
 - **Type:** `RuntimeOptions | undefined`
 - **Default:** `undefined`
-- **Example value:**
+- **Supported runtimes:** `node`, `bun`, `deno`, `serviceWorker`
+
+**Available options by runtime:**
+
+- **`node`**: Accepts all [Node.js HTTP ServerOptions](https://nodejs.org/api/http.html#httpcreateserveroptions-requestlistener), [HTTPS ServerOptions](https://nodejs.org/api/https.html#httpscreateserveroptions-requestlistener), [HTTP/2 ServerOptions](https://nodejs.org/api/http2.html#http2createsecureserveroptions-onrequesthandler), and [ListenOptions](https://nodejs.org/api/net.html#serverlistenoptions-callback), plus:
+  - `http2?: boolean` - Enable HTTP/2 (default: true with TLS)
+
+- **`bun`**: Accepts all [Bun.Serve.Options](https://bun.sh/docs/api/http) (except `fetch`)
+
+- **`deno`**: Accepts all [Deno.ServeOptions](https://docs.deno.com/api/deno/~/Deno.ServeOptions)
+
+- **`serviceWorker`**: Accepts service worker configuration (see [srvx docs](https://srvx.h3.dev/guide/options))
+
+**Example:**
 ```typescript
-{
-  node: {
-    http2: true,              // Enable HTTP/2 (default: true with TLS)
-    maxHeaderSize: 16384,     // Customize header size
-    ipv6Only: false           // IPv6-only mode
+yasui.createServer({
+  controllers: [UserController],
+  runtimeOptions: {
+    node: {
+      http2: true,
+      maxHeadersize: 16384,
+      ipv6Only: false
+    }
   }
-}
+});
 ```
+
+**Note:** For consistent header/body size limits across all runtimes, use the root-level `maxHeaderSize` and `maxBodySize` options. Runtime-specific options provide additional defense-in-depth where supported.
 
 #### `debug`
 Enable debug mode with additional logging and request tracing.

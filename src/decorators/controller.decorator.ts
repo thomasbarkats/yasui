@@ -66,7 +66,8 @@ export function Controller(
           route.params,
           pipes,
           false,
-          core.config.strictValidation
+          core.config.strictValidation,
+          core.config.maxBodySize
         );
 
         /** join controller path with route path */

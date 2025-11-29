@@ -16,7 +16,8 @@ export function Middleware(): ClassDecorator {
 
     target.prototype.run = (
       self: IMiddleware,
-      strictValidation?: boolean
+      strictValidation?: boolean,
+      maxBodySize?: number
     ): RequestHandler => {
       const descriptor = Object.getOwnPropertyDescriptor(target.prototype, 'use');
       if (!descriptor) {
@@ -32,7 +33,8 @@ export function Middleware(): ClassDecorator {
         params,
         [],
         true,
-        strictValidation
+        strictValidation,
+        maxBodySize
       );
     };
   };
