@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://yasui.app">
-    <img src="https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot.png" alt="Logo" height=160 />
+    <img src="https://raw.githubusercontent.com/thomasbarkats/assets/refs/heads/main/yasui/yasui-logo-mascot.png" alt="Logo" height=180 />
   </a>
   <h1 align="center">YasuiJS</h1>
 </p>
