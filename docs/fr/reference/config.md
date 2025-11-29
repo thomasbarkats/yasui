@@ -188,6 +188,12 @@ Activer la validation stricte pour la conversion de types et l'analyse JSON. Lor
 - **Défaut :** `false`
 - **Voir :** [Mode de validation stricte](/reference/controllers#mode-de-validation-stricte) pour le comportement détaillé et les exemples
 
+#### `requestTimeout`
+Durée maximale de requête en millisecondes. Les requêtes dépassant cette durée seront terminées avec 408 Request Timeout.
+- **Type :** `number`
+- **Défaut :** `30000` (30 secondes)
+- **Note :** Empêche les requêtes de longue durée d'épuiser les ressources du serveur. Définir à `0` pour désactiver le timeout.
+
 ## createServer() vs createApp()
 
 ### createServer()

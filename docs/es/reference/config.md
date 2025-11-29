@@ -188,6 +188,12 @@ Habilitar validación estricta de conversión de tipos y análisis JSON. Cuando 
 - **Por defecto:** `false`
 - **Ver:** [Modo de Validación Estricta](/reference/controllers#modo-de-validación-estricta) para comportamiento detallado y ejemplos
 
+#### `requestTimeout`
+Duración máxima de solicitud en milisegundos. Las solicitudes que excedan esta duración serán terminadas con 408 Request Timeout.
+- **Tipo:** `number`
+- **Por defecto:** `30000` (30 segundos)
+- **Nota:** Previene que solicitudes de larga duración agoten los recursos del servidor. Establece en `0` para deshabilitar el timeout.
+
 ## createServer() vs createApp()
 
 ### createServer()

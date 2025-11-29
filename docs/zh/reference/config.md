@@ -188,6 +188,12 @@ Swagger 文档配置。详情请参见 [Swagger](/zh/reference/swagger)。
 - **默认值：** `false`
 - **参见：** [严格验证模式](/reference/controllers#严格验证模式) 获取详细行为和示例
 
+#### `requestTimeout`
+请求的最大持续时间（毫秒）。超过此持续时间的请求将以 408 Request Timeout 终止。
+- **类型：** `number`
+- **默认值：** `30000`（30秒）
+- **注意：** 防止长时间运行的请求耗尽服务器资源。设置为 `0` 可禁用超时。
+
 ## createServer() vs createApp()
 
 ### createServer()
