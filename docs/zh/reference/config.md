@@ -194,6 +194,24 @@ Swagger 文档配置。详情请参见 [Swagger](/zh/reference/swagger)。
 - **默认值：** `30000`（30秒）
 - **注意：** 防止长时间运行的请求耗尽服务器资源。设置为 `0` 可禁用超时。
 
+#### `compression`
+根据客户端的 `Accept-Encoding` 头启用响应的自动 gzip 压缩。
+- **类型：** `boolean`
+- **默认值：** `false`
+- **行为：**
+  - 仅当客户端发送 `Accept-Encoding: gzip` 头时压缩
+  - 仅压缩基于文本的内容类型（JSON、HTML、CSS、JavaScript、XML）
+  - 跳过二进制格式的压缩（图像、视频、存档文件）
+  - 浏览器和 HTTP 客户端（curl、Postman、fetch）会自动解压响应
+- **示例：**
+```typescript
+yasui.createServer({
+  controllers: [UserController],
+  compression: true  // 启用 gzip 压缩
+});
+```
+- **注意：** 使用 Web 标准 `CompressionStream` API（Node.js 18+、Deno、Bun）。为 JSON/文本响应提供 70%+ 的带宽减少，CPU 开销极小。
+
 ## createServer() vs createApp()
 
 ### createServer()

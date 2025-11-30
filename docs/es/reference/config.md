@@ -194,6 +194,24 @@ Duración máxima de solicitud en milisegundos. Las solicitudes que excedan esta
 - **Por defecto:** `30000` (30 segundos)
 - **Nota:** Previene que solicitudes de larga duración agoten los recursos del servidor. Establece en `0` para deshabilitar el timeout.
 
+#### `compression`
+Habilita la compresión gzip automática para las respuestas basándose en el encabezado `Accept-Encoding` del cliente.
+- **Tipo:** `boolean`
+- **Por defecto:** `false`
+- **Comportamiento:**
+  - Solo comprime cuando el cliente envía el encabezado `Accept-Encoding: gzip`
+  - Solo comprime tipos de contenido basados en texto (JSON, HTML, CSS, JavaScript, XML)
+  - Omite la compresión para formatos binarios (imágenes, videos, archivos)
+  - Los navegadores y clientes HTTP (curl, Postman, fetch) descomprimen automáticamente las respuestas
+- **Ejemplo:**
+```typescript
+yasui.createServer({
+  controllers: [UserController],
+  compression: true  // Habilitar compresión gzip
+});
+```
+- **Nota:** Utiliza la API `CompressionStream` de Web Standards (Node.js 18+, Deno, Bun). Proporciona una reducción de ancho de banda del 70%+ para respuestas JSON/texto con mínima sobrecarga de CPU.
+
 ## createServer() vs createApp()
 
 ### createServer()

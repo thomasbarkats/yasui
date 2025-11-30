@@ -114,7 +114,7 @@ export class Core {
       try {
         const req: CoreYasuiRequest = new YasuiRequest(standardReq);
 
-        // Check header size limit
+        /** check header size limit */
         if (this.config.maxHeaderSize) {
           let totalHeaderSize = 0;
           standardReq.headers.forEach((value, key) => {
@@ -140,7 +140,7 @@ export class Core {
           req._logger = new LoggerService().start();
         }
 
-        // Apply request timeout if configured
+        /** apply request timeout if configured */
         if (this.config.requestTimeout) {
           const timeoutPromise = new Promise<Response>((_, reject) => {
             setTimeout(() => {
@@ -230,6 +230,32 @@ export class Core {
     return Response.json(result, { status });
   }
 
+  private compressResponse(response: Response, req: YasuiRequest): Response {
+    if (!this.config.compression || !response.body || response.status === 204 || response.status === 304) {
+      return response;
+    }
+
+    const acceptEncoding = req.rawHeaders.get('accept-encoding') || '';
+    if (!acceptEncoding.includes('gzip')) {
+      return response;
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    // only compress text-based content types
+    if (!/^(text\/|application\/(json|javascript|xml|.*\+xml))/.test(contentType)) {
+      return response;
+    }
+
+    const headers = new Headers(response.headers);
+    headers.set('content-encoding', 'gzip');
+    headers.delete('content-length');
+
+    return new Response(
+      response.body.pipeThrough(new CompressionStream('gzip')),
+      { status: response.status, statusText: response.statusText, headers }
+    );
+  }
+
   private async executeChain(
     req: YasuiRequest,
     routeData: RouteData & { params?: Record<string, unknown> }
@@ -248,7 +274,8 @@ export class Core {
     };
 
     try {
-      return await next();
+      const response = await next();
+      return this.compressResponse(response, req);
     } catch (error) {
       return this.appService.handleErrors(<Error>error, req);
     }
