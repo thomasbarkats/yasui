@@ -384,7 +384,7 @@ export class UserController {
 
 ### Manual Response Handling
 
-For complete control, return a Web Standards Response object:
+By default, all returned values are automatically serialized to JSON. To return non-JSON formats (HTML, XML, files, etc.), you must return a Web Standards Response object with the appropriate `Content-Type` header:
 
 ```typescript
 @Controller('/api/users')
@@ -400,11 +400,15 @@ export class UserController {
     });
   }
 
-  @Get('/text')
-  textResponse() {
-    return new Response('Plain text response', {
+  @Get('/download')
+  downloadFile() {
+    const fileBuffer = new Uint8Array([/* file data */]);
+    return new Response(fileBuffer, {
       status: 200,
-      headers: { 'Content-Type': 'text/plain' }
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename="report.pdf"'
+      }
     });
   }
 }

@@ -64,5 +64,9 @@ export interface YasuiConfig {
   /** Request timeout in milliseconds. Requests exceeding this duration will be terminated with 408 Request Timeout
    *  @default 30000 (30s) */
   requestTimeout?: number;
+  /** Enable automatic gzip compression based on client Accept-Encoding header.
+   *  Only compresses text-based content types (JSON, HTML, CSS, JS, XML). Browsers automatically decompress.
+   *  @default false */
+  compression?: boolean;
   swagger?: YasuiSwaggerConfig;
 }

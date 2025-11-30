@@ -384,7 +384,7 @@ export class UserController {
 
 ### 手动响应处理
 
-如需完全控制，返回 Web 标准 Response 对象：
+默认情况下，所有返回值都会自动序列化为 JSON。要返回非 JSON 格式（HTML、XML、文件等），必须返回带有适当 `Content-Type` 头的 Web 标准 Response 对象：
 
 ```typescript
 @Controller('/api/users')
@@ -400,11 +400,15 @@ export class UserController {
     });
   }
 
-  @Get('/text')
-  textResponse() {
-    return new Response('Plain text response', {
+  @Get('/download')
+  downloadFile() {
+    const fileBuffer = new Uint8Array([/* 文件数据 */]);
+    return new Response(fileBuffer, {
       status: 200,
-      headers: { 'Content-Type': 'text/plain' }
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename="report.pdf"'
+      }
     });
   }
 }

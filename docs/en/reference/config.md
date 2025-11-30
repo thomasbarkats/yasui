@@ -194,6 +194,24 @@ Maximum request duration in milliseconds. Requests exceeding this duration will 
 - **Default:** `30000` (30 seconds)
 - **Note:** Prevents long-running requests from exhausting server resources. Set to `0` to disable timeout.
 
+#### `compression`
+Enable automatic gzip compression for responses based on the client's `Accept-Encoding` header.
+- **Type:** `boolean`
+- **Default:** `false`
+- **Behavior:**
+  - Only compresses when client sends `Accept-Encoding: gzip` header
+  - Only compresses text-based content types (JSON, HTML, CSS, JavaScript, XML)
+  - Skips compression for binary formats (images, videos, archives)
+  - Browsers and HTTP clients (curl, Postman, fetch) automatically decompress responses
+- **Example:**
+```typescript
+yasui.createServer({
+  controllers: [UserController],
+  compression: true  // Enable gzip compression
+});
+```
+- **Note:** Uses Web Standards `CompressionStream` API (Node.js 18+, Deno, Bun). Provides 70%+ bandwidth reduction for JSON/text responses with minimal CPU overhead.
+
 ## createServer() vs createApp()
 
 ### createServer()

@@ -384,7 +384,7 @@ export class UserController {
 
 ### Gestion manuelle des réponses
 
-Pour un contrôle complet, retournez un objet Response des Web Standards :
+Par défaut, toutes les valeurs retournées sont automatiquement sérialisées en JSON. Pour retourner des formats non-JSON (HTML, XML, fichiers, etc.), vous devez retourner un objet Response des Web Standards avec l'en-tête `Content-Type` approprié :
 
 ```typescript
 @Controller('/api/users')
@@ -400,11 +400,15 @@ export class UserController {
     });
   }
 
-  @Get('/text')
-  textResponse() {
-    return new Response('Réponse en texte brut', {
+  @Get('/download')
+  downloadFile() {
+    const fileBuffer = new Uint8Array([/* données du fichier */]);
+    return new Response(fileBuffer, {
       status: 200,
-      headers: { 'Content-Type': 'text/plain' }
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename="rapport.pdf"'
+      }
     });
   }
 }
