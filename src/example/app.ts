@@ -1,10 +1,11 @@
 import { createServer } from 'yasui';
 import { TestsController } from './tests.controller.js';
+// import { cors } from '@yasui/cors';
 
 
 createServer({
   controllers: [TestsController],
-  middlewares: [],
+  // middlewares: [cors()],
   environment: 'development',
   port: 8080,
   debug: true,

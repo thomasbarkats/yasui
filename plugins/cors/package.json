@@ -1,0 +1,47 @@
+{
+  "name": "@yasui/cors",
+  "version": "1.0.0",
+  "description": "CORS middleware for YasuiJS",
+  "license": "AGPL-3.0-or-later",
+  "author": "Thomas BARKATS",
+  "keywords": [
+    "yasui",
+    "cors",
+    "middleware",
+    "cross-origin",
+    "web-standards"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thomasbarkats/yasui.git",
+    "directory": "plugins/cors"
+  },
+  "homepage": "https://yasui.app",
+  "bugs": {
+    "url": "https://github.com/thomasbarkats/yasui/issues"
+  },
+  "type": "module",
+  "main": "./lib/cors.js",
+  "types": "./lib/cors.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/cors.d.ts",
+      "import": "./lib/cors.js"
+    }
+  },
+  "files": [
+    "lib/**/*"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "rm -rf lib && tsc"
+  },
+  "peerDependencies": {
+    "yasui": "^4.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

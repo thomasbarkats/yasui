@@ -1,0 +1,13 @@
+{
+  "name": "@yasui/cors",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./cors.ts"
+  },
+  "publish": {
+    "include": [
+      "cors.ts",
+      "README.md"
+    ]
+  }
+}

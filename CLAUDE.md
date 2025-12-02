@@ -20,6 +20,7 @@ src/
 ├── base.ts              # Entry: createServer() / createApp()
 └── web.ts               # YasuiRequest extends Request
 
+plugins/         # Official plugins (@yasui/cors, etc.) - functional middlewares
 docs/en/         # Source of truth
 docs/es|fr|zh/   # Translations (ask before updating)
 src/example/     # Basic usage example + sanity test
@@ -100,7 +101,13 @@ RESOLVED_METHOD_DEPS // Injector writes resolved deps
 
 ## Documentation
 
-English first. Ask before touching es/fr/zh.
+English first. Ask before touching es/fr/zh translations.
+
+**Important:** Links in translated docs must point to localized paths:
+- FR docs: `/fr/guide/...`, `/fr/reference/...`, `/fr/plugins/...`
+- ES docs: `/es/guide/...`, `/es/reference/...`, `/es/plugins/...`
+- ZH docs: `/zh/guide/...`, `/zh/reference/...`, `/zh/plugins/...`
+- Never use `/guide/...` or `/plugins/...` in translated docs (points to EN version)
 
 ## Source of Truth
 

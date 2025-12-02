@@ -71,6 +71,12 @@ yasui.createServer({
 - [Pipes](https://yasui.app/guide/pipes.html) - Transform and validate request data automatically
 - [Swagger Doc.](https://yasui.app/guide/swagger.html) - Generate OpenAPI docs with flexible decorators
 
+## Plugins
+
+Production-ready middlewares and utilities for YasuiJS:
+
+- **[@yasui/cors](https://www.npmjs.com/package/@yasui/cors)** ([JSR](https://jsr.io/@yasui/cors)) - CORS middleware with origin validation, credentials support, and Private Network Access
+
 ## Why YasuiJS?
 
 YasuiJS adopts a **class-based, object-oriented approach** with decorators, bringing significant architectural advantages:

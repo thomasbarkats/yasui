@@ -33,6 +33,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^8.46.2
         version: 8.46.2(eslint@9.38.0)(typescript@5.9.3)
+      '@yasui/cors':
+        specifier: workspace:*
+        version: link:plugins/cors
       eslint:
         specifier: ^9.38.0
         version: 9.38.0
@@ -57,6 +60,16 @@ importers:
       vue:
         specifier: ^3.5.22
         version: 3.5.22(typescript@5.9.3)
+
+  plugins/cors:
+    dependencies:
+      yasui:
+        specifier: ^4.0.0
+        version: 4.1.2
+    devDependencies:
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
 
 packages:
 
@@ -1364,6 +1377,10 @@ packages:
   word-wrap@1.2.5:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
     engines: {node: '>=0.10.0'}
+
+  yasui@4.1.2:
+    resolution: {integrity: sha512-AlWsc21Hg99ge3y00FA0rlCqBy37s7NdB67xFhpSlnJOYO8ShwxS0OeMUbxzSvILSKHWXmeuBmsO9z3Jgx7ozA==}
+    engines: {node: '>=18.0.0'}
 
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
@@ -2714,6 +2731,13 @@ snapshots:
       isexe: 2.0.0
 
   word-wrap@1.2.5: {}
+
+  yasui@4.1.2:
+    dependencies:
+      kleur: 4.1.5
+      radix3: 1.1.2
+      reflect-metadata: 0.2.2
+      srvx: 0.9.4
 
   yocto-queue@0.1.0: {}
 
