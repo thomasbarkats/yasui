@@ -10,4 +10,8 @@
 docs/.vitepress/dist
 docs/.vitepress/cache
 
+# Plugins
+plugins/*/lib
+plugins/*/node_modules
+
 scripts/.env

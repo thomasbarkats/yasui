@@ -65,6 +65,7 @@ export default [
       '.git/**',
       '.vscode/**',
       'lib/**',
+      'plugins/*/lib/**',
       'benchmarks/**',
       'docs/.vitepress/cache/**',
       'docs/.vitepress/dist/**'
