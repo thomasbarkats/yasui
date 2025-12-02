@@ -9,7 +9,8 @@ export default {
     nav: [
       { text: 'Inicio', link: '/es/' },
       { text: 'Guía', link: '/es/guide/what-is-yasuijs' },
-      { text: 'Referencia', link: '/es/reference/config' }
+      { text: 'Referencia', link: '/es/reference/config' },
+      { text: 'Plugins', link: '/es/plugins/cors' }
     ],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/thomasbarkats/yasui' },
@@ -39,6 +40,12 @@ export default {
           { text: 'Manejo de Errores', link: '/es/reference/error-handling' },
           { text: 'Registro de Eventos', link: '/es/reference/logging' },
           { text: 'Swagger Doc.', link: '/es/reference/swagger' }
+        ]
+      },
+      {
+        text: 'Plugins',
+        items: [
+          { text: 'CORS', link: '/es/plugins/cors' }
         ]
       }
     ]

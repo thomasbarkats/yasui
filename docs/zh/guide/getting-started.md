@@ -91,9 +91,23 @@ yasui.createServer({
 
 构建并运行您的 API：
 
-```bash
+::: code-group
+```bash [npm]
 npm run dev
 ```
+
+```bash [pnpm]
+pnpm dev
+```
+
+```bash [bun]
+bun run dev
+```
+
+```bash [deno]
+deno run --allow-net --allow-read app.ts
+```
+:::
 
 访问 `http://localhost:3000`，您将看到：
 ```json

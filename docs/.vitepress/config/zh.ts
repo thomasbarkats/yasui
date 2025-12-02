@@ -9,7 +9,8 @@ export default {
     nav: [
       { text: '首页', link: '/zh/' },
       { text: '指南', link: '/zh/guide/what-is-yasuijs' },
-      { text: '参考', link: '/zh/reference/config' }
+      { text: '参考', link: '/zh/reference/config' },
+      { text: '插件', link: '/zh/plugins/cors' }
     ],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/thomasbarkats/yasui' },
@@ -39,6 +40,12 @@ export default {
           { text: '错误处理', link: '/zh/reference/error-handling' },
           { text: '日志', link: '/zh/reference/logging' },
           { text: 'Swagger 文档', link: '/zh/reference/swagger' }
+        ]
+      },
+      {
+        text: '插件',
+        items: [
+          { text: 'CORS', link: '/zh/plugins/cors' }
         ]
       }
     ]

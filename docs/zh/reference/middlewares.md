@@ -123,24 +123,25 @@ export class ApiKeyMiddleware implements IMiddleware {
 
 ```typescript
 @Middleware()
-export class CorsMiddleware implements IMiddleware {
+export class TimingMiddleware implements IMiddleware {
   async use(@Req() req: Request, @Next() next: NextFunction) {
+    const start = Date.now();
     const response = await next();
+    const duration = Date.now() - start;
 
-    // 向响应添加 CORS 头
     const headers = new Headers(response.headers);
-    headers.set('Access-Control-Allow-Origin', '*');
-    headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH');
-    headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    headers.set('X-Response-Time', `${duration}ms`);
 
     return new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
-      headers,
+      headers
     });
   }
 }
 ```
+
+**对于生产环境的 CORS 处理**，请使用官方插件 [`@yasui/cors`](/zh/plugins/cors)，它提供源验证、预检请求处理、凭据支持和现代安全功能。
 
 ## 中间件使用级别
 
