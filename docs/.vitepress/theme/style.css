@@ -1,18 +1,26 @@
+@font-face {
+  font-family: 'YasuiCofeben';
+  src: url('./fonts/YasuiCofeben.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --vp-c-brand-1: #D2932C;
-  --vp-c-brand-2: #C4851F;
+  --vp-c-brand-1: #C98E4E;
+  --vp-c-brand-2: #C47A37;
   --vp-c-brand-3: #B57615;
   --vp-c-brand-4: #CC855F;
-  --vp-c-brand-shadow: #dba78a;
+  --vp-c-brand-shadow: #d8ad95;
 }
 
 /* Dark mode colors */
 .dark {
-  --vp-c-brand-1: #E8B55A;
+  --vp-c-brand-1: #E4A257;
   --vp-c-brand-2: #DCA347;
   --vp-c-brand-3: #D2932C;
   --vp-c-brand-4: #996447;
-  --vp-c-brand-shadow: #69402a;
+  --vp-c-brand-shadow: #5a3724;
 }
 
 :root {
@@ -25,7 +33,11 @@
 }
 
 .VPImage {
-  filter: drop-shadow(-8px 8px 44px var(--vp-c-brand-shadow));
+  filter: drop-shadow(-8px 8px 64px var(--vp-c-brand-shadow));
+}
+
+.VPButton.medium {
+  border-radius: 8px !important;
 }
 
 .VPHero .main {
@@ -40,6 +52,10 @@
 
   .VPHero .image {
     margin-top: -92px;
+  }
+
+  .VPHero .main .name {
+    font-size: 48px !important;
   }
 }
 
@@ -59,12 +75,17 @@
 
   .VPHero .image img {
     max-width: 300px !important;
-    margin-left: 28px;
-    margin-top: 8px;
+    margin-left: 46px;
+    margin-top: -6px;
+    transform: translate(-50%, -50%) rotate(-4deg);
+  }
+
+  .VPHero .main .name {
+    font-size: 68px !important;
   }
 
   .VPHero .main .text {
-    font-size: 52px !important;
+    font-size: 50px !important;
     max-width: 640px !important;
   }
 
@@ -80,5 +101,6 @@
 }
 
 .VPHero .main .name {
-  margin-bottom: 4px !important;
+  margin-bottom: 12px !important;
+  font-family: 'YasuiCofeben', sans-serif !important;
 }

@@ -22,6 +22,13 @@ export default defineConfig({
       type: 'image/svg+xml',
       fetchpriority: 'high'
     }],
+    ['link', {
+      rel: 'preload',
+      href: '/theme/fonts/YasuiCofeben.ttf',
+      as: 'font',
+      type: 'font/ttf',
+      crossorigin: 'anonymous'
+    }],
   ],
   rewrites: {
     'en/(.*)': '(.*)'
