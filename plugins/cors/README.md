@@ -38,4 +38,4 @@ yasui.createServer({
 
 ## License
 
-This project is licensed under the [GNU Affero General Public License v3.0 or later](https://www.gnu.org/licenses/agpl-3.0.html). See the [LICENSE](../LICENSE) file for details.
+This project is licensed under the [GNU Affero General Public License v3.0 or later](https://www.gnu.org/licenses/agpl-3.0.html). See the [LICENSE](../../LICENSE) file for details.

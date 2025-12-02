@@ -30,13 +30,38 @@ Vamos a crear tu primera API de YasuiJS en 3 simples pasos.
 
 Crea un nuevo directorio e instala YasuiJS:
 
-```bash
+::: code-group
+```bash [npm]
 mkdir my-yasui-api
 cd my-yasui-api
 npm init -y
 npm install yasui
 npm install -D typescript @types/node
 ```
+
+```bash [pnpm]
+mkdir my-yasui-api
+cd my-yasui-api
+pnpm init
+pnpm add yasui
+pnpm add -D typescript @types/node
+```
+
+```bash [bun]
+mkdir my-yasui-api
+cd my-yasui-api
+bun init -y
+bun add yasui
+bun add -D typescript @types/node
+```
+
+```bash [deno]
+mkdir my-yasui-api
+cd my-yasui-api
+deno init
+deno add jsr:@yasui/yasui
+```
+:::
 
 ### Paso 2: Configurar TypeScript
 
@@ -91,9 +116,23 @@ Añade scripts a tu `package.json`:
 
 Construye y ejecuta tu API:
 
-```bash
+::: code-group
+```bash [npm]
 npm run dev
 ```
+
+```bash [pnpm]
+pnpm dev
+```
+
+```bash [bun]
+bun run dev
+```
+
+```bash [deno]
+deno run --allow-net --allow-read app.ts
+```
+:::
 
 Visita `http://localhost:3000` y verás:
 ```json

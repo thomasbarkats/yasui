@@ -39,7 +39,7 @@
     "build": "rm -rf lib && tsc"
   },
   "peerDependencies": {
-    "yasui": "^4.0.0"
+    "yasui": ">= 4.0.0"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

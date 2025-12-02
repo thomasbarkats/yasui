@@ -75,7 +75,7 @@ yasui.createServer({
 
 Production-ready middlewares and utilities for YasuiJS:
 
-- **[@yasui/cors](https://www.npmjs.com/package/@yasui/cors)** ([JSR](https://jsr.io/@yasui/cors)) - CORS middleware with origin validation, credentials support, and Private Network Access
+- **[@yasui/cors](https://www.npmjs.com/package/@yasui/cors)** ([JSR](https://jsr.io/@yasui/cors)) - CORS middleware
 
 ## Why YasuiJS?
 

@@ -9,7 +9,8 @@ export default {
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/guide/what-is-yasuijs' },
-      { text: 'Reference', link: '/reference/config' }
+      { text: 'Reference', link: '/reference/config' },
+      { text: 'Plugins', link: '/plugins/cors' }
     ],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/thomasbarkats/yasui' },
@@ -39,6 +40,12 @@ export default {
           { text: 'Error Handling', link: '/reference/error-handling' },
           { text: 'Logging', link: '/reference/logging' },
           { text: 'Swagger Doc.', link: '/reference/swagger' }
+        ]
+      },
+      {
+        text: 'Plugins',
+        items: [
+          { text: 'CORS', link: '/plugins/cors' }
         ]
       }
     ]

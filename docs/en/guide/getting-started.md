@@ -7,14 +7,14 @@ This guide will get you up and running with your first API in just a few minutes
 Before we begin, make sure you have:
 
 - **Node.js** (version 18 or higher), **Deno**, or **Bun** - YasuiJS works on all runtimes
-- **npm**, **pnpm**, **yarn**, or your preferred package manager
+- **npm**, **pnpm**, or your preferred package manager (Not necessary with Bun and Deno, package manager included)
 - Basic knowledge of **TypeScript**
 
 You can check your runtime version with:
 ```bash
 node --version  # Node.js
 deno --version  # Deno
-bun --version   # Bun
+bun  --version  # Bun
 ```
 
 This guide uses Node.js, but the same code works on:
@@ -30,13 +30,38 @@ Let's create your first YasuiJS API in 3 simple steps.
 
 Create a new directory and install YasuiJS:
 
-```bash
+::: code-group
+```bash [npm]
 mkdir my-yasui-api
 cd my-yasui-api
 npm init -y
 npm install yasui
 npm install -D typescript @types/node
 ```
+
+```bash [pnpm]
+mkdir my-yasui-api
+cd my-yasui-api
+pnpm init
+pnpm add yasui
+pnpm add -D typescript @types/node
+```
+
+```bash [bun]
+mkdir my-yasui-api
+cd my-yasui-api
+bun init -y
+bun add yasui
+bun add -D typescript @types/node
+```
+
+```bash [deno]
+mkdir my-yasui-api
+cd my-yasui-api
+deno init
+deno add jsr:@yasui/yasui
+```
+:::
 
 ### Step 2: Configure TypeScript
 
@@ -91,9 +116,23 @@ Add scripts to your `package.json`:
 
 Build and run your API:
 
-```bash
+::: code-group
+```bash [npm]
 npm run dev
 ```
+
+```bash [pnpm]
+pnpm dev
+```
+
+```bash [bun]
+bun run dev
+```
+
+```bash [deno]
+deno run --allow-net --allow-read app.ts
+```
+:::
 
 Visit `http://localhost:3000` and you'll see:
 ```json

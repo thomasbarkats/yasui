@@ -56,9 +56,7 @@
     "precommit": "pnpm run lint",
     "commit": "pnpm run lint && format-commit",
     "branch": "format-commit --branch",
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:dev": "vitepress dev docs"
   },
   "dependencies": {
     "kleur": "^4.1.5",
@@ -75,7 +73,6 @@
     "eslint": "^9.38.0",
     "format-commit": "^0.4.0",
     "globals": "^16.4.0",
-    "lucide-vue-next": "^0.555.0",
     "rollup-plugin-dts": "^6.2.3",
     "typescript": "^5.9.3",
     "vitepress": "^1.6.4",

@@ -123,24 +123,25 @@ Cuando necesites modificar la respuesta, usa `@Next()`:
 
 ```typescript
 @Middleware()
-export class CorsMiddleware implements IMiddleware {
+export class TimingMiddleware implements IMiddleware {
   async use(@Req() req: Request, @Next() next: NextFunction) {
+    const start = Date.now();
     const response = await next();
+    const duration = Date.now() - start;
 
-    // Agregar headers CORS a la respuesta
     const headers = new Headers(response.headers);
-    headers.set('Access-Control-Allow-Origin', '*');
-    headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH');
-    headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    headers.set('X-Response-Time', `${duration}ms`);
 
     return new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
-      headers,
+      headers
     });
   }
 }
 ```
+
+**Para el manejo de CORS en producción**, utiliza el plugin oficial [`@yasui/cors`](/es/plugins/cors) que proporciona validación de orígenes, manejo de solicitudes preflight, soporte de credenciales y características de seguridad modernas.
 
 ## Niveles de Uso de Middleware
 
