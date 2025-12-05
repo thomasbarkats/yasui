@@ -4,7 +4,10 @@
 
 ## 概述
 
-YasuiJS 使用带有 `@Middleware()` 装饰器的**基于类的中间件**。中间件基于 Web 标准构建，可在所有支持的运行时（Node.js、Deno、Bun）中工作。
+YasuiJS 支持两种类型的中间件，两者都基于 Web 标准构建，并与所有运行时（Node.js、Deno、Bun）兼容：
+
+1. **基于类的中间件** - 使用 `@Middleware()` 装饰器，支持依赖注入
+2. **函数式中间件** - 遵循 Web 标准 `Request → Response` 模式的简单函数
 
 **重要提示**：YasuiJS 4.x 使用 Web 标准 Request/Response 而不是 Express。Express 风格的中间件（如 `cors`、`helmet` 等）**不兼容**。请使用与 Web 标准兼容的替代方案或编写原生 YasuiJS 中间件。
 
@@ -23,6 +26,39 @@ export class LoggingMiddleware {
   }
 }
 ```
+
+## 函数式中间件
+
+函数式中间件是遵循 Web 标准 `Request → Response` 模式的简单函数。它们非常适合第三方集成、无状态操作或不需要依赖注入的场景。
+
+```typescript
+import type { YasuiRequest, RequestHandler, NextFunction } from 'yasui';
+
+export function simpleLogger(): RequestHandler {
+  return async (req: YasuiRequest, next?: NextFunction): Promise<Response> => {
+    console.log(`${req.method} ${req.path}`);
+    return next ? next() : new Response(null, { status: 500 });
+  };
+}
+
+// 使用方式
+yasui.createServer({
+  middlewares: [simpleLogger()],
+  controllers: [UserController]
+});
+```
+
+**第三方兼容性：** 函数式中间件可与任何提供 Web 标准处理程序的库配合使用，例如身份验证库（如 BetterAuth 的 `auth.handler()`）、官方插件或自定义 fetch 兼容处理程序。
+
+**何时使用：**
+- 第三方集成（BetterAuth 等）
+- 无状态操作（日志记录、CORS、速率限制）
+- 不需要依赖注入
+
+**何时使用类：**
+- 需要依赖注入（`@Inject()`）
+- 访问服务/数据库
+- 具有共享状态的复杂业务逻辑
 
 ## 基于类的中间件
 

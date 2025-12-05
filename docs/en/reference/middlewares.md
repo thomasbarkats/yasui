@@ -4,7 +4,10 @@ Middlewares process requests in a pipeline before they reach your controllers. T
 
 ## Overview
 
-YasuiJS uses **class-based middlewares** with the `@Middleware()` decorator. Middlewares are built on Web Standards and work across all supported runtimes (Node.js, Deno, Bun).
+YasuiJS supports two types of middlewares, both built on Web Standards and compatible with all runtimes (Node.js, Deno, Bun):
+
+1. **Class-based middlewares** - Use the `@Middleware()` decorator with dependency injection support
+2. **Functional middlewares** - Simple functions following the Web Standards `Request → Response` pattern
 
 **Important**: YasuiJS 4.x uses Web Standards Request/Response instead of Express. Express-style middlewares (like `cors`, `helmet`, etc.) are **not compatible**. Use Web Standards-compatible alternatives or write native YasuiJS middlewares.
 
@@ -23,6 +26,39 @@ export class LoggingMiddleware {
   }
 }
 ```
+
+## Functional Middlewares
+
+Functional middlewares are simple functions that follow the Web Standards `Request → Response` pattern. They're perfect for third-party integrations, stateless operations, or when you don't need dependency injection.
+
+```typescript
+import type { YasuiRequest, RequestHandler, NextFunction } from 'yasui';
+
+export function simpleLogger(): RequestHandler {
+  return async (req: YasuiRequest, next?: NextFunction): Promise<Response> => {
+    console.log(`${req.method} ${req.path}`);
+    return next ? next() : new Response(null, { status: 500 });
+  };
+}
+
+// Usage
+yasui.createServer({
+  middlewares: [simpleLogger()],
+  controllers: [UserController]
+});
+```
+
+**Third-party compatibility:** Functional middlewares work with any library providing Web Standards handlers, such as authentication libraries (e.g., BetterAuth's `auth.handler()`), official plugins, or custom fetch-compatible handlers.
+
+**When to use:**
+- Third-party integrations (BetterAuth, etc.)
+- Stateless operations (logging, CORS, rate limiting)
+- No dependency injection needed
+
+**When to use classes:**
+- Need dependency injection (`@Inject()`)
+- Access to services/database
+- Complex business logic with shared state
 
 ## Class-based Middlewares
 

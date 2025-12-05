@@ -4,7 +4,10 @@ Les middlewares traitent les requêtes dans un pipeline avant qu'elles n'atteign
 
 ## Vue d'ensemble
 
-YasuiJS utilise des **middlewares basés sur des classes** avec le décorateur `@Middleware()`. Les middlewares sont construits sur les standards Web et fonctionnent sur tous les runtimes supportés (Node.js, Deno, Bun).
+YasuiJS supporte deux types de middlewares, tous deux construits sur les standards Web et compatibles avec tous les runtimes (Node.js, Deno, Bun) :
+
+1. **Middlewares basés sur des classes** - Utilisent le décorateur `@Middleware()` avec support de l'injection de dépendances
+2. **Middlewares fonctionnels** - Fonctions simples suivant le pattern `Request → Response` des standards Web
 
 **Important** : YasuiJS 4.x utilise les Request/Response des standards Web au lieu d'Express. Les middlewares de style Express (comme `cors`, `helmet`, etc.) ne sont **pas compatibles**. Utilisez des alternatives compatibles avec les standards Web ou écrivez des middlewares YasuiJS natifs.
 
@@ -23,6 +26,39 @@ export class LoggingMiddleware {
   }
 }
 ```
+
+## Middlewares fonctionnels
+
+Les middlewares fonctionnels sont de simples fonctions qui suivent le pattern `Request → Response` des standards Web. Ils sont parfaits pour les intégrations tierces, les opérations sans état ou lorsque vous n'avez pas besoin d'injection de dépendances.
+
+```typescript
+import type { YasuiRequest, RequestHandler, NextFunction } from 'yasui';
+
+export function simpleLogger(): RequestHandler {
+  return async (req: YasuiRequest, next?: NextFunction): Promise<Response> => {
+    console.log(`${req.method} ${req.path}`);
+    return next ? next() : new Response(null, { status: 500 });
+  };
+}
+
+// Utilisation
+yasui.createServer({
+  middlewares: [simpleLogger()],
+  controllers: [UserController]
+});
+```
+
+**Compatibilité tierce :** Les middlewares fonctionnels fonctionnent avec toute bibliothèque fournissant des handlers compatibles avec les standards Web, comme les bibliothèques d'authentification (ex. `auth.handler()` de BetterAuth), les plugins officiels, ou les handlers fetch personnalisés.
+
+**Quand les utiliser :**
+- Intégrations tierces (BetterAuth, etc.)
+- Opérations sans état (logging, CORS, limitation de débit)
+- Pas besoin d'injection de dépendances
+
+**Quand utiliser des classes :**
+- Besoin d'injection de dépendances (`@Inject()`)
+- Accès aux services/base de données
+- Logique métier complexe avec état partagé
 
 ## Middlewares basés sur des classes
 

@@ -4,7 +4,10 @@ Los middlewares procesan las solicitudes en un pipeline antes de que lleguen a t
 
 ## Descripción General
 
-YasuiJS utiliza **middlewares basados en clases** con el decorador `@Middleware()`. Los middlewares están construidos sobre Web Standards y funcionan en todos los runtimes soportados (Node.js, Deno, Bun).
+YasuiJS soporta dos tipos de middlewares, ambos construidos sobre Web Standards y compatibles con todos los runtimes (Node.js, Deno, Bun):
+
+1. **Middlewares basados en clases** - Usan el decorador `@Middleware()` con soporte de inyección de dependencias
+2. **Middlewares funcionales** - Funciones simples que siguen el patrón `Request → Response` de Web Standards
 
 **Importante**: YasuiJS 4.x utiliza Web Standards Request/Response en lugar de Express. Los middlewares estilo Express (como `cors`, `helmet`, etc.) **no son compatibles**. Usa alternativas compatibles con Web Standards o escribe middlewares nativos de YasuiJS.
 
@@ -23,6 +26,39 @@ export class LoggingMiddleware {
   }
 }
 ```
+
+## Middlewares Funcionales
+
+Los middlewares funcionales son funciones simples que siguen el patrón `Request → Response` de Web Standards. Son perfectos para integraciones de terceros, operaciones sin estado o cuando no necesitas inyección de dependencias.
+
+```typescript
+import type { YasuiRequest, RequestHandler, NextFunction } from 'yasui';
+
+export function simpleLogger(): RequestHandler {
+  return async (req: YasuiRequest, next?: NextFunction): Promise<Response> => {
+    console.log(`${req.method} ${req.path}`);
+    return next ? next() : new Response(null, { status: 500 });
+  };
+}
+
+// Uso
+yasui.createServer({
+  middlewares: [simpleLogger()],
+  controllers: [UserController]
+});
+```
+
+**Compatibilidad con terceros:** Los middlewares funcionales funcionan con cualquier biblioteca que proporcione handlers compatibles con Web Standards, como bibliotecas de autenticación (ej. `auth.handler()` de BetterAuth), plugins oficiales, o handlers fetch personalizados.
+
+**Cuándo usarlos:**
+- Integraciones de terceros (BetterAuth, etc.)
+- Operaciones sin estado (logging, CORS, limitación de tasa)
+- No se necesita inyección de dependencias
+
+**Cuándo usar clases:**
+- Necesitas inyección de dependencias (`@Inject()`)
+- Acceso a servicios/base de datos
+- Lógica de negocio compleja con estado compartido
 
 ## Middlewares Basados en Clases
 
