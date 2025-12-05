@@ -45,7 +45,8 @@ export default {
       {
         text: 'Plugins',
         items: [
-          { text: 'CORS', link: '/es/plugins/cors' }
+          { text: 'CORS', link: '/es/plugins/cors' },
+          { text: 'Rate Limiting', link: '/es/plugins/rate-limit' }
         ]
       }
     ]

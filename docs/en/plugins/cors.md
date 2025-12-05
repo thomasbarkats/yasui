@@ -220,83 +220,6 @@ cors({
 
 **Security Note:** The middleware only sends `Access-Control-Allow-Private-Network: true` if the preflight request explicitly includes `Access-Control-Request-Private-Network: true`, following the CORS-RFC1918 specification.
 
-## Common Use Cases
-
-### Production API with Multiple Frontends
-
-```typescript
-import { cors } from '@yasui/cors';
-
-yasui.createServer({
-  middlewares: [
-    cors({
-      origins: [
-        'https://app.example.com',
-        'https://admin.example.com',
-        'https://mobile.example.com'
-      ],
-      credentials: true,
-      exposeHeaders: 'X-Total-Count'
-    })
-  ],
-  controllers: [UserController, ProductController]
-});
-```
-
-### Multi-tenant with Subdomain Regex
-
-```typescript
-import { cors } from '@yasui/cors';
-
-yasui.createServer({
-  middlewares: [
-    cors({
-      origins: [
-        'https://app.example.com',
-        /^https:\/\/[a-z0-9-]+\.example\.com$/  // tenant-123.example.com
-      ],
-      credentials: true
-    })
-  ],
-  controllers: [TenantController]
-});
-```
-
-### Development Setup
-
-```typescript
-import { cors } from '@yasui/cors';
-
-yasui.createServer({
-  middlewares: [
-    cors({
-      origins: process.env.NODE_ENV === 'production'
-        ? ['https://app.example.com']
-        : ['http://localhost:3000', 'http://localhost:5173'],
-      credentials: true
-    })
-  ],
-  controllers: [UserController]
-});
-```
-
-### IoT / Local Network Access
-
-```typescript
-import { cors } from '@yasui/cors';
-
-yasui.createServer({
-  middlewares: [
-    cors({
-      origins: ['https://app.example.com'],
-      allowPrivateNetwork: true,  // Allow access to local device
-      credentials: true
-    })
-  ],
-  controllers: [DeviceController]
-});
-```
-
 ## How It Works
 
 ### Preflight Requests
@@ -442,7 +365,6 @@ If you get a 404 on preflight requests, verify the middleware is registered at t
 
 The middleware validates configuration at application startup (not per-request):
 - ❌ Throws error if `credentials: true` with `origins: '*'`
-- ✅ Fails fast to prevent misconfigurations in production
 
 ### Header Merging
 

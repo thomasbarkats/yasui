@@ -220,83 +220,6 @@ cors({
 
 **Nota de seguridad:** El middleware solo envía `Access-Control-Allow-Private-Network: true` si la solicitud preflight incluye explícitamente `Access-Control-Request-Private-Network: true`, siguiendo la especificación CORS-RFC1918.
 
-## Casos de uso comunes
-
-### API de producción con múltiples frontends
-
-```typescript
-import { cors } from '@yasui/cors';
-
-yasui.createServer({
-  middlewares: [
-    cors({
-      origins: [
-        'https://app.example.com',
-        'https://admin.example.com',
-        'https://mobile.example.com'
-      ],
-      credentials: true,
-      exposeHeaders: 'X-Total-Count'
-    })
-  ],
-  controllers: [UserController, ProductController]
-});
-```
-
-### Multi-tenant con regex de subdominios
-
-```typescript
-import { cors } from '@yasui/cors';
-
-yasui.createServer({
-  middlewares: [
-    cors({
-      origins: [
-        'https://app.example.com',
-        /^https:\/\/[a-z0-9-]+\.example\.com$/  // tenant-123.example.com
-      ],
-      credentials: true
-    })
-  ],
-  controllers: [TenantController]
-});
-```
-
-### Configuración de desarrollo
-
-```typescript
-import { cors } from '@yasui/cors';
-
-yasui.createServer({
-  middlewares: [
-    cors({
-      origins: process.env.NODE_ENV === 'production'
-        ? ['https://app.example.com']
-        : ['http://localhost:3000', 'http://localhost:5173'],
-      credentials: true
-    })
-  ],
-  controllers: [UserController]
-});
-```
-
-### IoT / Acceso a red local
-
-```typescript
-import { cors } from '@yasui/cors';
-
-yasui.createServer({
-  middlewares: [
-    cors({
-      origins: ['https://app.example.com'],
-      allowPrivateNetwork: true,  // Permitir acceso al dispositivo local
-      credentials: true
-    })
-  ],
-  controllers: [DeviceController]
-});
-```
-
 ## Cómo funciona
 
 ### Solicitudes preflight
@@ -416,7 +339,6 @@ Si obtienes un 404 en solicitudes preflight, verifica que el middleware esté re
 
 El middleware valida la configuración al inicio de la aplicación (no por solicitud):
 - ❌ Arroja error si `credentials: true` con `origins: '*'`
-- ✅ Falla rápido para prevenir configuraciones incorrectas en producción
 
 ### Fusión de encabezados
 

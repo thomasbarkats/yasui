@@ -220,83 +220,6 @@ cors({
 
 **安全说明**：仅当预检请求明确包含 `Access-Control-Request-Private-Network: true` 时，中间件才会发送 `Access-Control-Allow-Private-Network: true`，遵循 CORS-RFC1918 规范。
 
-## 常见使用场景
-
-### 具有多个前端的生产 API
-
-```typescript
-import { cors } from '@yasui/cors';
-
-yasui.createServer({
-  middlewares: [
-    cors({
-      origins: [
-        'https://app.example.com',
-        'https://admin.example.com',
-        'https://mobile.example.com'
-      ],
-      credentials: true,
-      exposeHeaders: 'X-Total-Count'
-    })
-  ],
-  controllers: [UserController, ProductController]
-});
-```
-
-### 使用子域正则表达式的多租户
-
-```typescript
-import { cors } from '@yasui/cors';
-
-yasui.createServer({
-  middlewares: [
-    cors({
-      origins: [
-        'https://app.example.com',
-        /^https:\/\/[a-z0-9-]+\.example\.com$/  // tenant-123.example.com
-      ],
-      credentials: true
-    })
-  ],
-  controllers: [TenantController]
-});
-```
-
-### 开发环境设置
-
-```typescript
-import { cors } from '@yasui/cors';
-
-yasui.createServer({
-  middlewares: [
-    cors({
-      origins: process.env.NODE_ENV === 'production'
-        ? ['https://app.example.com']
-        : ['http://localhost:3000', 'http://localhost:5173'],
-      credentials: true
-    })
-  ],
-  controllers: [UserController]
-});
-```
-
-### IoT / 本地网络访问
-
-```typescript
-import { cors } from '@yasui/cors';
-
-yasui.createServer({
-  middlewares: [
-    cors({
-      origins: ['https://app.example.com'],
-      allowPrivateNetwork: true,  // 允许访问本地设备
-      credentials: true
-    })
-  ],
-  controllers: [DeviceController]
-});
-```
-
 ## 工作原理
 
 ### 预检请求
@@ -442,7 +365,6 @@ yasui.createServer({
 
 中间件在应用程序启动时验证配置（而不是每个请求）：
 - ❌ 如果 `credentials: true` 与 `origins: '*'` 一起使用，则抛出错误
-- ✅ 快速失败以防止生产环境中的错误配置
 
 ### 标头合并
 

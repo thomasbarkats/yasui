@@ -1,32 +1,32 @@
 {
-  "name": "@yasui/cors",
+  "name": "@yasui/rate-limit",
   "version": "1.0.0",
-  "description": "CORS middleware for YasuiJS",
+  "description": "Rate limiting middleware for YasuiJS",
   "license": "AGPL-3.0-or-later",
   "author": "Thomas BARKATS",
   "keywords": [
     "yasui",
-    "cors",
+    "rate-limit",
     "middleware",
-    "cross-origin",
+    "throttle",
     "web-standards"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/thomasbarkats/yasui.git",
-    "directory": "plugins/cors"
+    "directory": "plugins/rate-limit"
   },
   "homepage": "https://yasui.app",
   "bugs": {
     "url": "https://github.com/thomasbarkats/yasui/issues"
   },
   "type": "module",
-  "main": "./lib/cors.js",
-  "types": "./lib/cors.d.ts",
+  "main": "./lib/rate-limit.js",
+  "types": "./lib/rate-limit.d.ts",
   "exports": {
     ".": {
-      "types": "./lib/cors.d.ts",
-      "import": "./lib/cors.js"
+      "types": "./lib/rate-limit.d.ts",
+      "import": "./lib/rate-limit.js"
     }
   },
   "files": [

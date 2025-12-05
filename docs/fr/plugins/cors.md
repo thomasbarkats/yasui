@@ -220,83 +220,6 @@ cors({
 
 **Note de sécurité :** Le middleware n'envoie `Access-Control-Allow-Private-Network: true` que si la requête preflight inclut explicitement `Access-Control-Request-Private-Network: true`, suivant la spécification CORS-RFC1918.
 
-## Cas d'usage courants
-
-### API de production avec plusieurs frontends
-
-```typescript
-import { cors } from '@yasui/cors';
-
-yasui.createServer({
-  middlewares: [
-    cors({
-      origins: [
-        'https://app.example.com',
-        'https://admin.example.com',
-        'https://mobile.example.com'
-      ],
-      credentials: true,
-      exposeHeaders: 'X-Total-Count'
-    })
-  ],
-  controllers: [UserController, ProductController]
-});
-```
-
-### Multi-tenant avec regex de sous-domaines
-
-```typescript
-import { cors } from '@yasui/cors';
-
-yasui.createServer({
-  middlewares: [
-    cors({
-      origins: [
-        'https://app.example.com',
-        /^https:\/\/[a-z0-9-]+\.example\.com$/  // tenant-123.example.com
-      ],
-      credentials: true
-    })
-  ],
-  controllers: [TenantController]
-});
-```
-
-### Configuration développement
-
-```typescript
-import { cors } from '@yasui/cors';
-
-yasui.createServer({
-  middlewares: [
-    cors({
-      origins: process.env.NODE_ENV === 'production'
-        ? ['https://app.example.com']
-        : ['http://localhost:3000', 'http://localhost:5173'],
-      credentials: true
-    })
-  ],
-  controllers: [UserController]
-});
-```
-
-### IoT / Accès réseau local
-
-```typescript
-import { cors } from '@yasui/cors';
-
-yasui.createServer({
-  middlewares: [
-    cors({
-      origins: ['https://app.example.com'],
-      allowPrivateNetwork: true,  // Permettre l'accès au dispositif local
-      credentials: true
-    })
-  ],
-  controllers: [DeviceController]
-});
-```
-
 ## Fonctionnement
 
 ### Requêtes preflight
@@ -416,7 +339,6 @@ Si vous obtenez une 404 sur les requêtes preflight, vérifiez que le middleware
 
 Le middleware valide la configuration au démarrage de l'application (pas par requête) :
 - ❌ Génère une erreur si `credentials: true` avec `origins: '*'`
-- ✅ Échoue rapidement pour éviter les mauvaises configurations en production
 
 ### Fusion d'en-têtes
 
