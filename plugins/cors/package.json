@@ -1,6 +1,6 @@
 {
   "name": "@yasui/cors",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "CORS middleware for YasuiJS",
   "license": "AGPL-3.0-or-later",
   "author": "Thomas BARKATS",
