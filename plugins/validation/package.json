@@ -1,0 +1,55 @@
+{
+  "name": "@yasui/validation",
+  "version": "1.0.0",
+  "description": "Class-validator based validation pipe for YasuiJS",
+  "license": "AGPL-3.0-or-later",
+  "author": "Thomas BARKATS",
+  "keywords": [
+    "yasui",
+    "validation",
+    "class-validator",
+    "pipe",
+    "dto",
+    "web-standards"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thomasbarkats/yasui.git",
+    "directory": "plugins/validation"
+  },
+  "homepage": "https://yasui.app",
+  "bugs": {
+    "url": "https://github.com/thomasbarkats/yasui/issues"
+  },
+  "type": "module",
+  "main": "./lib/validation.js",
+  "types": "./lib/validation.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/validation.d.ts",
+      "import": "./lib/validation.js"
+    }
+  },
+  "files": [
+    "lib/**/*"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "rm -rf lib && tsc"
+  },
+  "peerDependencies": {
+    "class-transformer": ">= 0.5.0",
+    "class-validator": ">= 0.14.0",
+    "yasui": ">= 4.0.0"
+  },
+  "dependencies": {
+    "class-transformer": "^0.5.1"
+  },
+  "devDependencies": {
+    "class-validator": "^0.14.1",
+    "typescript": "^5.9.3",
+    "yasui": "^4.2.0"
+  }
+}

@@ -46,7 +46,8 @@ export default {
         text: '插件',
         items: [
           { text: 'CORS', link: '/zh/plugins/cors' },
-          { text: '速率限制', link: '/zh/plugins/rate-limit' }
+          { text: '速率限制', link: '/zh/plugins/rate-limit' },
+          { text: '验证', link: '/zh/plugins/validation' }
         ]
       }
     ]
