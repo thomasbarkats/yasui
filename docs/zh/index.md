@@ -2,7 +2,6 @@
 layout: home
 
 hero:
-  name: "YasuiJS"
   text: "在几分钟内部署生产就绪的REST API"
   tagline: 轻量级框架，但包含您所需的一切。
   image:

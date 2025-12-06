@@ -2,7 +2,6 @@
 layout: home
 
 hero:
-  name: "YasuiJS"
   text: "Déployez des API REST prêtes pour la production en quelques minutes"
   tagline: Un framework léger, mais avec tout ce dont vous avez besoin.
   image:

@@ -26,6 +26,7 @@
 :root {
   --vp-home-hero-name-color: var(--vp-c-brand-1);
   --vp-button-brand-bg: var(--vp-c-brand-4);
+  --vp-button-brand-bg: var(--vp-c-brand-4);
 }
 
 .DocSearch {
@@ -37,7 +38,18 @@
 }
 
 .VPButton.medium {
-  border-radius: 8px !important;
+  border-radius: 12px !important;
+  padding: 2px 24px !important;
+}
+
+.box .icon {
+  height: 52px !important;
+  width: 52px !important;
+  border-radius: 10px !important;
+}
+
+.VPFeature {
+  border-radius: 16px !important;
 }
 
 .VPHero .main {
@@ -64,6 +76,10 @@
     margin-bottom: 84px !important;
   }
 
+  .VPHero {
+    margin-bottom: 24px;
+  }
+
   .VPHero .main {
     margin-top: -32px;
     flex: 2 !important;
@@ -74,9 +90,9 @@
   }
 
   .VPHero .image img {
-    max-width: 300px !important;
-    margin-left: 46px;
-    margin-top: -6px;
+    max-width: 260px !important;
+    margin-left: 54px;
+    margin-top: 20px;
     transform: translate(-50%, -50%) rotate(-4deg);
   }
 
