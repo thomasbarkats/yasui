@@ -1,6 +1,6 @@
 {
   "name": "@yasui/validation",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Class-validator based validation pipe for YasuiJS",
   "license": "AGPL-3.0-or-later",
   "author": "Thomas BARKATS",

@@ -4,10 +4,10 @@ import {
   type IParamMetadata,
   type IPipeTransform,
   type Constructible,
-  type RouteRequestParamTypes,
   HttpCode,
   HttpError,
-  PipeTransform
+  PipeTransform,
+  RouteRequestParamTypes
 } from 'yasui';
 
 
@@ -72,13 +72,18 @@ export function validation(config?: ClassValidatorPipeConfig): Constructible<IPi
   class ConfiguredValidationPipe implements IPipeTransform {
 
     async transform(value: unknown, metadata: IParamMetadata): Promise<unknown> {
-      const { metatype } = metadata;
-
-      if (!metatype || typeof metatype !== 'function') {
+      if (
+        metadata.type !== RouteRequestParamTypes.BODY &&
+        metadata.type !== RouteRequestParamTypes.QUERY
+      ) {
         return value;
       }
-      /** skip native types (already handled by YasuiJS type casting) */
+
+      const { metatype } = metadata;
       if (
+        !metatype ||
+        typeof metatype !== 'function' ||
+        /** skip native types (already handled by YasuiJS type casting) */
         metatype === String ||
         metatype === Number ||
         metatype === Boolean ||
