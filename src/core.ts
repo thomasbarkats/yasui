@@ -132,8 +132,18 @@ export class Core {
         const match = this.router.lookup(routeKey);
 
         if (!match) {
+          /** execute global middlewares even without a route
+           *  this allows CORS and other global middlewares to apply to all responses */
+          if (req.method === 'OPTIONS' && this.globalMiddlewares.length > 0) {
+            return await this.executeChain(req, {
+              handler: () => new Response(null, { status: 204 }),
+              middlewares: this.globalMiddlewares,
+              method: req.method
+            });
+          }
           return this.appService.handleNotFound(req);
         }
+
         req.params = match.params || {};
         req.source = match.source;
         if (match.useLogger) {
