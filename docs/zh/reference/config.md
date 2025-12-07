@@ -210,7 +210,7 @@ yasui.createServer({
   compression: true  // 启用 gzip 压缩
 });
 ```
-- **注意：** 使用 Web 标准 `CompressionStream` API（Node.js 18+、Deno、Bun）。为 JSON/文本响应提供 70%+ 的带宽减少，CPU 开销极小。
+- **注意：** 需要 Web 标准 `CompressionStream` API（Node.js 18+、Deno、Bun）。如果不可用，压缩将在启动时记录警告后被静默跳过。可用时为 JSON/文本响应提供 70%+ 的带宽减少，CPU 开销极小。
 
 ## createServer() vs createApp()
 

@@ -210,7 +210,7 @@ yasui.createServer({
   compression: true  // Enable gzip compression
 });
 ```
-- **Note:** Uses Web Standards `CompressionStream` API (Node.js 18+, Deno, Bun). Provides 70%+ bandwidth reduction for JSON/text responses with minimal CPU overhead.
+- **Note:** Requires Web Standards `CompressionStream` API (Node.js 18+, Deno, Bun). If unavailable, compression will be silently skipped with a warning logged at startup. Provides 70%+ bandwidth reduction for JSON/text responses with minimal CPU overhead when available.
 
 ## createServer() vs createApp()
 

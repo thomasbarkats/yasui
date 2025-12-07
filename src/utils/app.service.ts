@@ -66,7 +66,7 @@ export class AppService {
       const [, filename, line, column] = stack.match(this.errorRegex) || Array(0);
 
       this.logger.error(
-        'Unexpected ' + err.constructor.name,
+        'Unexpected ' + (err?.constructor?.name || 'Error'),
         req.source || 'unknown'
       );
       console.error(kleur.red(

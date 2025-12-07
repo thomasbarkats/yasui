@@ -94,6 +94,12 @@ export class Core {
       this.globalMiddlewares.push(this.appService.auth.bind(this.appService));
     }
 
+    /** warn if compression is enabled but CompressionStream is unavailable */
+    if (this.config.compression && typeof CompressionStream === 'undefined') {
+      // eslint-disable-next-line max-len
+      this.logger.warn('compression is enabled but CompressionStream API is unavailable (requires Node.js 18+, Deno, or Bun)');
+    }
+
     /** register custom injections */
     await this.registerInjections();
 
@@ -242,6 +248,11 @@ export class Core {
 
   private compressResponse(response: Response, req: YasuiRequest): Response {
     if (!this.config.compression || !response.body || response.status === 204 || response.status === 304) {
+      return response;
+    }
+
+    // Check if CompressionStream is available (Node.js 18+, Deno, Bun)
+    if (typeof CompressionStream === 'undefined') {
       return response;
     }
 

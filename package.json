@@ -1,6 +1,6 @@
 {
   "name": "yasui",
-  "version": "4.2.1",
+  "version": "4.2.2",
   "description": "Lightweight multi-runtime framework for REST and web APIs",
   "license": "AGPL-3.0-or-later",
   "author": "Thomas BARKATS",

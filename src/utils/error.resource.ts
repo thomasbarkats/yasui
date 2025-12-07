@@ -34,7 +34,7 @@ export class ErrorResource {
     this.status = err.status || HttpCode.INTERNAL_SERVER_ERROR;
     this.statusMessage = HttpCodeMap[this.status] || '';
     this.message = err?.message || '';
-    this.name = err.constructor.name;
+    this.name = err?.constructor?.name || 'Error';
 
     this.data = {};
     this.setData(err);
