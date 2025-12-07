@@ -93,8 +93,13 @@ export function validation(config?: ClassValidatorPipeConfig): Constructible<IPi
         enableImplicitConversion: true
       });
 
+      /** skip validation if transformation resulted in null/undefined */
+      if (!object || typeof object !== 'object') {
+        return value;
+      }
+
       /** validate with class-validator */
-      const errors = await validate(object as object, {
+      const errors = await validate(object, {
         whitelist: finalConfig.whitelist,
         forbidNonWhitelisted: finalConfig.forbidNonWhitelisted,
         stopAtFirstError: finalConfig.stopAtFirstError,
