@@ -1,6 +1,6 @@
 {
   "name": "@yasui/rate-limit",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "license": "AGPL-3.0-or-later",
   "exports": {
     ".": "./rate-limit.ts"

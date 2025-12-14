@@ -1,6 +1,6 @@
 {
   "name": "@yasui/cors",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "CORS middleware for YasuiJS",
   "license": "AGPL-3.0-or-later",
   "author": "Thomas BARKATS",
@@ -39,10 +39,10 @@
     "build": "rm -rf lib && tsc"
   },
   "peerDependencies": {
-    "yasui": ">= 4.0.0"
+    "yasui": ">= 4.3.0"
   },
   "devDependencies": {
     "typescript": "^5.9.3",
-    "yasui": "^4.2.0"
+    "yasui": "^4.3.0"
   }
 }

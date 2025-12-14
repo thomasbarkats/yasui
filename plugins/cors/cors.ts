@@ -49,7 +49,7 @@ export function cors(config: CorsConfig): RequestHandler {
   }
 
   return async (req: YasuiRequest, next?: NextFunction): Promise<Response> => {
-    const origin = req.rawHeaders.get('origin');
+    const origin = req.headers.get('origin');
     const isAllowed = isOriginAllowed(origin, origins, allowNullOrigin);
 
     /** handle preflight OPTIONS request */
@@ -60,7 +60,7 @@ export function cors(config: CorsConfig): RequestHandler {
       }
 
       /** check if Private Network Access is requested (CORS-RFC1918) */
-      const requestPrivateNetwork = req.rawHeaders.get('access-control-request-private-network') === 'true';
+      const requestPrivateNetwork = req.headers.get('access-control-request-private-network') === 'true';
 
       return new Response(null, {
         status: 204,

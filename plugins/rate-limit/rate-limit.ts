@@ -20,7 +20,7 @@ export interface RateLimitConfig {
   windowMs?: number;
   /** Custom key generator function. Returns identifier for rate limiting
    *  @default Uses client IP address
-   *  @example (req) => req.rawHeaders.get('x-api-key') ?? 'anonymous' */
+   *  @example (req) => req.headers.get('x-api-key') ?? 'anonymous' */
   keyGenerator?: (req: YasuiRequest) => string;
   /** Custom storage implementation
    *  @default In-memory store */
@@ -30,7 +30,7 @@ export interface RateLimitConfig {
   // eslint-disable-next-line max-len
   handler?: (req: YasuiRequest, limit: number, remaining: number, resetTime: number) => Response | unknown | Promise<Response | unknown>;
   /** Skip rate limiting based on request
-   *  @example (req) => req.rawHeaders.get('x-internal-request') === 'true' */
+   *  @example (req) => req.headers.get('x-internal-request') === 'true' */
   skip?: (req: YasuiRequest) => boolean | Promise<boolean>;
   /** Include rate limit info in response headers
    *  @default true */
@@ -103,19 +103,19 @@ class MemoryStore implements RateLimitStore {
 
 /** Extract client IP from request */
 function getClientIp(req: YasuiRequest): string {
-  const forwarded = req.rawHeaders.get('x-forwarded-for');
+  const forwarded = req.headers.get('x-forwarded-for');
   if (forwarded) {
     return forwarded.split(',')[0].trim();
   }
 
-  const realIp = req.rawHeaders.get('x-real-ip');
+  const realIp = req.headers.get('x-real-ip');
   if (realIp) {
     return realIp;
   }
 
   /** fallback: use request signature to prevent all unknowns sharing same limit */
-  const userAgent = req.rawHeaders.get('user-agent') || '';
-  const acceptLang = req.rawHeaders.get('accept-language') || '';
+  const userAgent = req.headers.get('user-agent') || '';
+  const acceptLang = req.headers.get('accept-language') || '';
   return `unknown:${hashString(userAgent + acceptLang)}`;
 }
 
