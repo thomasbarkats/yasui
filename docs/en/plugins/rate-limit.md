@@ -106,7 +106,7 @@ rateLimit({
   max: 1000,
   windowMs: 3600000,
   keyGenerator: (req) => {
-    return req.rawHeaders.get('x-api-key') ?? 'anonymous';
+    return req.headers.get('x-api-key') ?? 'anonymous';
   }
 })
 
@@ -124,7 +124,7 @@ rateLimit({
   max: 100,
   windowMs: 60000,
   keyGenerator: (req) => {
-    const ip = req.rawHeaders.get('x-forwarded-for')?.split(',')[0] ?? 'unknown';
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] ?? 'unknown';
     const endpoint = new URL(req.url).pathname;
     return `${ip}:${endpoint}`;
   }
@@ -228,7 +228,7 @@ rateLimit({
   max: 100,
   windowMs: 60000,
   handler: (req) => {
-    const acceptsHtml = req.rawHeaders.get('accept')?.includes('text/html');
+    const acceptsHtml = req.headers.get('accept')?.includes('text/html');
 
     if (acceptsHtml) {
       return new Response(
@@ -259,7 +259,7 @@ rateLimit({
   max: 100,
   windowMs: 60000,
   skip: (req) => {
-    return req.rawHeaders.get('x-internal-request') === 'true';
+    return req.headers.get('x-internal-request') === 'true';
   }
 })
 
@@ -268,7 +268,7 @@ rateLimit({
   max: 100,
   windowMs: 60000,
   skip: async (req) => {
-    const token = req.rawHeaders.get('authorization');
+    const token = req.headers.get('authorization');
     const user = await validateToken(token);
     return user?.role === 'admin';
   }
@@ -396,7 +396,7 @@ export class AuthController {
 // ✅ PRODUCTION - Validate trusted proxy
 rateLimit({
   keyGenerator: (req) => {
-    const forwarded = req.rawHeaders.get('x-forwarded-for');
+    const forwarded = req.headers.get('x-forwarded-for');
 
     // Only trust X-Forwarded-For from known proxies
     if (forwarded && isTrustedProxy(req)) {
@@ -404,7 +404,7 @@ rateLimit({
     }
 
     // Fallback: don't share rate limit across unknowns
-    const userAgent = req.rawHeaders.get('user-agent') || '';
+    const userAgent = req.headers.get('user-agent') || '';
     return `fallback:${hashUserAgent(userAgent)}`;
   }
 })
@@ -439,7 +439,7 @@ rateLimit({
     console.warn(`Rate limit exceeded: ${req.url}`);
     await logSecurityEvent({
       type: 'rate_limit_exceeded',
-      ip: req.rawHeaders.get('x-forwarded-for'),
+      ip: req.headers.get('x-forwarded-for'),
       endpoint: req.url
     });
 

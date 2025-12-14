@@ -41,11 +41,11 @@ export function routeHandler(
     if (
       needsBody &&
       req.method !== 'GET' &&
-      req.rawHeaders.get('content-type')?.includes('application/json')
+      req.headers.get('content-type')?.includes('application/json')
     ) {
       // Check body size limit before parsing
       if (maxBodySize) {
-        const contentLength = req.rawHeaders.get('content-length');
+        const contentLength = req.headers.get('content-length');
         if (contentLength) {
           const bodySize = parseInt(contentLength, 10);
           if (!isNaN(bodySize) && bodySize > maxBodySize) {
@@ -78,8 +78,11 @@ export function routeHandler(
       if (param.path[0] === 'next') {
         value = next;
       } else if (param.path[0] === 'req' && param.path[1] === 'headers' && param.path.length === 3) {
-        // Optimize single header access to avoid Object.fromEntries() conversion
-        value = req.rawHeaders.get(param.path[2]) ?? null;
+        value = req.headers.get(param.path[2]) ?? null;
+      } else if (param.path[0] === 'req' && param.path[1] === 'body') {
+        // Access parsed body instead of ReadableStream
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        value = param.path.slice(2).reduce((prev: any, curr: string) => prev?.[curr] ?? null, req.parsedBody);
       } else {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         value = param.path.slice(1).reduce((prev: any, curr: string) => prev?.[curr] ?? null, req);

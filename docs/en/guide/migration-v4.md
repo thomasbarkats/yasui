@@ -91,31 +91,43 @@ export class AuthMiddleware {
 
 ### 3. Request Object Changes
 
-`@Req()` provides a web-standard Request object, rather than Express; only some properties remain compatible.
+`@Req()` now provides a **truly web-standard Request object** with additional convenience properties.
 
-**Express-compatible properties** (still available):
+**Native web-standard properties:**
+- `req.body` - ReadableStream (web-standard)
+- `req.headers` - Headers object (web-standard)
+- `req.method`, `req.url` - Standard Request properties
+
+**Additional convenience properties:**
+- `req.parsedBody` - Parsed JSON body (cached)
+- `req.flatHeaders` - Plain object for Express-style access
 - `req.path` - Pathname without query string
 - `req.hostname` - Host without port
 - `req.protocol` - "http" or "https"
 - `req.ip` - Client IP address
 - `req.query` - Parsed query object
 - `req.cookies` - Parsed cookies object
-- `req.body` - Parsed request body
-- `req.headers` - Returns plain object for property access
+- `req.params` - Route parameters
 
-**After (v4.x):**
+**After (>= v4.3):**
 ```typescript
 @Get('/users')
 getUsers(@Req() req: Request) {
-  // Headers via .get() on native Headers object
-  const auth = req.rawHeaders.get('authorization');
+  // Web-standard Headers API (recommended)
+  const auth = req.headers.get('authorization');
 
-  // Express-compatible properties still work
-  const auth = req.headers.authorization;
+  // Or Express-style via flatHeaders
+  const auth = req.flatHeaders['authorization'];
+
+  // Convenience properties
   const page = req.query.page;
   const path = req.path;
 }
 ```
+
+**Note for versions < v4.3:**
+
+Backward compatibility of header and body properties in Express format was initially proposed to prevent breaking changes, but this prevented true compatibility with Web Standards. It was therefore abandoned.
 
 ### 4. Custom Response Handling Changes
 

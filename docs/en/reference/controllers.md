@@ -259,11 +259,13 @@ export class UserController {
 **Available request properties:**
 - `url` - Full request URL
 - `method` - HTTP method (GET, POST, etc.)
-- `headers` / `rawHeaders` - Request headers (see [Headers Access](#headers-access))
+- `headers` - Native Headers object (web-standard)
+- `flatHeaders` - Plain object for Express-style access
 - `params` - Route parameters
 - `query` - Query string parameters
 - `cookies` - Parsed cookies
-- `body` - Parsed request body
+- `body` - Native ReadableStream (web-standard)
+- `parsedBody` - Parsed JSON body (cached)
 - `path` - Request pathname
 - `hostname` - Request hostname
 - `protocol` - Request protocol (http/https)
@@ -273,29 +275,23 @@ export class UserController {
 
 YasuiJS provides two ways to access headers:
 
-**Express-style (plain object)**
-
-For compatibility by avoiding a breaking change since v3.
+**Web Standards (recommended):**
 ```typescript
 @Get('/')
 getUsers(@Req() req: Request) {
-  const auth = req.headers.authorization;        // Dot notation
-  const type = req.headers['content-type'];      // Bracket notation
+  const auth = req.headers.get('authorization');
+  const type = req.headers.get('content-type');
 }
 ```
 
-**Native Web Standards (Headers object):**
+**Express-style (plain object):**
 ```typescript
 @Get('/')
 getUsers(@Req() req: Request) {
-  const auth = req.rawHeaders.get('authorization');
-  const type = req.rawHeaders.get('content-type');
+  const auth = req.flatHeaders.authorization;        // Dot notation
+  const type = req.flatHeaders['content-type'];      // Bracket notation
 }
 ```
-
-**When to use:**
-- `req.headers` - When accessing multiple headers or prefer Express-style syntax
-- `req.rawHeaders` - Best for single header checks, better performance (no object conversion)
 
 ### Creating Custom Request Decorators
 

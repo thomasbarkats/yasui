@@ -17,11 +17,8 @@ export class YasuiRequest extends Request {
   /** Source controller or middleware name for debugging */
   source?: string;
 
-  /** Cached parsed body to avoid re-parsing */
-  private _parsedBody?: any;
-
-  /** Cached headers as plain object for Express-style access */
-  private _headersObj?: Record<string, string>;
+  /** Parsed body cache (use instead of body.getReader()) */
+  parsedBody?: any;
 
   /** Cached parsed query string */
   private _query?: Record<string, string | string[]>;
@@ -32,38 +29,28 @@ export class YasuiRequest extends Request {
   /** Cached parsed URL object to avoid re-parsing */
   private _parsedUrl?: URL;
 
+  /** Cached flat headers object for Express-compatible access */
+  private _flatHeaders?: Record<string, string>;
+
   constructor(input: globalThis.RequestInfo | URL, init?: globalThis.RequestInit) {
     super(input, init);
   }
 
   /**
-   * Get parsed body (Express-compatible property)
-   * Returns cached parsed body from json() call
-   * Note: This shadows the Web Standard Request.body (ReadableStream)
+   * Get headers as flat object for Express-compatible access
+   * Use this for Express-style: req.flatHeaders['content-type']
+   * For web-standard access, use req.headers.get('content-type')
    */
-  override get body(): any {
-    return this._parsedBody;
-  }
-
-  /**
-   * Get headers as a plain object for Express-style property access
-   * Allows req.headers.something or req.headers['content-type']
-   * Note: This intentionally overrides the standard Headers type for Express compatibility
-   */
-  override get headers(): any {
-    if (!this._headersObj) {
-      this._headersObj = Object.fromEntries(super.headers.entries());
+  get flatHeaders(): Record<string, string> {
+    if (!this._flatHeaders) {
+      this._flatHeaders = Object.fromEntries(this.headers.entries());
     }
-    return this._headersObj;
+    return this._flatHeaders;
   }
 
-  /**
-   * Get native Headers object for performance-critical operations
-   * Use this when you only need to check one or two headers via .get()
-   * to avoid converting all headers to a plain object
-   */
+  /** @deprecated Use req.headers directly (now returns native Headers object) */
   get rawHeaders(): Headers {
-    return super.headers;
+    return this.headers;
   }
 
   /** Get the pathname of the URL - without query string (Express-compatible property) */
@@ -73,7 +60,7 @@ export class YasuiRequest extends Request {
 
   /** Get hostname from the Host header (Express-compatible property) */
   get hostname(): string {
-    const host = this.headers.host || '';
+    const host = this.headers.get('host') || '';
     // Remove port if present
     return host.split(':')[0];
   }
@@ -81,7 +68,7 @@ export class YasuiRequest extends Request {
   /** Get protocol http or https (Express-compatible property) */
   get protocol(): string {
     // Check X-Forwarded-Proto header (common with proxies/load balancers)
-    const forwarded = this.headers['x-forwarded-proto'];
+    const forwarded = this.headers.get('x-forwarded-proto');
     if (forwarded) {
       return forwarded.split(',')[0].trim();
     }
@@ -95,12 +82,12 @@ export class YasuiRequest extends Request {
    */
   get ip(): string | undefined {
     // Check X-Forwarded-For (leftmost = client)
-    const forwarded = this.headers['x-forwarded-for'];
+    const forwarded = this.headers.get('x-forwarded-for');
     if (forwarded) {
       return forwarded.split(',')[0].trim();
     }
     // Check X-Real-IP
-    const realIp = this.headers['x-real-ip'];
+    const realIp = this.headers.get('x-real-ip');
     if (realIp) {
       return realIp;
     }
@@ -125,7 +112,7 @@ export class YasuiRequest extends Request {
   get cookies(): Record<string, string> {
     if (!this._cookies) {
       this._cookies = {};
-      const cookieHeader = this.headers.cookie;
+      const cookieHeader = this.headers.get('cookie');
       if (cookieHeader) {
         cookieHeader.split(';').forEach((cookie: string) => {
           const [key, ...valueParts] = cookie.split('=');
@@ -151,16 +138,16 @@ export class YasuiRequest extends Request {
    * Returns cached value on subsequent calls
    */
   override async json(): Promise<any> {
-    if (this._parsedBody !== undefined) {
-      return this._parsedBody;
+    if (this.parsedBody !== undefined) {
+      return this.parsedBody;
     }
-    this._parsedBody = await super.json();
-    return this._parsedBody;
+    this.parsedBody = await super.json();
+    return this.parsedBody;
   }
 }
 
 
-/** Type alias for yasui Request */
+/** Type alias for YasuiJS Request */
 export type Request = YasuiRequest;
 
 /** Next function for middleware chain */
@@ -172,7 +159,7 @@ export type RequestHandler = (
   next?: NextFunction
 ) => MaybePromise<Response | JsonValue | void>;
 
-/** Fetch handler type for yasui apps */
+/** Fetch handler type for YasuiJS apps */
 export type FetchHandler = {
   fetch: (req: globalThis.Request) => MaybePromise<Response>;
 };

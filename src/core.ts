@@ -250,7 +250,7 @@ export class Core {
       return response;
     }
 
-    const acceptEncoding = req.rawHeaders.get('accept-encoding') || '';
+    const acceptEncoding = req.headers.get('accept-encoding') || '';
     if (!acceptEncoding.includes('gzip')) {
       return response;
     }

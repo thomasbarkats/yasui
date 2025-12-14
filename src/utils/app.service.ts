@@ -27,7 +27,7 @@ export class AppService {
     req: YasuiRequest,
     next?: NextFunction
   ): MaybePromise<Response> {
-    const apiKey = req.headers['x-api-key'];
+    const apiKey = req.headers.get('x-api-key');
     if (apiKey === this.appConfig.apiKey && next) {
       return next();
     }

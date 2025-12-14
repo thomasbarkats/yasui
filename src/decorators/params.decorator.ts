@@ -84,7 +84,7 @@ export const Res: RouteParamDecorator = routeParamDecorator(RouteParamTypes.RES)
 /** @deprecated Middleware should use async/await pattern instead of next() */
 export const Next: RouteParamDecorator = routeParamDecorator(RouteParamTypes.NEXT);
 
-/** Extracts specific header from `req.headers[name]`
+/** Extracts specific header from `req.headers.get(name)`
  *  @param items If you are expecting an array, specify the type of items */
 export const Header: RouteReqParamDecorator = routeRequestParamDecorator(RouteRequestParamTypes.HEADER);
 /** Extracts specific path parameter from `req.params[name]`
