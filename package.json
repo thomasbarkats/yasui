@@ -1,6 +1,6 @@
 {
   "name": "yasui",
-  "version": "4.3.0",
+  "version": "4.3.1",
   "description": "Lightweight multi-runtime framework for REST and web APIs",
   "license": "AGPL-3.0-or-later",
   "author": "Thomas BARKATS",
@@ -47,7 +47,6 @@
   },
   "scripts": {
     "example": "npm run build && node lib/example/app.js",
-    "preinstall": "rm -f package-lock.json && sh scripts/only-allow-pnpm.sh",
     "build": "sh scripts/build.sh",
     "build:plugins": "pnpm -r --filter @yasui/* build",
     "lint": "eslint . --ext .ts --fix",
