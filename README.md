@@ -76,6 +76,8 @@ yasui.createServer({
 Production-ready middlewares and utilities for YasuiJS:
 
 - **[@yasui/cors](https://www.npmjs.com/package/@yasui/cors)** ([JSR](https://jsr.io/@yasui/cors)) - CORS middleware
+- **[@yasui/rate-limit](https://www.npmjs.com/package/@yasui/rate-limit)** ([JSR](https://jsr.io/@yasui/rate-limit)) - Rate limiting middleware
+- **[@yasui/validation](https://www.npmjs.com/package/@yasui/validation)** ([JSR](https://jsr.io/@yasui/validation)) - Automatic DTO validation middleware
 
 ## Why YasuiJS?
 
@@ -92,16 +94,6 @@ Instead of manually registering routes and extracting parameters, you declare wh
 
 ### Multi-Runtime Support
 Built on web standards, YasuiJS provides a portable, standard codebase for JavaScript runtimes, capable of running on Node.js, Deno, and Bun with [SRVX](https://srvx.h3.dev), a universal server abstraction based on the Fetch API. Future-proof your applications with standard web APIs.
-
-## Migration from 3.x (Express)
-
-Version 4.x migrated from Express to Web Standards. **Key breaking changes:**
-
-- **Express middlewares are not compatible** - Use Web Standards-based alternatives or write native Yasui middlewares
-- Request/Response objects now follow Web Standards (immutable)
-- Most features remain unchanged - decorators, DI, routing all work the same way
-
-See the [migration guide](https://yasui.app/guide/migration.html) for more details.
 
 ## Contributing
 
