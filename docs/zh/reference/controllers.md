@@ -178,6 +178,40 @@ TypeScript 无法在运行时检测数组项类型，因此您必须为非字符
 @Header('headerName', [Type]) headerName: Type[]
 ```
 
+### 枚举验证
+
+可以通过定义一组允许的值来强制执行枚举约束以进行参数验证：
+
+```typescript
+// 使用 'as const' 定义允许的值（推荐的 TypeScript 模式）
+const LANGS = ['en', 'fr', 'es'] as const;
+type Lang = typeof LANGS[number];
+
+// 或使用 TypeScript 枚举
+enum UserRole {
+  Admin = 'admin',
+  User = 'user',
+  Guest = 'guest'
+}
+
+@Controller('/api')
+export class ApiController {
+  @Get('/content')
+  getContent(
+    @Query('lang', LANGS) lang?: Lang,        // 验证 ['en', 'fr', 'es']
+    @Query('role', UserRole) role?: UserRole, // 验证枚举值
+  ) {
+    return { lang, role };
+  }
+}
+```
+
+**行为：**
+- 如果值匹配允许的枚举值之一，则按原样返回
+- 对于数字枚举，会尝试自动转换（例如：`"1"` → `1`）
+- 使用 `strictValidation: false`（默认）：对无效值返回 `null`
+- 使用 `strictValidation: true`：抛出 HTTP 400 错误并带有描述性消息
+
 ### 严格验证模式
 
 默认情况下，YasuiJS 在类型转换失败时返回无效值（NaN、Invalid Date、null）。在配置中启用 `strictValidation` 以抛出 HTTP 400 错误：

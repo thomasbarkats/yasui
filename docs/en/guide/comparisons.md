@@ -159,13 +159,13 @@ import { Controller, Get, Param, Query } from 'yasui';
 export class UserController {
   @Get('/:id')
   getUser(
-    @Param('id') id: number,           // Automatically converted to number
-    @Query('include') include: boolean, // Automatically converted to boolean
-    @Query('tags', [String]) tags: string[]  // Array support
+    @Param('id') id: number,                // Automatically converted to number
+    @Query('include') include: boolean,     // Automatically converted to boolean
+    @Query('tags', [String]) tags: string[] // Array support
   ) {
-    console.log(typeof id);      // 'number'
-    console.log(typeof include); // 'boolean'
-    console.log(Array.isArray(tags)); // true
+    console.log(typeof id);                 // 'number'
+    console.log(typeof include);            // 'boolean'
+    console.log(Array.isArray(tags));       // true
 
     return { id, include, tags };
   }

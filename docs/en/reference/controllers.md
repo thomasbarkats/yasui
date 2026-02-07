@@ -178,6 +178,40 @@ TypeScript cannot detect array item types at runtime, so you must specify `[Type
 @Header('headerName', [Type]) headerName: Type[]
 ```
 
+### Enum Validation
+
+Enum constraints can be enforced by defining a set of allowed values for parameter validation:
+
+```typescript
+// Define allowed values using 'as const' (recommended TypeScript pattern)
+const LANGS = ['en', 'fr', 'es'] as const;
+type Lang = typeof LANGS[number];
+
+// Or use a TypeScript enum
+enum UserRole {
+  Admin = 'admin',
+  User = 'user',
+  Guest = 'guest'
+}
+
+@Controller('/api')
+export class ApiController {
+  @Get('/content')
+  getContent(
+    @Query('lang', LANGS) lang?: Lang,        // Validates ['en', 'fr', 'es']
+    @Query('role', UserRole) role?: UserRole, // Validates enum values
+  ) {
+    return { lang, role };
+  }
+}
+```
+
+**Behavior:**
+- If the value matches one of the allowed enum values, it is returned as-is
+- For numeric enums, automatic conversion is attempted (e.g., `"1"` → `1`)
+- With `strictValidation: false` (default): Returns `null` for invalid values
+- With `strictValidation: true`: Throws HTTP 400 error with descriptive message
+
 ### Strict Validation Mode
 
 By default, YasuiJS returns invalid values (NaN, Invalid Date, null) when type casting fails. Enable `strictValidation` in your config to throw an HTTP 400 error instead:

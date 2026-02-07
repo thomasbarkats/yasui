@@ -159,9 +159,9 @@ import { Controller, Get, Param, Query } from 'yasui';
 export class UserController {
   @Get('/:id')
   getUser(
-    @Param('id') id: number,           // Convertido automáticamente a número
-    @Query('include') include: boolean, // Convertido automáticamente a booleano
-    @Query('tags', [String]) tags: string[]  // Soporte para arrays
+    @Param('id') id: number,                // Convertido automáticamente a número
+    @Query('include') include: boolean,     // Convertido automáticamente a booleano
+    @Query('tags', [String]) tags: string[] // Soporte para arrays
   ) {
     console.log(typeof id);      // 'number'
     console.log(typeof include); // 'boolean'

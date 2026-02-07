@@ -159,9 +159,9 @@ import { Controller, Get, Param, Query } from 'yasui';
 export class UserController {
   @Get('/:id')
   getUser(
-    @Param('id') id: number,           // 自动转换为数字
-    @Query('include') include: boolean, // 自动转换为布尔值
-    @Query('tags', [String]) tags: string[]  // 数组支持
+    @Param('id') id: number,                // 自动转换为数字
+    @Query('include') include: boolean,     // 自动转换为布尔值
+    @Query('tags', [String]) tags: string[] // 数组支持
   ) {
     console.log(typeof id);      // 'number'
     console.log(typeof include); // 'boolean'

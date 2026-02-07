@@ -178,6 +178,40 @@ TypeScript ne peut pas détecter les types d'éléments de tableau à l'exécuti
 @Header('headerName', [Type]) headerName: Type[]
 ```
 
+### Validation Enum
+
+Les contraintes enum peuvent être appliquées en définissant un ensemble de valeurs autorisées pour la validation des paramètres :
+
+```typescript
+// Définir les valeurs autorisées avec 'as const' (pattern TypeScript recommandé)
+const LANGS = ['en', 'fr', 'es'] as const;
+type Lang = typeof LANGS[number];
+
+// Ou utiliser un enum TypeScript
+enum UserRole {
+  Admin = 'admin',
+  User = 'user',
+  Guest = 'guest'
+}
+
+@Controller('/api')
+export class ApiController {
+  @Get('/content')
+  getContent(
+    @Query('lang', LANGS) lang?: Lang,        // Valide ['en', 'fr', 'es']
+    @Query('role', UserRole) role?: UserRole, // Valide les valeurs enum
+  ) {
+    return { lang, role };
+  }
+}
+```
+
+**Comportement :**
+- Si la valeur correspond à l'une des valeurs enum autorisées, elle est retournée telle quelle
+- Pour les enums numériques, une conversion automatique est tentée (ex : `"1"` → `1`)
+- Avec `strictValidation: false` (défaut) : Retourne `null` pour les valeurs invalides
+- Avec `strictValidation: true` : Lance une erreur HTTP 400 avec un message descriptif
+
 ### Mode de validation stricte
 
 Par défaut, YasuiJS retourne des valeurs invalides (NaN, Invalid Date, null) lors de l'échec de conversion de type. Activez `strictValidation` dans votre configuration pour lancer une erreur HTTP 400 à la place :
