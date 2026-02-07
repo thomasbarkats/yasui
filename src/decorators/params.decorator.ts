@@ -2,6 +2,11 @@ import { RouteRequestParamTypes, RouteParamTypes } from '../enums/index.js';
 import { ReflectMetadata, getMetadata, defineMetadata } from '../utils/reflect.js';
 import { ArrayItem, IRouteParam } from '../interfaces/index.js';
 
+/** Enum-like object (TypeScript enum or as const object) */
+type EnumLike = Record<string, string | number>;
+
+/** Array of allowed enum values for validation */
+type EnumValues = readonly (string | number)[];
 
 type RouteParamDecorator = (
   varName?: string,
@@ -18,16 +23,37 @@ function routeParamDecorator(source: RouteParamTypes): RouteParamDecorator {
 
 type RouteReqParamDecorator = (
   varName?: string,
-  items?: [ArrayItem]
+  itemsOrEnum?: [ArrayItem] | EnumLike | EnumValues,
 ) => ParameterDecorator;
 
 /** Factory function for creating parameter decorators that extract request data */
 export function routeRequestParamDecorator(reqProperty: string): RouteReqParamDecorator {
   return function (
     varName?: string,
-    items?: [ArrayItem]
+    itemsOrEnum?: [ArrayItem] | EnumLike | EnumValues,
   ): ParameterDecorator {
-    return extractParam(RouteParamTypes.REQ, reqProperty, varName, items ? items[0] : undefined);
+    // Handle array items, enum objects, and enum value arrays
+    let itemsType: ArrayItem | undefined;
+    let enumValues: EnumLike | EnumValues | undefined;
+
+    if (itemsOrEnum) {
+      if (Array.isArray(itemsOrEnum)) {
+        // Check if it's an array of constructors (e.g., [String]) or literal values (e.g., ['en', 'fr'])
+        const firstItem = itemsOrEnum[0];
+        if (firstItem === String || firstItem === Number || firstItem === Boolean) {
+          // Array element type: [String], [Number], [Boolean]
+          itemsType = firstItem as ArrayItem;
+        } else {
+          // Enum values array: ['en', 'fr', 'es']
+          enumValues = itemsOrEnum as unknown as EnumValues;
+        }
+      } else if (typeof itemsOrEnum === 'object') {
+        // Enum object: UserStatus, Priority, etc.
+        enumValues = itemsOrEnum as EnumLike;
+      }
+    }
+
+    return extractParam(RouteParamTypes.REQ, reqProperty, varName, itemsType, enumValues);
   };
 }
 
@@ -37,7 +63,8 @@ function extractParam(
   source: RouteParamTypes,
   reqProperty?: string,
   varName?: string,
-  itemsType?: ArrayItem
+  itemsType?: ArrayItem,
+  enumValues?: EnumLike | EnumValues
 ): ParameterDecorator {
   return function (
     target: object,
@@ -64,6 +91,7 @@ function extractParam(
       type: paramType,
       itemsType,
       path,
+      enumValues,
     };
 
     /** add mapped param to route metadata */

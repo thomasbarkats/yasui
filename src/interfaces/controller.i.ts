@@ -25,10 +25,18 @@ export interface IControllerRoute {
 // eslint-disable-next-line @typescript-eslint/no-wrapper-object-types
 export type ArrayItem = Constructible<Number | Boolean | String>;
 
+/** Enum-like object (TypeScript enum or as const object) */
+export type EnumLike = Record<string, string | number>;
+
+/** Array of allowed enum values for validation */
+export type EnumValues = readonly (string | number)[];
+
 /** Parameter metadata for route handlers */
 export interface IRouteParam {
   index: number;
   type: Function;
-  itemsType?: ArrayItem;
   path: string[];
+  itemsType?: ArrayItem;
+  /** Optional enum values for validation (enum object or array of allowed values) */
+  enumValues?: EnumLike | EnumValues;
 }

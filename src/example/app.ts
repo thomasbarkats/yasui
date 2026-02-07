@@ -9,6 +9,7 @@ createServer({
   environment: 'development',
   port: 8081,
   debug: true,
+  strictValidation: true,
   swagger: {
     generate: true,
     path: 'api-docs',

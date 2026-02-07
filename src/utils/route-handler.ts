@@ -1,9 +1,17 @@
 import { RequestHandler, NextFunction, YasuiRequest } from '../web.js';
 import { ReflectMetadata, getMetadata } from './reflect.js';
 import { RouteRequestParamTypes } from '../enums/index.js';
-import { IRouteParam, IPipeTransform, IParamMetadata, ArrayItem, JsonValue } from '../interfaces/index.js';
 import { HttpError } from './error.resource.js';
 import { HttpCode } from '../enums/index.js';
+import {
+  IRouteParam,
+  IPipeTransform,
+  IParamMetadata,
+  ArrayItem,
+  JsonValue,
+  EnumLike,
+  EnumValues,
+} from '../interfaces/index.js';
 
 
 /** Create yasui route handler from controller/middleware method */
@@ -90,7 +98,14 @@ export function routeHandler(
 
       // Cast string values from HTTP (params/query/headers) to target types
       if (value !== null && param.type && shouldCastParam(param.path)) {
-        value = castParamValue(<string>value, param.type, param.path[2], strictValidation, param.itemsType);
+        value = castParamValue(
+          <string>value,
+          param.type,
+          param.path[2],
+          strictValidation,
+          param.itemsType,
+          param.enumValues
+        );
       }
 
       // Apply validation/transformation pipes
@@ -140,6 +155,7 @@ function castParamValue(
   paramName: string,
   strictValidation?: boolean,
   itemsType?: ArrayItem,
+  enumValues?: EnumLike | EnumValues,
 ): unknown {
   // Handle Array type first (uses all values)
   if (paramType === Array) {
@@ -154,6 +170,41 @@ function castParamValue(
 
   // For non-Array types, use first value if array is provided
   const singleValue = Array.isArray(value) ? value[0] : value;
+
+  // Handle enum validation if enumValues are provided
+  if (enumValues) {
+    let allowedValues = Array.isArray(enumValues)
+      ? enumValues
+      : Object.values(enumValues);
+
+    // For numeric enums (bidirectional mapping), filter to only keep numeric values
+    // Numeric enums have both string keys and numeric values in Object.values()
+    const hasNumbers = allowedValues.some(v => typeof v === 'number');
+    const hasStrings = allowedValues.some(v => typeof v === 'string');
+    if (hasNumbers && hasStrings) {
+      // This is a numeric enum with bidirectional mapping - keep only numeric values
+      allowedValues = allowedValues.filter(v => typeof v === 'number');
+    }
+
+    if (allowedValues.includes(singleValue)) {
+      return singleValue;
+    }
+
+    if (hasNumbers) {
+      const numValue = Number(singleValue);
+      if (!isNaN(numValue) && allowedValues.includes(numValue)) {
+        return numValue;
+      }
+    }
+
+    if (strictValidation) {
+      throw new HttpError(
+        HttpCode.BAD_REQUEST,
+        `Parameter '${paramName || 'value'}' expected one of [${allowedValues.join(', ')}], got '${singleValue}'`
+      );
+    }
+    return null;
+  }
 
   switch (paramType) {
     case Number: {
