@@ -12,28 +12,31 @@
     },
     {
       "value": "core",
-      "description": "Change(s) on application core"
-    },
-    {
-      "value": "config",
-      "description": "Project configuration"
+      "description": "Change(s) on the application core"
     },
     {
       "value": "test",
       "description": "Change(s) related to tests"
     },
     {
-      "value": "doc",
-      "description": "Documentation / comment(s)"
+      "value": "config",
+      "description": "Project configuration"
     },
     {
-      "value": "type",
-      "description": "Application usage typing"
+      "value": "doc",
+      "description": "Documentation / comment(s)"
     }
   ],
   "minLength": 8,
-  "maxLength": 70,
-  "changeVersion": "never",
+  "maxLength": 80,
+  "changeVersion": "ignore",
   "showAllVersionTypes": false,
-  "stageAllChanges": false
+  "ai": {
+    "enabled": true,
+    "provider": "anthropic",
+    "model": "claude-haiku-4-5",
+    "envPath": ".env",
+    "envKeyName": "ANTHROPIC_API_KEY",
+    "largeDiffTokenThreshold": 12000
+  }
 }

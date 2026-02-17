@@ -15,3 +15,4 @@ plugins/*/lib
 plugins/*/node_modules
 
 scripts/.env
+.env
