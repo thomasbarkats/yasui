@@ -1,12 +1,7 @@
 import { RouteRequestParamTypes, RouteParamTypes } from '../enums/index.js';
 import { ReflectMetadata, getMetadata, defineMetadata } from '../utils/reflect.js';
-import { ArrayItem, IRouteParam } from '../interfaces/index.js';
+import { ArrayItem, EnumLike, EnumValues, IRouteParam } from '../interfaces/index.js';
 
-/** Enum-like object (TypeScript enum or as const object) */
-type EnumLike = Record<string, string | number>;
-
-/** Array of allowed enum values for validation */
-type EnumValues = readonly (string | number)[];
 
 type RouteParamDecorator = (
   varName?: string,
