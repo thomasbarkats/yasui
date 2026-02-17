@@ -6,19 +6,19 @@ Validation automatique des DTO pour les applications YasuiJS utilisant [class-va
 
 ::: code-group
 ```bash [npm]
-npm install @yasui/validation class-validator class-transformer
+npm install class-validator class-transformer @yasui/validation
 ```
 
 ```bash [pnpm]
-pnpm add @yasui/validation class-validator class-transformer
+pnpm add class-validator class-transformer @yasui/validation
 ```
 
 ```bash [bun]
-bun add @yasui/validation class-validator class-transformer
+bun add class-validator class-transformer @yasui/validation
 ```
 
 ```bash [deno]
-deno add jsr:@yasui/validation npm:class-validator npm:class-transformer
+deno add npm:class-validator npm:class-transformer jsr:@yasui/validation
 ```
 :::
 
